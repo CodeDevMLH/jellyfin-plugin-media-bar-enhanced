@@ -858,7 +858,7 @@ const LocalizationUtils = {
       try {
         const userId = window.ApiClient.getCurrentUserId();
         if (userId) {
-          const userUrl = window.ApiClient.getUrl(`Users/${userId}`);
+          const userUrl = `${STATE.jellyfinData.serverAddress}/Users/${userId}`;
           const userResponse = await fetch(userUrl, {
             headers: ApiUtils.getAuthHeaders(),
           });
@@ -876,7 +876,7 @@ const LocalizationUtils = {
 
     if (!locale && window.ApiClient && (STATE.jellyfinData && STATE.jellyfinData.accessToken)) {
       try {
-        const configUrl = window.ApiClient.getUrl('System/Configuration');
+        const configUrl = `${STATE.jellyfinData.serverAddress}/System/Configuration`;
         const configResponse = await fetch(configUrl, {
           headers: ApiUtils.getAuthHeaders(),
         });
@@ -3677,11 +3677,11 @@ const MediaBarEnhancedSettingsManager = {
     button.title = 'Media Bar Settings';
     // button.innerHTML = '<span class="material-icons">tune</span>';
 
-    // button.innerHTML = `<img src="${window.ApiClient.getUrl('/MediaBarEnhanced/Resources/assets/logo_SW.svg')}" style="width: 24px; height: 24px; vertical-align: middle;">`;
+    // button.innerHTML = `<img src="${STATE.jellyfinData.serverAddress}/MediaBarEnhanced/Resources/assets/logo_SW.svg" style="width: 24px; height: 24px; vertical-align: middle;">`;
     // currently not optimal, as it's egg-shaped due to the svg format... but if it's square, it's very small...
-    // button.innerHTML = `<img src="${window.ApiClient.getUrl('/MediaBarEnhanced/Resources/assets/logo_SW.svg')}" draggable="false" style="width: 52px; height: 24px; vertical-align: middle; pointer-events: none;">`;
-    // button.innerHTML = `<img src="${window.ApiClient.getUrl('/MediaBarEnhanced/Resources/assets/logo_SW_SHORT.svg')}" draggable="false" style="width: 41px; height: 24px; vertical-align: middle; pointer-events: none;">`;
-    button.innerHTML = `<img src="${window.ApiClient.getUrl('/MediaBarEnhanced/Resources/assets/logo_SW_MINIMAL.svg')}" draggable="false" style="width: 24px; height: 24px; vertical-align: middle; pointer-events: none;">`;
+    // button.innerHTML = `<img src="${STATE.jellyfinData.serverAddress}/MediaBarEnhanced/Resources/assets/logo_SW.svg" draggable="false" style="width: 52px; height: 24px; vertical-align: middle; pointer-events: none;">`;
+    // button.innerHTML = `<img src="${STATE.jellyfinData.serverAddress}/MediaBarEnhanced/Resources/assets/logo_SW_SHORT.svg" draggable="false" style="width: 41px; height: 24px; vertical-align: middle; pointer-events: none;">`;
+    button.innerHTML = `<img src="${STATE.jellyfinData.serverAddress}/MediaBarEnhanced/Resources/assets/logo_SW_MINIMAL.svg" draggable="false" style="width: 24px; height: 24px; vertical-align: middle; pointer-events: none;">`;
     
     button.style.verticalAlign = 'middle';
 
@@ -3994,7 +3994,7 @@ const slidesInit = async () => {
       
       // If activeOverlayImage starts with /, adjust for base URL
       if (activeOverlayImage.startsWith('/') && !activeOverlayImage.startsWith('//')) {
-          img.src = window.ApiClient.getUrl(activeOverlayImage);
+          img.src = `${STATE.jellyfinData.serverAddress}${activeOverlayImage}`;
       } else {
           img.src = activeOverlayImage;
       }
