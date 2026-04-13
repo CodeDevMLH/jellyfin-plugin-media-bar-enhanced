@@ -142,6 +142,8 @@
                                     style="width: 100%; height: 150px; font-family: monospace;"></textarea>
                                 <div class="fieldDescription">Enter the IDs of the items you want to show in the
                                     slideshow as your default content. You can separate them by new line or comma.
+                                    <br>
+                                    <b style="color:#00a4dc">Tip:</b> You can simply paste full Jellyfin item URLs here and the IDs will be automatically extracted!
                                     <br><br>
                                     <b>Manual Trailer/Video Override:</b> You can specify a YouTube URL <b>OR</b> a
                                     Jellyfin Item ID (e.g. for a Theme Video) for an item by adding it in
@@ -1007,7 +1009,7 @@
                         '<div class="inputContainer">' +
                         '    <label class="inputLabel" style="margin-bottom:0.5em; display:block;">Media IDs</label>' +
                         '    <textarea is="emby-textarea" class="emby-textarea section-ids" style="width: 100%; height: 80px; font-family: monospace;">' + (data.MediaIds || '') + '</textarea>' +
-                        '    <div class="fieldDescription">Comma-separated or Newline separated list of Movie/Series/Collection IDs to show during this season.<br>Same options available as for the default media IDs.</div>' +
+                        '    <div class="fieldDescription">Comma-separated or Newline separated list of Movie/Series/Collection IDs to show during this season.<br>Same options available as for default media IDs.<br><b style="color:#00a4dc">Tip:</b> You can also simply paste full Jellyfin item URLs here!</div>' +
                         '</div>' + 
                         '<h3 class="inputLabel" style="margin-top: 1.5em; margin-bottom: 0.5em;">Custom Overlay Overrides</h3>' +
                         '<div style="display: flex; flex-wrap: wrap; gap: 1em; align-items: flex-start;">' +
@@ -1270,6 +1272,23 @@
                 e.preventDefault();
                 MediaBarEnhancedConfigurationPage.saveConfiguration(document.querySelector('#MediaBarEnhancedConfigurationPage'));
                 return false;
+            });
+            document.querySelector('#MediaBarEnhancedConfigurationPage').addEventListener('input', function(e) {
+                if (e.target && (e.target.id === 'CustomMediaIds' || e.target.classList.contains('section-ids'))) {
+                    var target = e.target;
+                    if (!target.value) return;
+                    
+                    var originalValue = target.value;
+                    
+                    // Replace URLs matching .../?id=XXXX&... with just XXXX
+                    var modifiedValue = originalValue.replace(/https?:\/\/[^\s,]*[?&]id=([a-f0-9]{32})[^\s,]*/gi, '$1');
+                    
+                    if (originalValue !== modifiedValue) {
+                        if (target.value !== modifiedValue) {
+                            target.value = modifiedValue;
+                        }
+                    }
+                }
             });
         </script>
 
