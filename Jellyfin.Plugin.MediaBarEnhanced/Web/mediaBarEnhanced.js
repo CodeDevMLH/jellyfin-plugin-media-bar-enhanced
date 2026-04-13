@@ -2648,13 +2648,17 @@ const SlideshowManager = {
 
           if (videoBackdrop.tagName === 'VIDEO') {
             videoBackdrop.play().catch(e => {
+              // Ignore intentional aborts when sliding away quickly
+              if (e.name === 'AbortError') return;
               if (!STATE.slideshow.isMuted) {
                 // Check if it actually started playing after a short delay (handling autoplay blocks)
                 setTimeout(() => {
                   if (videoBackdrop.paused && currentSlide.classList.contains('active')) {
                     console.warn("🎬 Media Bar:", `Autoplay blocked for ${currentItemId}, attempting muted fallback`);
                     videoBackdrop.muted = true;
-                    videoBackdrop.play().catch(err => console.error("🎬 Media Bar:", "Muted fallback failed", err));
+                    videoBackdrop.play().catch(err => {
+                      if (err.name !== 'AbortError') console.error("🎬 Media Bar:", "Muted fallback failed", err);
+                    });
                   }
                 }, 1000);
               } else {
@@ -2941,10 +2945,11 @@ const SlideshowManager = {
         }
 
         video.play().catch(error => {
+          if (error.name === 'AbortError') return;
           console.warn("🎬 Media Bar:", "Unmuted play blocked, reverting to muted...");
           STATE.slideshow.isMuted = true;
           video.muted = true;
-          video.play();
+          video.play().catch(err => { if (err.name !== 'AbortError') console.warn(err); });
           updateIcon();
         });
       }
@@ -3114,7 +3119,9 @@ const SlideshowManager = {
       }
       html5Video.muted = STATE.slideshow.isMuted;
       if (!STATE.slideshow.isMuted) html5Video.volume = 0.4;
-      html5Video.play().catch(e => console.warn("🎬 Media Bar:", "Error resuming HTML5 video:", e));
+      html5Video.play().catch(e => {
+        if (e.name !== 'AbortError') console.warn("🎬 Media Bar:", "Error resuming HTML5 video:", e);
+      });
     }
   },
 
@@ -3890,7 +3897,9 @@ const initPageVisibilityHandler = () => {
             }
           } else if (player.tagName === 'VIDEO') { // HTML5 Video
              try {
-                player.play().catch(e => console.warn("🎬 Media Bar:", "Error resuming HTML5 video:", e));
+                player.play().catch(e => {
+                  if (e.name !== 'AbortError') console.warn("🎬 Media Bar:", "Error resuming HTML5 video:", e);
+                });
                 STATE.slideshow.isVideoPlaying = true;
              } catch(e) { console.warn("🎬 Media Bar:", e); }
           }
