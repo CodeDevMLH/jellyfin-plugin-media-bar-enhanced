@@ -2598,9 +2598,13 @@ const SlideshowManager = {
           if (lazySrc && !videoBackdrop.src) {
             videoBackdrop.src = lazySrc;
             videoBackdrop.load(); // Force pre-buffering
+          } else {
+            try {
+              if (videoBackdrop.currentTime > 0) {
+                videoBackdrop.currentTime = 0;
+              }
+            } catch (e) {}
           }
-
-          videoBackdrop.currentTime = 0;
 
           videoBackdrop.muted = STATE.slideshow.isMuted;
           if (!STATE.slideshow.isMuted) {
