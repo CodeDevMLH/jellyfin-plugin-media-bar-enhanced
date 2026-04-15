@@ -1968,7 +1968,11 @@ const SlideCreator = {
           if (!slide || !slide.classList.contains('active')) {
             console.log("🎬 Media Bar:", `Local video ${itemId} started playing but slide is not active, pausing.`);
             event.target.pause();
-            event.target.currentTime = 0;
+            try {
+              if (event.target.currentTime > 0) {
+                event.target.currentTime = 0;
+              }
+            } catch(e){}
             return;
           }
           
@@ -2539,7 +2543,11 @@ const SlideshowManager = {
               if (p instanceof HTMLVideoElement) {
                 p.pause();
                 p.muted = true;
-                p.currentTime = 0;
+                try {
+                  if (p.currentTime > 0) {
+                    p.currentTime = 0;
+                  }
+                } catch(e){}
                 // Save src to data-src and release the HTTP streaming connection
                 if (p.src && !p.getAttribute('data-src')) {
                   p.setAttribute('data-src', p.src);
@@ -3070,7 +3078,11 @@ const SlideshowManager = {
         try {
           video.pause();
           video.muted = true;
-          video.currentTime = 0;
+          try {
+            if (video.currentTime > 0) {
+              video.currentTime = 0;
+            }
+          } catch(e){}
           // Save src and release HTTP streaming connection
           if (video.src && !video.getAttribute('data-src')) {
             video.setAttribute('data-src', video.src);
