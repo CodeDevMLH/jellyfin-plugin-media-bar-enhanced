@@ -9,6 +9,14 @@
     "imageUrl": "https://raw.githubusercontent.com/CodeDevMLH/jellyfin-plugin-media-bar-enhanced/refs/heads/main/logo.png",
     "versions": [
       {
+        "version": "1.9.7.0",
+        "changelog": "- fix again: reset video backdrop current time on load for local trailers to prevent potential playback issues",
+        "targetAbi": "10.11.0.0",
+        "sourceUrl": "https://github.com/CodeDevMLH/jellyfin-plugin-media-bar-enhanced/releases/download/v1.9.6.0/Jellyfin.Plugin.MediaBarEnhanced.zip",
+        "checksum": "97c8f8e77180872a22232a3460cf640b",
+        "timestamp": "2026-04-14T22:56:45Z"
+      },
+      {
         "version": "1.9.6.0",
         "changelog": "- fix: reset video backdrop current time on load for local trailers to prevent potential playback issues\n- feat: enhance media ID input with URL parsing",
         "targetAbi": "10.11.0.0",
