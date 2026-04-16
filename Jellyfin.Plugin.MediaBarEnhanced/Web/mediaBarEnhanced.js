@@ -3897,13 +3897,13 @@ const initPageVisibilityHandler = () => {
       const currentItemId = STATE.slideshow.itemIds[STATE.slideshow.currentSlideIndex];
       
       // Resume video if the play signal was given (either before hiding, or timer expired while hidden)
-      if (currentItemId && STATE.slideshow.currentPlayVideoLogic) {
-          if (STATE.slideshow.playSignals && STATE.slideshow.playSignals[currentItemId] === true) {
-             STATE.slideshow.currentPlayVideoLogic();
-          }
-      }
-
       if (!STATE.slideshow.isPaused) {
+        if (currentItemId && STATE.slideshow.currentPlayVideoLogic) {
+            if (STATE.slideshow.playSignals && STATE.slideshow.playSignals[currentItemId] === true) {
+               STATE.slideshow.currentPlayVideoLogic();
+            }
+        }
+
         if (wasVideoPlayingBeforeHide && currentItemId && STATE.slideshow.videoPlayers && STATE.slideshow.videoPlayers[currentItemId]) {
           const player = STATE.slideshow.videoPlayers[currentItemId];
           
