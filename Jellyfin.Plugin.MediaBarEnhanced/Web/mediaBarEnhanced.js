@@ -1932,9 +1932,9 @@ const SlideCreator = {
                 },
                 'onError': (event) => {
                   console.warn("🎬 Media Bar:", `YouTube player error ${event.data} for video ${videoId}`);
-                  // Fallback to next slide on error
-                  if (CONFIG.waitForTrailerToEnd) {
-                    SlideshowManager.nextSlide();
+                  // Fallback to normal slideshow interval on error
+                  if (STATE.slideshow.slideInterval && !STATE.slideshow.isPaused) {
+                    STATE.slideshow.slideInterval.start();
                   }
                 }
               }
@@ -2000,7 +2000,10 @@ const SlideCreator = {
           console.warn("🎬 Media Bar:", `Local video error for item ${itemId}`);
           const slide = event.target.closest('.slide');
           if (slide && slide.classList.contains('active')) {
-            SlideshowManager.nextSlide();
+            // Re-enable normal slideshow timing if video fails
+            if (STATE.slideshow.slideInterval && !STATE.slideshow.isPaused) {
+              STATE.slideshow.slideInterval.start();
+            }
           }
         });
       }
@@ -2474,9 +2477,33 @@ const SlideshowManager = {
         `.slide[data-item-id="${currentItemId}"]`
       );
 
+      // pruning for iOS/LowPower
       const isLowPower = isLowPowerDevice();
       const isIOSApp = /iPhone|iPad|iPod/i.test(navigator.userAgent);
       const limitVideos = isLowPower || isIOSApp;
+      
+      // Destroy old video to free up the hardware decoder before allocating new one.
+      if (limitVideos) {
+        const currentActiveSlide = container.querySelectorAll(".slide.active");
+        currentActiveSlide.forEach(activeSlide => {
+            const oldVideoItemId = activeSlide.dataset.itemId;
+            if (oldVideoItemId && STATE.slideshow.hasTrailer && STATE.slideshow.hasTrailer[oldVideoItemId] === true && oldVideoItemId !== currentItemId) {
+               const oldVideo = activeSlide.querySelector('.video-backdrop');
+               if (oldVideo) {
+                   if (oldVideo.tagName === 'VIDEO') {
+                     oldVideo.pause();
+                     oldVideo.removeAttribute('src');
+                     oldVideo.load(); // Force decoder release
+                   }
+                   oldVideo.remove();
+                   console.log("🎬 Media Bar:", "Pruned hidden slide video strictly before new allocation to bypass Apple/Low Power Device limits");
+                   if (STATE.slideshow.videoPlayers && STATE.slideshow.videoPlayers[oldVideoItemId]) {
+                       delete STATE.slideshow.videoPlayers[oldVideoItemId];
+                   }
+               }
+            }
+        });
+      }
       
       // JIT recreating video to bypass OOM limitations on low-end devices
       if (limitVideos && currentSlide && STATE.slideshow.hasTrailer && STATE.slideshow.hasTrailer[currentItemId] === true) {
@@ -2503,24 +2530,8 @@ const SlideshowManager = {
       }
 
       previousVisibleSlide = container.querySelector(".slide.active");
-
       if (previousVisibleSlide) {
         previousVisibleSlide.classList.remove("active");
-
-        // Prune old video to save memory on low-end devices
-        if (limitVideos) {
-           const prevItemId = previousVisibleSlide.dataset.itemId;
-           if (prevItemId && STATE.slideshow.hasTrailer && STATE.slideshow.hasTrailer[prevItemId] === true) {
-               const oldVideo = previousVisibleSlide.querySelector('.video-backdrop');
-               if (oldVideo) {
-                   oldVideo.remove();
-                   console.log("🎬 Media Bar:", "Pruned hidden slide video to save RAM");
-                   if (STATE.slideshow.videoPlayers && STATE.slideshow.videoPlayers[prevItemId]) {
-                       delete STATE.slideshow.videoPlayers[prevItemId];
-                   }
-               }
-           }
-        }
       }
 
       void currentSlide.offsetWidth;
@@ -3886,13 +3897,13 @@ const initPageVisibilityHandler = () => {
       const currentItemId = STATE.slideshow.itemIds[STATE.slideshow.currentSlideIndex];
       
       // Resume video if the play signal was given (either before hiding, or timer expired while hidden)
-      if (currentItemId && STATE.slideshow.currentPlayVideoLogic) {
-          if (STATE.slideshow.playSignals && STATE.slideshow.playSignals[currentItemId] === true) {
-             STATE.slideshow.currentPlayVideoLogic();
-          }
-      }
-
       if (!STATE.slideshow.isPaused) {
+        if (currentItemId && STATE.slideshow.currentPlayVideoLogic) {
+            if (STATE.slideshow.playSignals && STATE.slideshow.playSignals[currentItemId] === true) {
+               STATE.slideshow.currentPlayVideoLogic();
+            }
+        }
+
         if (wasVideoPlayingBeforeHide && currentItemId && STATE.slideshow.videoPlayers && STATE.slideshow.videoPlayers[currentItemId]) {
           const player = STATE.slideshow.videoPlayers[currentItemId];
           
