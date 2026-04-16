@@ -12,9 +12,9 @@
         "version": "1.9.8.0",
         "changelog": "- fix: improve video handling for low-power devices and optimize memory usage\n- fallback to static backdrop and intervall if video playback fails\n- fix: streamline video playback logic in slideshow pause logic",
         "targetAbi": "10.11.0.0",
-        "sourceUrl": "https://github.com/CodeDevMLH/jellyfin-plugin-media-bar-enhanced/releases/download/v1.9.7.0/Jellyfin.Plugin.MediaBarEnhanced.zip",
-        "checksum": "657bba5382227a979f56d2b0d530be5f",
-        "timestamp": "2026-04-15T00:13:39Z"
+        "sourceUrl": "https://github.com/CodeDevMLH/jellyfin-plugin-media-bar-enhanced/releases/download/v1.9.8.0/Jellyfin.Plugin.MediaBarEnhanced.zip",
+        "checksum": "a510c013e35f4a09579553bd0a3cce30",
+        "timestamp": "2026-04-16T14:44:28Z"
       },
       {
         "version": "1.9.7.0",
