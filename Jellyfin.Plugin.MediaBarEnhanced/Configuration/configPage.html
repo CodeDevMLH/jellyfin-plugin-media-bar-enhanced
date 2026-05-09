@@ -136,7 +136,7 @@
                         <div id="customMediaIdsContainer">
                             <div class="inputContainer">
                                 <label class="inputLabel inputLabelUnfocused" for="CustomMediaIds">Default
-                                    Media/Collection/Playlist IDs (Newline or Comma-separated)</label>
+                                    Media/Collection/Playlist IDs, Genres &amp; Tags (Newline or Comma-separated)</label>
                                 <textarea class="emby-textarea" is="emby-textarea" id="CustomMediaIds"
                                     name="CustomMediaIds"
                                     style="width: 100%; height: 150px; font-family: monospace;"></textarea>
@@ -144,6 +144,16 @@
                                     slideshow as your default content. You can separate them by new line or comma.
                                     <br>
                                     <b style="color:#00a4dc">Tip:</b> You can simply paste full Jellyfin item URLs here and the IDs will be automatically extracted!
+                                    <br><br>
+                                    <b>Genre &amp; Tag Filters:</b> You can filter items by genre or tag using prefixes:
+                                    <ul>
+                                        <li><code>genre:Action</code> &mdash; Show items with the "Action" genre</li>
+                                        <li><code>tag:2000s</code> &mdash; Show items with the "2000s" tag</li>
+                                    </ul>
+                                    You can list multiple tags or genres by separating them with a <b>comma (,)</b> or <b>newline</b>.<br>
+                                    Multiple genres/tags are combined with <b>OR</b> (union) within their type.
+                                    If you use both genres and tags, they are combined with <b>AND</b> (items must match at least one genre AND at least one tag).
+                                    You can freely mix genre/tag filters with regular IDs and collection names.
                                     <br><br>
                                     <b>Manual Trailer/Video Override:</b> You can specify a YouTube URL <b>OR</b> a
                                     Jellyfin Item ID (e.g. for a Theme Video) for an item by adding it in
