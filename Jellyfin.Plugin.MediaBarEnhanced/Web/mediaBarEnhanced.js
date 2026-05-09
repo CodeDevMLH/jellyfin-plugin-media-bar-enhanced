@@ -1954,7 +1954,7 @@ const SlideCreator = {
           const muteParam = STATE.slideshow.isMuted ? 1 : 0;
           const ytPlayerIframe = SlideUtils.createElement("iframe", {
             id: `youtube-player-${itemId}`,
-            src: `https://www.youtube-nocookie.com/embed/${videoId}?enablejsapi=1&playsinline=1&controls=1&modestbranding=1&showinfo=0&disablekb=1&fs=0&iv_load_policy=3&rel=0&loop=0&origin=${encodeURIComponent(window.location.origin)}${startParam}${endParam}`,
+            src: `https://www.youtube-nocookie.com/embed/${videoId}?enablejsapi=1&playsinline=1&controls=1&modestbranding=1&showinfo=0&disablekb=1&fs=0&iv_load_policy=3&rel=0&loop=0&origin=${encodeURIComponent(window.location.origin)}&mute=${muteParam}${startParam}${endParam}`,
             style: "width: 100%; height: 100%; border: none; pointer-events: none;",
             allow: "autoplay; encrypted-media",
             referrerpolicy: "strict-origin-when-cross-origin",
