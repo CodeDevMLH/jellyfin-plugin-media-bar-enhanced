@@ -2571,8 +2571,10 @@ const SlideshowManager = {
         }
       }, CONFIG.fadeTransitionDuration);
 
-      // 2. Pause all other HTML5 videos e.g. local trailers
-      document.querySelectorAll('video').forEach(video => {
+      // 2. Pause other Media Bar HTML5 videos e.g. local trailers.
+      // Do not pause every <video> in Jellyfin Web: other plugins such as
+      // HoverTrailer also render local trailers as HTML5 videos.
+      container.querySelectorAll('video').forEach(video => {
         if (!video.closest(`.slide[data-item-id="${currentItemId}"]`)) {
           video.pause();
         }
