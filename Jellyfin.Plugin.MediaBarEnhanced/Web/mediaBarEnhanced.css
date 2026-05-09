@@ -988,6 +988,7 @@
 .video-backdrop {
   pointer-events: none;
   object-fit: cover;
+  overflow: hidden;
 }
 
 .video-backdrop-default {
