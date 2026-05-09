@@ -1230,6 +1230,120 @@ const ApiUtils = {
   },
 
   /**
+   * Fetches items filtered by genres and/or tags from the server.
+   * Multiple genres are OR'd (union). Multiple tags are OR'd (union).
+   * Genres + Tags combined are AND'd (items must match at least one genre AND at least one tag).
+   * @param {string[]} genres - Genre names to filter by
+   * @param {string[]} tags - Tag names to filter by
+   * @returns {Promise<string[]>} Array of item IDs
+   */
+  async fetchItemsByGenresAndTags(genres = [], tags = []) {
+    try {
+      if (!STATE.jellyfinData.accessToken || STATE.jellyfinData.accessToken === "Not Found") {
+        console.warn("🎬 Media Bar:", "Access token not available for genre/tag fetch.");
+        return [];
+      }
+
+      if (!STATE.jellyfinData.serverAddress || STATE.jellyfinData.serverAddress === "Not Found") {
+        console.warn("🎬 Media Bar:", "Server address not available for genre/tag fetch.");
+        return [];
+      }
+
+      let genreParam = '';
+      if (genres.length > 0) {
+        genreParam = `&genres=${genres.map(g => encodeURIComponent(g)).join('|')}`;
+      }
+
+      let tagParam = '';
+      if (tags.length > 0) {
+        tagParam = `&tags=${tags.map(t => encodeURIComponent(t)).join('|')}`;
+      }
+
+      // Apply same filters as fetchItemIdsFromServer
+      let sortParams = `sortBy=${CONFIG.sortBy}`;
+      if (CONFIG.sortBy === 'Random' || CONFIG.sortBy === 'Original') {
+        sortParams = 'sortBy=Random';
+      } else {
+        sortParams += `&sortOrder=${CONFIG.sortOrder}`;
+      }
+
+      const playedFilter = CONFIG.includeWatchedContent ? '' : '&isPlayed=False';
+      
+      let parentalFilter = '';
+      if (CONFIG.maxParentalRating) {
+        parentalFilter = `&MaxOfficialRating=${CONFIG.maxParentalRating}`;
+      }
+
+      let dateFilter = '';
+      if (CONFIG.maxDaysRecent) {
+        const pastDate = new Date();
+        pastDate.setDate(pastDate.getDate() - CONFIG.maxDaysRecent);
+        dateFilter = `&minDateLastSaved=${pastDate.toISOString()}`;
+      }
+
+      // Exclude seasonal content from genre/tag results
+      let excludeFilter = '';
+      if (CONFIG.excludeSeasonalContent && CONFIG.seasonalSections) {
+        try {
+          const sections = JSON.parse(CONFIG.seasonalSections || "[]");
+          let allExcludedIds = [];
+          for (const section of sections) {
+            if (section.MediaIds) {
+              const idsInThisSection = section.MediaIds.split(/[\n,]/)
+                .map((line) => {
+                  const urlMatch = line.match(/\[(.*?)\]/);
+                  let id = line;
+                  if (urlMatch) {
+                    id = line.replace(/\[.*?\]/, '').trim();
+                    const guidMatch = id.match(/([0-9a-f]{32})/i);
+                    if (guidMatch) { id = guidMatch[1]; } else { id = id.split('|')[0].trim(); }
+                  }
+                  return id.trim();
+                })
+                .filter((id) => id && !id.match(/^(genre|tag):/i));
+              allExcludedIds.push(...idsInThisSection);
+            }
+          }
+          if (allExcludedIds.length > 0) {
+            excludeFilter = `&ExcludeItemIds=${allExcludedIds.join(',')}`;
+          }
+        } catch(e) {
+          console.error("🎬 Media Bar:", "Error extracting seasonal IDs for exclusion:", e);
+        }
+      }
+
+      console.log("🎬 Media Bar:", `Fetching items by genre/tag filter (genres: [${genres.join(', ')}], tags: [${tags.join(', ')}])...`);
+
+      const url = `${STATE.jellyfinData.serverAddress}/Items?IncludeItemTypes=Movie,Series&Recursive=true&hasOverview=true&imageTypes=Logo,Backdrop&${sortParams}${playedFilter}${parentalFilter}${dateFilter}${excludeFilter}${genreParam}${tagParam}&enableUserData=true&Limit=${CONFIG.maxItems}&fields=Id,DateCreated,Type`;
+      const response = await fetch(url, { headers: this.getAuthHeaders() });
+
+      if (!response.ok) {
+        console.error("🎬 Media Bar:", `Failed to fetch items by genre/tag: ${response.status} ${response.statusText}`);
+        return [];
+      }
+
+      const data = await response.json();
+      let items = data.Items || [];
+
+      // Apply exact DateCreated filter (same as fetchItemIdsFromServer)
+      if (CONFIG.maxDaysRecent && dateFilter !== '') {
+        const pastDate = new Date();
+        pastDate.setDate(pastDate.getDate() - CONFIG.maxDaysRecent);
+        items = items.filter(item => {
+          if (!item.DateCreated) return true;
+          return new Date(item.DateCreated) >= pastDate;
+        });
+      }
+
+      console.log("🎬 Media Bar:", `Found ${items.length} items matching genre/tag filters`);
+
+      return items.map(item => ({ Id: item.Id, Type: item.Type }));
+    } catch (error) {
+      console.error("🎬 Media Bar:", "Error fetching items by genre/tag:", error);
+      return [];
+    }
+  },
+  /**
    * Get authentication headers for API requests
    * @returns {Object} Headers object
    */
@@ -1814,54 +1928,48 @@ const SlideCreator = {
             style: "opacity: 0; transition: opacity 1.2s ease-in-out;" // Start interrupted/transparent
         });
 
-        // Create an iframe upfront
-        const ytPlayerIframe = SlideUtils.createElement("iframe", {
-          id: `youtube-player-${itemId}`,
-          src: `https://www.youtube-nocookie.com/embed/${videoId}?enablejsapi=1&playsinline=1&origin=${encodeURIComponent(window.location.origin)}`,
-          style: "width: 100%; height: 100%; border: none; pointer-events: none;",
-          allow: "autoplay; encrypted-media",
-          referrerpolicy: "strict-origin-when-cross-origin",
-          allowfullscreen: "true"
-        });
-        
-        videoBackdrop.appendChild(ytPlayerIframe);
+        // Load YouTube API and fetch SponsorBlock data concurrently
+        Promise.all([
+          SlideUtils.loadYouTubeIframeAPI(),
+          ApiUtils.fetchSponsorBlockData(videoId)
+        ]).then(([_, segments]) => {
+          let startSecs = 0;
+          let endSecs = undefined;
+          let startParam = "";
+          let endParam = "";
 
-        // Initialize YouTube Player
-        SlideUtils.loadYouTubeIframeAPI().then(() => {
-          // Fetch SponsorBlock data
-          ApiUtils.fetchSponsorBlockData(videoId).then(segments => {
-            const playerVars = {
-              autoplay: 0,
-              mute: STATE.slideshow.isMuted ? 1 : 0,
-              controls: 0,
-              disablekb: 1,
-              fs: 0,
-              iv_load_policy: 3,
-              rel: 0,
-              loop: 0,
-              playsinline: 1,
-              origin: window.location.origin,
-              enablejsapi: 1
-            };
+          // Apply SponsorBlock start/end times
+          if (segments.intro) {
+            startSecs = Math.ceil(segments.intro[1]);
+            startParam = `&start=${startSecs}`;
+            console.info("🎬 Media Bar:", `SponsorBlock intro detected for video ${videoId}: skipping to ${startSecs}s`);
+          }
+          if (segments.outro) {
+            endSecs = Math.floor(segments.outro[0]);
+            endParam = `&end=${endSecs}`;
+            console.info("🎬 Media Bar:", `SponsorBlock outro detected for video ${videoId}: ending at ${endSecs}s`);
+          }
 
-            // Apply SponsorBlock start/end times
-            if (segments.intro) {
-              playerVars.start = Math.ceil(segments.intro[1]);
-              console.info("🎬 Media Bar:", `SponsorBlock intro detected for video ${videoId}: skipping to ${playerVars.start}s`);
-            }
-            if (segments.outro) {
-              playerVars.end = Math.floor(segments.outro[0]);
-              console.info("🎬 Media Bar:", `SponsorBlock outro detected for video ${videoId}: ending at ${playerVars.end}s`);
-            }
+          // Create an iframe upfront with ALL parameters including start/end
+          const muteParam = STATE.slideshow.isMuted ? 1 : 0;
+          const ytPlayerIframe = SlideUtils.createElement("iframe", {
+            id: `youtube-player-${itemId}`,
+            src: `https://www.youtube-nocookie.com/embed/${videoId}?enablejsapi=1&playsinline=1&controls=1&modestbranding=1&showinfo=0&disablekb=1&fs=0&iv_load_policy=3&rel=0&loop=0&origin=${encodeURIComponent(window.location.origin)}${startParam}${endParam}`,
+            style: "width: 100%; height: 100%; border: none; pointer-events: none;",
+            allow: "autoplay; encrypted-media",
+            referrerpolicy: "strict-origin-when-cross-origin",
+            allowfullscreen: "true"
+          });
+          
+          videoBackdrop.appendChild(ytPlayerIframe);
 
-            STATE.slideshow.videoPlayers[itemId] = new YT.Player(ytPlayerIframe, {
-              playerVars: playerVars,
-              events: {
-                'onReady': (event) => {
-                  // Store start/end time and videoId for later use
-                  event.target._startTime = playerVars.start || 0;
-                  event.target._endTime = playerVars.end || undefined;
-                  event.target._videoId = videoId;
+          STATE.slideshow.videoPlayers[itemId] = new YT.Player(ytPlayerIframe, {
+            events: {
+              'onReady': (event) => {
+                // Store start/end time and videoId for later use
+                event.target._startTime = startSecs;
+                event.target._endTime = endSecs;
+                event.target._videoId = videoId;
                   
                   // Store reference to wrapper for fading
                   event.target._wrapperDiv = videoBackdrop;
@@ -1873,24 +1981,11 @@ const SlideCreator = {
                     event.target.setVolume(40);
                   }
 
-                  // Only play if this is the active slide and the play signal has been issued (delay finished)
                   const slide = document.querySelector(`.slide[data-item-id="${itemId}"]`);
-                  const isVideoPlayerOpen = document.querySelector('.videoPlayerContainer') || document.querySelector('.youtubePlayerContainer');
-
-                  if (slide && slide.classList.contains('active') && STATE.slideshow.playSignals[itemId] === true && !document.hidden && (!isVideoPlayerOpen || isVideoPlayerOpen.classList.contains('hide'))) {
+                  if (slide && slide.classList.contains('active')) {
                     event.target.playVideo();
-                    
-                    // Check if it actually started playing after a short delay (handling autoplay blocks)
                     const timeoutId = setTimeout(() => {
-                      // Re-check conditions before processing fallback
-                      const isVideoPlayerOpenNow = document.querySelector('.videoPlayerContainer') || document.querySelector('.youtubePlayerContainer');
-                      if (document.hidden || (isVideoPlayerOpenNow && !isVideoPlayerOpenNow.classList.contains('hide')) || !slide.classList.contains('active')) {
-                          console.log("🎬 Media Bar:", `Navigation detected during autoplay check for ${itemId}, stopping video.`);
-                          try {
-                            event.target.stopVideo();
-                          } catch (e) { console.warn("🎬 Media Bar:", "Error stopping video in timeout:", e); }
-                          return;
-                      }
+                      if (!slide.classList.contains('active') || document.hidden) return;
 
                       if (event.target.getPlayerState() !== YT.PlayerState.PLAYING &&
                         event.target.getPlayerState() !== YT.PlayerState.BUFFERING) {
@@ -1898,35 +1993,53 @@ const SlideCreator = {
                         event.target.mute();
                         event.target.playVideo();
                       }
-                    }, 1000);
+                    }, 2000);
 
                     if (!STATE.slideshow.autoplayTimeouts) STATE.slideshow.autoplayTimeouts = [];
                     STATE.slideshow.autoplayTimeouts.push(timeoutId);
-
-                    // Pause slideshow timer when video starts if configured
-                    if (CONFIG.waitForTrailerToEnd && STATE.slideshow.slideInterval) {
-                      STATE.slideshow.slideInterval.stop();
-                    }
                   }
                 },
                 'onStateChange': (event) => {
                   if (event.data === YT.PlayerState.PLAYING) {
                       const slide = document.querySelector(`.slide[data-item-id="${itemId}"]`);
-                      if (slide && STATE.slideshow.playSignals[itemId] === false) {
-                          event.target.pauseVideo();
+                      const isActive = slide && slide.classList.contains('active');
+                      const playAllowed = STATE.slideshow.playSignals[itemId] === true;
+                      
+                      if (!isActive) {
+                          if (event.target._wrapperDiv) {
+                              event.target._wrapperDiv.style.transition = "none";
+                              event.target._wrapperDiv.style.opacity = "0";
+                          }
+                          if (typeof event.target.stopVideo === 'function') event.target.stopVideo();
+                          return;
+                      }
+
+                      if (!playAllowed) {
+                          // Active slide but play signal not yet issued
                           return;
                       }
                       
                       // Fade in when legitimately playing
                       if (event.target._wrapperDiv) {
+                          event.target._wrapperDiv.style.transition = "opacity 1.2s ease-in-out";
                           event.target._wrapperDiv.style.opacity = "1";
                       }
-                  }
-                  
-                  if (event.data === YT.PlayerState.ENDED) {
+                      if (CONFIG.waitForTrailerToEnd && STATE.slideshow.slideInterval) {
+                          STATE.slideshow.slideInterval.stop();
+                      }
+                  } else if (event.data === YT.PlayerState.ENDED) {
+                    if (event.target._wrapperDiv) {
+                        event.target._wrapperDiv.style.transition = "none";
+                        event.target._wrapperDiv.style.opacity = "0";
+                    }
                     const slide = document.querySelector(`.slide[data-item-id="${itemId}"]`);
                     if (slide && slide.classList.contains('active')) {
-                      SlideshowManager.nextSlide();
+                      if (typeof SlideshowManager !== 'undefined' && SlideshowManager.nextSlide) SlideshowManager.nextSlide();
+                    }
+                  } else {
+                    if (event.target._wrapperDiv) {
+                        event.target._wrapperDiv.style.transition = "opacity 0.5s ease-in-out";
+                        event.target._wrapperDiv.style.opacity = "0";
                     }
                   }
                 },
@@ -1940,7 +2053,6 @@ const SlideCreator = {
               }
             });
           });
-        });
 
         // 2. Check for local video trailers in MediaSources if yt is not available
       } else if (!isYoutube && shouldCreateVideo) {
@@ -2220,6 +2332,7 @@ const SlideCreator = {
       onclick: (e) => {
         e.preventDefault();
         e.stopPropagation();
+        console.log("🎬 Media Bar: Play button clicked for", itemId);
         ApiUtils.playItem(itemId);
       },
     });
@@ -2492,14 +2605,12 @@ const SlideshowManager = {
                if (oldVideo) {
                    if (oldVideo.tagName === 'VIDEO') {
                      oldVideo.pause();
-                     oldVideo.removeAttribute('src');
-                     oldVideo.load(); // Force decoder release
+                     if (oldVideo.src) {
+                         oldVideo.removeAttribute('src');
+                         oldVideo.load(); // Force decoder release
+                     }
                    }
-                   oldVideo.remove();
                    console.log("🎬 Media Bar:", "Pruned hidden slide video strictly before new allocation to bypass Apple/Low Power Device limits");
-                   if (STATE.slideshow.videoPlayers && STATE.slideshow.videoPlayers[oldVideoItemId]) {
-                       delete STATE.slideshow.videoPlayers[oldVideoItemId];
-                   }
                }
             }
         });
@@ -2546,8 +2657,13 @@ const SlideshowManager = {
             if (id !== currentItemId) {
               const p = STATE.slideshow.videoPlayers[id];
               if (!p) return;
-              // YouTube player
-              if (typeof p.pauseVideo === 'function') {
+              if (typeof p.stopVideo === 'function') {
+                if (p._wrapperDiv) {
+                  p._wrapperDiv.style.transition = "none";
+                  p._wrapperDiv.style.opacity = "0";
+                }
+                p.stopVideo();
+              } else if (typeof p.pauseVideo === 'function') {
                 p.pauseVideo();
               }
               // HTML5 <video> element (local trailers), release HTTP connection
@@ -2571,9 +2687,7 @@ const SlideshowManager = {
         }
       }, CONFIG.fadeTransitionDuration);
 
-      // 2. Pause other Media Bar HTML5 videos e.g. local trailers.
-      // Do not pause every <video> in Jellyfin Web: other plugins such as
-      // HoverTrailer also render local trailers as HTML5 videos.
+      // 2. Pause all other HTML5 videos e.g. local trailers
       container.querySelectorAll('video').forEach(video => {
         if (!video.closest(`.slide[data-item-id="${currentItemId}"]`)) {
           video.pause();
@@ -2633,27 +2747,6 @@ const SlideshowManager = {
           }
         } else if (STATE.slideshow.videoPlayers && STATE.slideshow.videoPlayers[currentItemId]) {
           const player = STATE.slideshow.videoPlayers[currentItemId];
-          // If delay > 0, buffer the video silently using cueVideoById. If 0, skip and load directly later.
-          if (CONFIG.backdropVideoDelay > 0) {
-            if (player && typeof player.cueVideoById === 'function' && player._videoId) {
-              // Use cueVideoById to buffer video without auto-playing it
-              player.cueVideoById({
-                videoId: player._videoId,
-                startSeconds: player._startTime || 0,
-                endSeconds: player._endTime
-              });
-
-              if (STATE.slideshow.isMuted) {
-                player.mute();
-              } else {
-                player.unMute();
-                player.setVolume(40);
-              }
-            } else if (player && typeof player.seekTo === 'function') {
-              const startTime = player._startTime || 0;
-              player.seekTo(startTime);
-            }
-          }
         }
 
         // play logic
@@ -2672,18 +2765,21 @@ const SlideshowManager = {
               // Ignore intentional aborts when sliding away quickly
               if (e.name === 'AbortError') return;
               if (!STATE.slideshow.isMuted) {
-                // Check if it actually started playing after a short delay (handling autoplay blocks)
-                setTimeout(() => {
-                  if (videoBackdrop.paused && currentSlide.classList.contains('active')) {
-                    console.warn("🎬 Media Bar:", `Autoplay blocked for ${currentItemId}, attempting muted fallback`);
-                    videoBackdrop.muted = true;
-                    videoBackdrop.play().catch(err => {
-                      if (err.name !== 'AbortError') console.error("🎬 Media Bar:", "Muted fallback failed", err);
-                    });
-                  }
-                }, 1000);
+                 console.warn("🎬 Media Bar:", `Autoplay blocked for ${currentItemId}, attempting immediate muted fallback`);
+                 videoBackdrop.muted = true;
+                 videoBackdrop.play().catch(err => {
+                    if (err.name !== 'AbortError') {
+                       console.error("🎬 Media Bar:", "Muted fallback failed", err);
+                       if (STATE.slideshow.slideInterval && !STATE.slideshow.isPaused) {
+                           STATE.slideshow.slideInterval.start();
+                       }
+                    }
+                 });
               } else {
                 console.error("🎬 Media Bar:", "Playback failed despite being muted", e);
+                if (STATE.slideshow.slideInterval && !STATE.slideshow.isPaused) {
+                    STATE.slideshow.slideInterval.start();
+                }
               }
             });
           } else if (STATE.slideshow.videoPlayers && STATE.slideshow.videoPlayers[currentItemId]) {
@@ -3015,9 +3111,17 @@ const SlideshowManager = {
       const ytPlayer = STATE.slideshow.videoPlayers[currentItemId];
       if (ytPlayer && typeof ytPlayer.getPlayerState === 'function') {
         if (STATE.slideshow.isPaused) {
-          ytPlayer.pauseVideo();
+          if (typeof ytPlayer.pauseVideo === 'function') ytPlayer.pauseVideo();
+          if (ytPlayer._wrapperDiv) {
+            ytPlayer._wrapperDiv.style.transition = "opacity 0.5s ease-in-out";
+            ytPlayer._wrapperDiv.style.opacity = "0";
+          }
         } else {
-          ytPlayer.playVideo();
+          if (typeof ytPlayer.playVideo === 'function') ytPlayer.playVideo();
+          if (ytPlayer._wrapperDiv) {
+            ytPlayer._wrapperDiv.style.transition = "opacity 0.5s ease-in-out";
+            ytPlayer._wrapperDiv.style.opacity = "1";
+          }
         }
       }
 
@@ -3026,8 +3130,12 @@ const SlideshowManager = {
       if (html5Video) {
         if (STATE.slideshow.isPaused) {
           html5Video.pause();
+          html5Video.style.transition = "opacity 0.5s ease-in-out";
+          html5Video.style.opacity = "0";
         } else {
           html5Video.play();
+          html5Video.style.transition = "opacity 0.5s ease-in-out";
+          html5Video.style.opacity = "1";
         }
       }
     }
@@ -3070,13 +3178,15 @@ const SlideshowManager = {
     if (STATE.slideshow.videoPlayers) {
       Object.values(STATE.slideshow.videoPlayers).forEach(player => {
         try {
-          if (player && typeof player.stopVideo === 'function') {
-            player.stopVideo();
-            if (typeof player.clearVideo === 'function') {
-                player.clearVideo();
+          if (player) {
+            if (typeof player.pauseVideo === 'function') player.pauseVideo();
+            if (player._wrapperDiv) {
+              player._wrapperDiv.style.transition = "opacity 0.3s ease-in-out";
+              player._wrapperDiv.style.opacity = "0";
             }
-          } else if (player && typeof player.pauseVideo === 'function') {
-            player.pauseVideo();
+          }
+          if (typeof player.clearVideo === 'function') {
+            player.clearVideo();
           }
         } catch (e) {
           console.warn("🎬 Media Bar:", "Error pausing/stopping YouTube player:", e);
@@ -3301,8 +3411,13 @@ const SlideshowManager = {
    * If Custom Media IDs are enabled (and no seasonal match):
    *  - Return Default Custom IDs.
    * If no Custom Media IDs are enabled:
-   *  - Return empty array (triggering random fallback).
-   * @returns {string[]} Array of media IDs
+   *  - Return empty result (triggering random fallback).
+   * 
+   * Supports special prefixes in the ID field:
+   *  - genre:Action  --> filter by genre
+   *  - tag:2000s     --> filter by tag
+   * 
+   * @returns {{ ids: string[], genres: string[], tags: string[] }} Parsed result
    */
   parseCustomIds() {
     let idsString = CONFIG.customMediaIds;
@@ -3362,15 +3477,36 @@ const SlideshowManager = {
     // If NOT using seasonal content (disabled or no match), 
     // Custom IDs are disabled, return empty to skip to random
     if (!usingSeasonal && !CONFIG.enableCustomMediaIds) {
-        return [];
+        return { ids: [], genres: [], tags: [] };
     }
     
     // Parse the resulting string (either seasonal or default)
-    if (!idsString) return [];
+    if (!idsString) return { ids: [], genres: [], tags: [] };
 
-    return idsString
+    const ids = [];
+    const genres = [];
+    const tags = [];
+
+    idsString
       .split(/[\n,]/)
-      .map((line) => {
+      .map((line) => line.trim())
+      .filter((line) => line)
+      .forEach((line) => {
+        // Check for genre prefix
+        const genreMatch = line.match(/^genre:\s*(.+)$/i);
+        if (genreMatch) {
+          genres.push(genreMatch[1].trim());
+          return;
+        }
+
+        // Check for tag prefix
+        const tagMatch = line.match(/^tag:\s*(.+)$/i);
+        if (tagMatch) {
+          tags.push(tagMatch[1].trim());
+          return;
+        }
+
+        // Regular ID/name processing
         const urlMatch = line.match(/\[(.*?)\]/);
         let id = line;
         if (urlMatch) {
@@ -3387,10 +3523,19 @@ const SlideshowManager = {
             }
             STATE.slideshow.customTrailerUrls[id] = url;
         }
-        return id.trim();
-      }) 
-      .map((id) => id.trim())
-      .filter((id) => id);
+        if (id.trim()) {
+          ids.push(id.trim());
+        }
+      });
+
+    if (genres.length > 0) {
+      console.log("🎬 Media Bar:", `Parsed ${genres.length} genre filter(s): ${genres.join(', ')}`);
+    }
+    if (tags.length > 0) {
+      console.log("🎬 Media Bar:", `Parsed ${tags.length} tag filter(s): ${tags.join(', ')}`);
+    }
+
+    return { ids, genres, tags };
   },
 
   /**
@@ -3452,8 +3597,33 @@ const SlideshowManager = {
       // 1. Try Custom Media/Collection IDs from Config & seasonal content
       if (CONFIG.enableCustomMediaIds || CONFIG.enableSeasonalContent) {
         console.log("🎬 Media Bar:", "Using Custom Media IDs from configuration");
-        const rawIds = this.parseCustomIds();
-        const resolvedItems = await this.resolveCollectionsAndItems(rawIds);
+        const parsed = this.parseCustomIds();
+        const hasGenresOrTags = parsed.genres.length > 0 || parsed.tags.length > 0;
+        const hasIds = parsed.ids.length > 0;
+
+        let resolvedItems = [];
+
+        // Resolve explicit IDs (GUIDs, collection names, etc.)
+        if (hasIds) {
+          resolvedItems = await this.resolveCollectionsAndItems(parsed.ids);
+        }
+
+        // Fetch items matching genre/tag filters from the API
+        if (hasGenresOrTags) {
+          const genreTagItems = await ApiUtils.fetchItemsByGenresAndTags(parsed.genres, parsed.tags);
+          
+          if (genreTagItems.length > 0) {
+            // Merge with explicit IDs, deduplicating by Id
+            const existingIds = new Set(resolvedItems.map(i => i.Id));
+            for (const item of genreTagItems) {
+              if (!existingIds.has(item.Id)) {
+                resolvedItems.push(item);
+                existingIds.add(item.Id);
+              }
+            }
+            console.log("🎬 Media Bar:", `Merged ${genreTagItems.length} genre/tag items with ${hasIds ? parsed.ids.length : 0} explicit IDs → ${resolvedItems.length} total unique items`);
+          }
+        }
 
         // Apply max items limit to custom IDs if enabled
         if (CONFIG.applyLimitsToCustomIds) {
@@ -3525,8 +3695,8 @@ const SlideshowManager = {
 
         if (CONFIG.waitForTrailerToEnd) {
           const activeSlide = document.querySelector('.slide.active');
-          const hasActiveVideo = !!(activeSlide && activeSlide.querySelector('.video-backdrop'));
-          if (hasActiveVideo) return;
+          const video = activeSlide ? activeSlide.querySelector('.video-backdrop') : null;
+          if (video && !video.paused) return;
         }
 
         this.nextSlide();
@@ -3537,8 +3707,8 @@ const SlideshowManager = {
 
       if (waitForTrailer && STATE.slideshow.slideInterval) {
         const activeSlide = document.querySelector('.slide.active');
-        const hasActiveVideo = !!(activeSlide && activeSlide.querySelector('.video-backdrop'));
-        if (hasActiveVideo) {
+        const video = activeSlide ? activeSlide.querySelector('.video-backdrop') : null;
+        if (video && !video.paused) {
           STATE.slideshow.slideInterval.stop();
         }
       }
@@ -3931,10 +4101,10 @@ const initPageVisibilityHandler = () => {
         } else {
           // No video was playing, just restart interval
           const activeSlide = document.querySelector('.slide.active');
-          const hasVideo = activeSlide && activeSlide.querySelector('.video-backdrop');
+          const video = activeSlide ? activeSlide.querySelector('.video-backdrop') : null;
           
-          if (CONFIG.waitForTrailerToEnd && hasVideo) {
-             // Don't restart interval if waiting for trailer
+          if (CONFIG.waitForTrailerToEnd && video && !video.paused) {
+             // Don't restart interval if waiting for a currently playing trailer
           } else {
              if (STATE.slideshow.slideInterval) {
                STATE.slideshow.slideInterval.start();
@@ -4126,7 +4296,8 @@ const slidesInit = async () => {
     );
 
     const observeSlideImages = () => {
-      const slides = document.querySelectorAll(".slide");
+      const slidesContainer = SlideUtils.getOrCreateSlidesContainer();
+      const slides = slidesContainer.querySelectorAll(".slide");
       slides.forEach((slide) => {
         const images = slide.querySelectorAll("img.low-quality");
         images.forEach((image) => {
