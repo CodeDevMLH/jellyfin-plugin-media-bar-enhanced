@@ -1928,48 +1928,54 @@ const SlideCreator = {
             style: "opacity: 0; transition: opacity 1.2s ease-in-out;" // Start interrupted/transparent
         });
 
+        // Create an iframe upfront
+        const ytPlayerIframe = SlideUtils.createElement("iframe", {
+          id: `youtube-player-${itemId}`,
+          src: `https://www.youtube-nocookie.com/embed/${videoId}?enablejsapi=1&playsinline=1&origin=${encodeURIComponent(window.location.origin)}`,
+          style: "width: 100%; height: 100%; border: none; pointer-events: none;",
+          allow: "autoplay; encrypted-media",
+          referrerpolicy: "strict-origin-when-cross-origin",
+          allowfullscreen: "true"
+        });
+
+        videoBackdrop.appendChild(ytPlayerIframe);
+
         // Load YouTube API and fetch SponsorBlock data concurrently
         Promise.all([
           SlideUtils.loadYouTubeIframeAPI(),
           ApiUtils.fetchSponsorBlockData(videoId)
         ]).then(([_, segments]) => {
-          let startSecs = 0;
-          let endSecs = undefined;
-          let startParam = "";
-          let endParam = "";
+            const playerVars = {
+              autoplay: 0,
+              mute: STATE.slideshow.isMuted ? 1 : 0,
+              controls: 0,
+              disablekb: 1,
+              fs: 0,
+              iv_load_policy: 3,
+              rel: 0,
+              loop: 0,
+              playsinline: 1,
+              origin: window.location.origin,
+            };
 
-          // Apply SponsorBlock start/end times
-          if (segments.intro) {
-            startSecs = Math.ceil(segments.intro[1]);
-            startParam = `&start=${startSecs}`;
-            console.info("🎬 Media Bar:", `SponsorBlock intro detected for video ${videoId}: skipping to ${startSecs}s`);
-          }
-          if (segments.outro) {
-            endSecs = Math.floor(segments.outro[0]);
-            endParam = `&end=${endSecs}`;
-            console.info("🎬 Media Bar:", `SponsorBlock outro detected for video ${videoId}: ending at ${endSecs}s`);
-          }
+            // Apply SponsorBlock start/end times
+            if (segments.intro) {
+              playerVars.start = Math.ceil(segments.intro[1]);
+              console.info("🎬 Media Bar:", `SponsorBlock intro detected for video ${videoId}: skipping to ${playerVars.start}s`);
+            }
+            if (segments.outro) {
+              playerVars.end = Math.floor(segments.outro[0]);
+              console.info("🎬 Media Bar:", `SponsorBlock outro detected for video ${videoId}: ending at ${playerVars.end}s`);
+            }
 
-          // Create an iframe upfront with ALL parameters including start/end
-          const muteParam = STATE.slideshow.isMuted ? 1 : 0;
-          const ytPlayerIframe = SlideUtils.createElement("iframe", {
-            id: `youtube-player-${itemId}`,
-            src: `https://www.youtube-nocookie.com/embed/${videoId}?enablejsapi=1&playsinline=1&controls=1&modestbranding=1&showinfo=0&disablekb=1&fs=0&iv_load_policy=3&rel=0&loop=0&origin=${encodeURIComponent(window.location.origin)}&mute=${muteParam}${startParam}${endParam}`,
-            style: "width: 100%; height: 100%; border: none; pointer-events: none;",
-            allow: "autoplay; encrypted-media",
-            referrerpolicy: "strict-origin-when-cross-origin",
-            allowfullscreen: "true"
-          });
-          
-          videoBackdrop.appendChild(ytPlayerIframe);
-
-          STATE.slideshow.videoPlayers[itemId] = new YT.Player(ytPlayerIframe, {
-            events: {
-              'onReady': (event) => {
-                // Store start/end time and videoId for later use
-                event.target._startTime = startSecs;
-                event.target._endTime = endSecs;
-                event.target._videoId = videoId;
+            STATE.slideshow.videoPlayers[itemId] = new YT.Player(ytPlayerIframe, {
+              playerVars: playerVars,
+              events: {
+                'onReady': (event) => {
+                  // Store start/end time and videoId for later use
+                  event.target._startTime = playerVars.start || 0;
+                  event.target._endTime = playerVars.end || undefined;
+                  event.target._videoId = videoId;
                   
                   // Store reference to wrapper for fading
                   event.target._wrapperDiv = videoBackdrop;
