@@ -12,9 +12,9 @@
         "version": "2.0.0.0",
         "changelog": "- feat: implement genre/tag filtering in custom id's\n- optimize video backdrop logic and SponsorBlock integration",
         "targetAbi": "10.11.0.0",
-        "sourceUrl": "https://github.com/CodeDevMLH/jellyfin-plugin-media-bar-enhanced/releases/download/v1.9.8.0/Jellyfin.Plugin.MediaBarEnhanced.zip",
-        "checksum": "a510c013e35f4a09579553bd0a3cce30",
-        "timestamp": "2026-04-16T14:44:28Z"
+        "sourceUrl": "https://github.com/CodeDevMLH/jellyfin-plugin-media-bar-enhanced/releases/download/v2.0.0.0/Jellyfin.Plugin.MediaBarEnhanced.zip",
+        "checksum": "a0c479779aa6ae94c33002b81da1a17b",
+        "timestamp": "2026-05-09T21:10:58Z"
       },
       {
         "version": "1.9.8.0",
