@@ -1956,6 +1956,7 @@ const SlideCreator = {
               loop: 0,
               playsinline: 1,
               origin: window.location.origin,
+              enablejsapi: 1
             };
 
             // Apply SponsorBlock start/end times
@@ -1988,10 +1989,18 @@ const SlideCreator = {
                   }
 
                   const slide = document.querySelector(`.slide[data-item-id="${itemId}"]`);
-                  if (slide && slide.classList.contains('active')) {
+                  const isVideoPlayerOpen = document.querySelector('.videoPlayerContainer') || document.querySelector('.youtubePlayerContainer');
+
+                  if (slide && slide.classList.contains('active') && STATE.slideshow.playSignals[itemId] === true && !document.hidden && (!isVideoPlayerOpen || isVideoPlayerOpen.classList.contains('hide'))) {
                     event.target.playVideo();
                     const timeoutId = setTimeout(() => {
-                      if (!slide.classList.contains('active') || document.hidden) return;
+                      const isVideoPlayerOpenNow = document.querySelector('.videoPlayerContainer') || document.querySelector('.youtubePlayerContainer');
+                      if (document.hidden || (isVideoPlayerOpenNow && !isVideoPlayerOpenNow.classList.contains('hide')) || !slide.classList.contains('active')) {
+                          try {
+                            event.target.stopVideo();
+                          } catch (e) {}
+                          return;
+                      }
 
                       if (event.target.getPlayerState() !== YT.PlayerState.PLAYING &&
                         event.target.getPlayerState() !== YT.PlayerState.BUFFERING) {
@@ -2022,6 +2031,7 @@ const SlideCreator = {
 
                       if (!playAllowed) {
                           // Active slide but play signal not yet issued
+                          event.target.pauseVideo();
                           return;
                       }
                       
@@ -2616,7 +2626,11 @@ const SlideshowManager = {
                          oldVideo.load(); // Force decoder release
                      }
                    }
+                   oldVideo.remove();
                    console.log("🎬 Media Bar:", "Pruned hidden slide video strictly before new allocation to bypass Apple/Low Power Device limits");
+                   if (STATE.slideshow.videoPlayers && STATE.slideshow.videoPlayers[oldVideoItemId]) {
+                       delete STATE.slideshow.videoPlayers[oldVideoItemId];
+                   }
                }
             }
         });
@@ -2753,6 +2767,27 @@ const SlideshowManager = {
           }
         } else if (STATE.slideshow.videoPlayers && STATE.slideshow.videoPlayers[currentItemId]) {
           const player = STATE.slideshow.videoPlayers[currentItemId];
+          // If delay > 0, buffer the video silently using cueVideoById. If 0, skip and load directly later.
+          if (CONFIG.backdropVideoDelay > 0) {
+            if (player && typeof player.cueVideoById === 'function' && player._videoId) {
+              // Use cueVideoById to buffer video without auto-playing it
+              player.cueVideoById({
+                videoId: player._videoId,
+                startSeconds: player._startTime || 0,
+                endSeconds: player._endTime
+              });
+
+              if (STATE.slideshow.isMuted) {
+                player.mute();
+              } else {
+                player.unMute();
+                player.setVolume(40);
+              }
+            } else if (player && typeof player.seekTo === 'function') {
+              const startTime = player._startTime || 0;
+              player.seekTo(startTime);
+            }
+          }
         }
 
         // play logic
@@ -3185,7 +3220,11 @@ const SlideshowManager = {
       Object.values(STATE.slideshow.videoPlayers).forEach(player => {
         try {
           if (player) {
-            if (typeof player.pauseVideo === 'function') player.pauseVideo();
+            if (typeof player.stopVideo === 'function') {
+                player.stopVideo();
+            } else if (typeof player.pauseVideo === 'function') {
+                player.pauseVideo();
+            }
             if (player._wrapperDiv) {
               player._wrapperDiv.style.transition = "opacity 0.3s ease-in-out";
               player._wrapperDiv.style.opacity = "0";
