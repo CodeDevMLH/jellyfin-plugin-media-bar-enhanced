@@ -74,7 +74,6 @@ jobs:
         with:
           dotnet-version: '9.x'
 
-
       - name: Build and Zip
         if: steps.check_release.outputs.release_exists == 'false'
         shell: bash
