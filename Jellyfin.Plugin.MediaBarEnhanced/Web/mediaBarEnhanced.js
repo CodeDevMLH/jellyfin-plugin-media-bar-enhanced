@@ -2166,17 +2166,28 @@ const SlideCreator = {
         backdropContainer.appendChild(videoBackdrop);
     }
 
-    const logo = SlideUtils.createElement("img", {
-      className: "logo high-quality",
-      src: this.buildImageUrl(item, "Logo", undefined, serverAddress, 40),
-      alt: item.Name,
-      loading: "eager",
-    });
-
+    const hasLogo = !!(item.ImageTags && item.ImageTags.Logo);
     const logoContainer = SlideUtils.createElement("div", {
       className: "logo-container",
     });
-    logoContainer.appendChild(logo);
+    const titleFallback = SlideUtils.createElement("div", {
+      className: "logo-title-fallback",
+    }, item.Name || "");
+    if (hasLogo) {
+      const logo = SlideUtils.createElement("img", {
+        className: "logo high-quality",
+        src: this.buildImageUrl(item, "Logo", undefined, serverAddress, 40),
+        alt: item.Name,
+        loading: "eager",
+      });
+      logo.onerror = () => {
+        logo.remove();
+        logoContainer.appendChild(titleFallback);
+      };
+      logoContainer.appendChild(logo);
+    } else {
+      logoContainer.appendChild(titleFallback);
+    }
 
     const featuredContent = SlideUtils.createElement(
       "div",
