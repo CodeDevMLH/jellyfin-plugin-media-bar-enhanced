@@ -25,11 +25,6 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v5
-        with:
-          dotnet-version: '9.x'
-
       - name: Read Version from Manifest
         id: read_version
         run: |
@@ -72,6 +67,12 @@ jobs:
             echo "Unexpected response when checking release: $HTTP_STATUS"
             exit 1
           fi
+
+      - name: Setup .NET
+        if: steps.check_release.outputs.release_exists == 'false'
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '9.x'
 
 
       - name: Build and Zip
