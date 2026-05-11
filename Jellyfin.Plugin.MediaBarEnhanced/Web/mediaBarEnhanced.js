@@ -2167,12 +2167,36 @@ const SlideCreator = {
     }
 
     const hasLogo = !!(item.ImageTags && item.ImageTags.Logo);
+    
     const logoContainer = SlideUtils.createElement("div", {
       className: "logo-container",
     });
-    const titleFallback = SlideUtils.createElement("div", {
-      className: "logo-title-fallback",
-    }, item.Name || "");
+
+    // Helper to create the title fallback only when needed (optimization)
+    const createTitleFallback = () => {
+      const titleText = item.Name || "";
+      // Break the title into a new line after a colon or hyphen/dash if followed by a space
+      let formattedTitle = titleText
+        .replace(/:\s+/g, ':<br>')
+        .replace(/\s+-\s+/g, ' -<br>')
+        .replace(/\s+–\s+/g, ' –<br>');
+
+      let fallbackFontSize = "3rem";
+      if (titleText.length <= 12) {
+        fallbackFontSize = "6rem";
+      } else if (titleText.length <= 25) {
+        fallbackFontSize = "4rem";
+      } else if (titleText.length >= 45) {
+        fallbackFontSize = "2.5rem";
+      }
+
+      return SlideUtils.createElement("div", {
+        className: "logo-title-fallback",
+        style: `font-size: ${fallbackFontSize};`,
+        innerHTML: formattedTitle
+      });
+    };
+    
     if (hasLogo) {
       const logo = SlideUtils.createElement("img", {
         className: "logo high-quality",
@@ -2182,11 +2206,11 @@ const SlideCreator = {
       });
       logo.onerror = () => {
         logo.remove();
-        logoContainer.appendChild(titleFallback);
+        logoContainer.appendChild(createTitleFallback());
       };
       logoContainer.appendChild(logo);
     } else {
-      logoContainer.appendChild(titleFallback);
+      logoContainer.appendChild(createTitleFallback());
     }
 
     const featuredContent = SlideUtils.createElement(
