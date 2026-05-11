@@ -2167,12 +2167,15 @@ const SlideCreator = {
     }
 
     const hasLogo = !!(item.ImageTags && item.ImageTags.Logo);
+    
     const logoContainer = SlideUtils.createElement("div", {
       className: "logo-container",
     });
+
     const titleFallback = SlideUtils.createElement("div", {
       className: "logo-title-fallback",
     }, item.Name || "");
+    
     if (hasLogo) {
       const logo = SlideUtils.createElement("img", {
         className: "logo high-quality",
