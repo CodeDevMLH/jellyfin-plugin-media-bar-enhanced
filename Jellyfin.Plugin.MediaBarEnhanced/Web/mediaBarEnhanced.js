@@ -81,6 +81,7 @@ const CONFIG = {
   applyLimitsToCustomIds: false,
   seasonalSections: "[]",
   excludeSeasonalContent: true,
+  maxCachedItems: 20,
   isEnabled: true,
 };
 
@@ -1092,6 +1093,11 @@ const ApiUtils = {
 
       STATE.slideshow.loadedItems[itemId] = itemData;
 
+      const cacheKeys = Object.keys(STATE.slideshow.loadedItems);
+      if (cacheKeys.length >= CONFIG.maxCachedItems) {
+        delete STATE.slideshow.loadedItems[cacheKeys[0]];
+      }
+
       return itemData;
     } catch (error) {
       console.error("🎬 Media Bar:", `Error fetching details for item ${itemId}:`, error);
@@ -1687,6 +1693,7 @@ class SlideTimer {
  * Observer for handling slideshow visibility based on current page
  */
 const VisibilityObserver = {
+  wasVisible: false,
   updateVisibility() {
     const videoPlayer = document.querySelector('.videoPlayerContainer');
     const trailerPlayer = document.querySelector('.youtubePlayerContainer');
@@ -1721,17 +1728,39 @@ const VisibilityObserver = {
     container.style.visibility = isVisible ? "visible" : "hidden";
     container.style.pointerEvents = isVisible ? "auto" : "none";
 
-    if (isVisible) {
+    if (isVisible && !this.wasVisible) {
+      if (STATE.slideshow.hasInitialized && STATE.slideshow.itemIds.length > 0) {
+        SlideshowManager.updateCurrentSlide(STATE.slideshow.currentSlideIndex);
+      }
       if (STATE.slideshow.slideInterval && !STATE.slideshow.isPaused) {
         STATE.slideshow.slideInterval.start();
         SlideshowManager.resumeActivePlayback();
       }
-    } else {
+    } else if (!isVisible && this.wasVisible) {
       if (STATE.slideshow.slideInterval) {
         STATE.slideshow.slideInterval.stop();
       }
       SlideshowManager.stopAllPlayback();
+
+      // Free memory: destroy players and slides
+      if (STATE.slideshow.videoPlayers) {
+        Object.values(STATE.slideshow.videoPlayers).forEach((player) => {
+          if (player) {
+            if (typeof player.destroy === "function") {
+              try { player.destroy(); } catch (e) {}
+            } else if (player.tagName === 'VIDEO') {
+              try { player.removeAttribute('src'); player.load(); player.remove(); } catch (e) {}
+            }
+          }
+        });
+        STATE.slideshow.videoPlayers = {};
+      }
+      container.querySelectorAll(".slide").forEach((slide) => slide.remove());
+      STATE.slideshow.createdSlides = {};
+      STATE.slideshow.hasTrailer = {};
     }
+
+    this.wasVisible = isVisible;
   },
 
   /**
