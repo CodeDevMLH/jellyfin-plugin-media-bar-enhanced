@@ -81,7 +81,106 @@ const CONFIG = {
   applyLimitsToCustomIds: false,
   seasonalSections: "[]",
   excludeSeasonalContent: true,
+  maxCachedItems: 20,
   isEnabled: true,
+};
+
+const CLIENT_MENU_TRANSLATIONS = {
+  'en': {
+    title: 'Media Bar Settings',
+    enabledLabel: 'Enable Media Bar Enhanced',
+    enabledDesc: 'Toggle the entire media bar visibility.',
+    videoBackdropsLabel: 'Enable Trailer Backdrops',
+    videoBackdropsDesc: 'Play trailers as background videos.',
+    trailerButtonLabel: 'Show Trailer Button',
+    trailerButtonDesc: 'Show button to play trailer in popup (only backdrops without trailer)',
+    mobileVideoLabel: 'Enable Trailer On Mobile',
+    mobileVideoDesc: 'Allow trailer backdrops on mobile devices.',
+    waitForTrailerLabel: 'Wait For Trailer To End',
+    waitForTrailerDesc: 'Wait for the trailer to finish before changing slides.',
+    slideAnimationsLabel: 'Enable Animations',
+    slideAnimationsDesc: 'Enable zooming-in effect (only on background images)',
+    resetBtn: 'Load Server Defaults',
+    resetTitle: 'Reset to Server Defaults',
+    saveBtn: 'Save & Reload',
+    confirmReset: 'Reset all local Media Bar settings to server defaults?'
+  },
+  'de': {
+    title: 'Media Bar Einstellungen',
+    enabledLabel: 'Media Bar Enhanced aktivieren',
+    enabledDesc: 'Schaltet die gesamte Media Bar ein/aus.',
+    videoBackdropsLabel: 'Trailer-Hintergründe aktivieren',
+    videoBackdropsDesc: 'Spielt Trailer als Hintergrundvideo ab.',
+    trailerButtonLabel: 'Trailer-Button anzeigen',
+    trailerButtonDesc: 'Zeigt einen Button zum Abspielen von Trailern an (für Kacheln ohne Video-Daten).',
+    mobileVideoLabel: 'Trailer auf Handys aktivieren',
+    mobileVideoDesc: 'Erlaubt Trailer-Hintergründe auf mobilen Geräten.',
+    waitForTrailerLabel: 'Auf Trailer-Ende warten',
+    waitForTrailerDesc: 'Wartet, bis der Trailer beendet ist, bevor die nächste Kachel gezeigt wird.',
+    slideAnimationsLabel: 'Animationen aktivieren',
+    slideAnimationsDesc: 'Aktiviert einen Zoom-Effekt (nur für Hintergrundbilder).',
+    resetBtn: 'Server-Standardwerte laden',
+    resetTitle: 'Auf Server-Standardwerte zurücksetzen',
+    saveBtn: 'Speichern & Neu laden',
+    confirmReset: 'Alle lokalen Media Bar Einstellungen auf Server-Standardwerte zurücksetzen?'
+  },
+  'es': {
+    title: 'Ajustes de Media Bar',
+    enabledLabel: 'Habilitar Media Bar Enhanced',
+    enabledDesc: 'Activa o desactiva toda la Media Bar.',
+    videoBackdropsLabel: 'Habilitar fondos de tráiler',
+    videoBackdropsDesc: 'Reproducir tráilers como videos de fondo.',
+    trailerButtonLabel: 'Mostrar botón de tráiler',
+    trailerButtonDesc: 'Muestra un botón para reproducir el tráiler en una ventana emergente (solo para fondos sin video).',
+    mobileVideoLabel: 'Habilitar tráiler en móviles',
+    mobileVideoDesc: 'Permitir fondos de tráiler en dispositivos móviles.',
+    waitForTrailerLabel: 'Esperar a que termine el tráiler',
+    waitForTrailerDesc: 'Espera a que el tráiler termine antes de cambiar de diapositiva.',
+    slideAnimationsLabel: 'Habilitar animaciones',
+    slideAnimationsDesc: 'Habilita el efecto de zoom (solo en imágenes de fondo).',
+    resetBtn: 'Cargar valores del servidor',
+    resetTitle: 'Restablecer a valores del servidor',
+    saveBtn: 'Guardar y recargar',
+    confirmReset: '¿Restablecer todos los ajustes locales de Media Bar a los valores predeterminados del servidor?'
+  },
+  'fr': {
+    title: 'Paramètres de Media Bar',
+    enabledLabel: 'Activer Media Bar Enhanced',
+    enabledDesc: 'Active ou désactive toute la Media Bar.',
+    videoBackdropsLabel: 'Activer les fonds de bande-annonce',
+    videoBackdropsDesc: 'Lire les bandes-annonces comme vidéos en arrière-plan.',
+    trailerButtonLabel: 'Afficher le bouton bande-annonce',
+    trailerButtonDesc: 'Affiche un bouton pour lire la bande-annonce dans une popup (uniquement pour les fonds sans vidéo).',
+    mobileVideoLabel: 'Activer les bandes-annonces sur mobile',
+    mobileVideoDesc: 'Autoriser les bandes-annonces en arrière-plan sur les appareils mobiles.',
+    waitForTrailerLabel: 'Attendre la fin de la bande-annonce',
+    waitForTrailerDesc: 'Attendre la fin de la bande-annonce avant de changer de diapositive.',
+    slideAnimationsLabel: 'Activer les animations',
+    slideAnimationsDesc: 'Activer l\'effet de zoom (uniquement sur les images d\'arrière-plan).',
+    resetBtn: 'Charger les valeurs par défaut',
+    resetTitle: 'Réinitialiser aux valeurs du serveur',
+    saveBtn: 'Enregistrer et recharger',
+    confirmReset: 'Réinitialiser tous les paramètres locaux de Media Bar aux valeurs par défaut du serveur ?'
+  },
+  'it': {
+    title: 'Impostazioni Media Bar',
+    enabledLabel: 'Abilita Media Bar Enhanced',
+    enabledDesc: 'Attiva o disattiva l\'intera Media Bar.',
+    videoBackdropsLabel: 'Abilita sfondi trailer',
+    videoBackdropsDesc: 'Riproduci trailer come video in background.',
+    trailerButtonLabel: 'Mostra pulsante trailer',
+    trailerButtonDesc: 'Mostra il pulsante per riprodurre il trailer (solo per sfondi senza video).',
+    mobileVideoLabel: 'Abilita trailer su mobile',
+    mobileVideoDesc: 'Consenti sfondi trailer sui dispositivi mobili.',
+    waitForTrailerLabel: 'Attendi fine trailer',
+    waitForTrailerDesc: 'Attende la fine del trailer prima di cambiare diapositiva.',
+    slideAnimationsLabel: 'Abilita animazioni',
+    slideAnimationsDesc: 'Abilita l\'effetto zoom (solo sulle immagini di sfondo).',
+    resetBtn: 'Carica valori del server',
+    resetTitle: 'Ripristina valori del server',
+    saveBtn: 'Salva e ricarica',
+    confirmReset: 'Ripristinare tutte le impostazioni locali di Media Bar ai valori predefiniti del server?'
+  }
 };
 
 // State management
@@ -1092,6 +1191,11 @@ const ApiUtils = {
 
       STATE.slideshow.loadedItems[itemId] = itemData;
 
+      const cacheKeys = Object.keys(STATE.slideshow.loadedItems);
+      if (cacheKeys.length >= CONFIG.maxCachedItems) {
+        delete STATE.slideshow.loadedItems[cacheKeys[0]];
+      }
+
       return itemData;
     } catch (error) {
       console.error("🎬 Media Bar:", `Error fetching details for item ${itemId}:`, error);
@@ -1687,6 +1791,7 @@ class SlideTimer {
  * Observer for handling slideshow visibility based on current page
  */
 const VisibilityObserver = {
+  wasVisible: false,
   updateVisibility() {
     const videoPlayer = document.querySelector('.videoPlayerContainer');
     const trailerPlayer = document.querySelector('.youtubePlayerContainer');
@@ -1721,17 +1826,39 @@ const VisibilityObserver = {
     container.style.visibility = isVisible ? "visible" : "hidden";
     container.style.pointerEvents = isVisible ? "auto" : "none";
 
-    if (isVisible) {
+    if (isVisible && !this.wasVisible) {
+      if (STATE.slideshow.hasInitialized && STATE.slideshow.itemIds.length > 0) {
+        SlideshowManager.updateCurrentSlide(STATE.slideshow.currentSlideIndex);
+      }
       if (STATE.slideshow.slideInterval && !STATE.slideshow.isPaused) {
         STATE.slideshow.slideInterval.start();
         SlideshowManager.resumeActivePlayback();
       }
-    } else {
+    } else if (!isVisible && this.wasVisible) {
       if (STATE.slideshow.slideInterval) {
         STATE.slideshow.slideInterval.stop();
       }
       SlideshowManager.stopAllPlayback();
+
+      // Free memory: destroy players and slides
+      if (STATE.slideshow.videoPlayers) {
+        Object.values(STATE.slideshow.videoPlayers).forEach((player) => {
+          if (player) {
+            if (typeof player.destroy === "function") {
+              try { player.destroy(); } catch (e) {}
+            } else if (player.tagName === 'VIDEO') {
+              try { player.removeAttribute('src'); player.load(); player.remove(); } catch (e) {}
+            }
+          }
+        });
+        STATE.slideshow.videoPlayers = {};
+      }
+      container.querySelectorAll(".slide").forEach((slide) => slide.remove());
+      STATE.slideshow.createdSlides = {};
+      STATE.slideshow.hasTrailer = {};
     }
+
+    this.wasVisible = isVisible;
   },
 
   /**
@@ -4024,17 +4151,21 @@ const MediaBarEnhancedSettingsManager = {
     }
 
     popup.style.top = `${rect.bottom + 10}px`;
+    
+    let locale = LocalizationUtils.cachedLocale || 'en';
+    locale = locale.split('-')[0].toLowerCase();
+    const t = CLIENT_MENU_TRANSLATIONS[locale] ? CLIENT_MENU_TRANSLATIONS[locale] : CLIENT_MENU_TRANSLATIONS['en'];
 
     const settings = [
-        { key: 'enabled', label: 'Enable Media Bar Enhanced', description: 'Toggle the entire media bar visibility.', default: true },
-        { key: 'videoBackdrops', label: 'Enable Trailer Backdrops', description: 'Play trailers as background videos.', default: CONFIG.enableVideoBackdrop },
-        { key: 'trailerButton', label: 'Show Trailer Button', description: 'Show button to play trailer in popup (only backdrops without trailer)', default: CONFIG.showTrailerButton },
-        { key: 'mobileVideo', label: 'Enable Trailer On Mobile', description: 'Allow trailer backdrops on mobile devices.', default: CONFIG.enableMobileVideo },
-        { key: 'waitForTrailer', label: 'Wait For Trailer To End', description: 'Wait for the trailer to finish before changing slides.', default: CONFIG.waitForTrailerToEnd },
-        { key: 'slideAnimations', label: 'Enable Animations', description: 'Enable zooming-in effect (only on background images)', default: CONFIG.slideAnimationEnabled },
+        { key: 'enabled', label: t.enabledLabel, description: t.enabledDesc, default: true },
+        { key: 'videoBackdrops', label: t.videoBackdropsLabel, description: t.videoBackdropsDesc, default: CONFIG.enableVideoBackdrop },
+        { key: 'trailerButton', label: t.trailerButtonLabel, description: t.trailerButtonDesc, default: CONFIG.showTrailerButton },
+        { key: 'mobileVideo', label: t.mobileVideoLabel, description: t.mobileVideoDesc, default: CONFIG.enableMobileVideo },
+        { key: 'waitForTrailer', label: t.waitForTrailerLabel, description: t.waitForTrailerDesc, default: CONFIG.waitForTrailerToEnd },
+        { key: 'slideAnimations', label: t.slideAnimationsLabel, description: t.slideAnimationsDesc, default: CONFIG.slideAnimationEnabled },
     ];
 
-    let html = '<h3 style="margin-top:0; margin-bottom:1em; border-bottom:1px solid #444; padding-bottom:0.5em;">Media Bar Settings</h3>';
+    let html = `<h3 style="margin-top:0; margin-bottom:1em; border-bottom:1px solid #444; padding-bottom:0.5em;">${t.title}</h3>`;
 
     settings.forEach(setting => {
         const isChecked = this.getSetting(setting.key, setting.default);
@@ -4052,11 +4183,11 @@ const MediaBarEnhancedSettingsManager = {
     // Buttons Container
     html += `
     <div style="margin-top:1em; display:flex; justify-content:flex-end; align-items:center; gap:1.5em;">
-        <button is="emby-button" type="button" class="raised button-cancel emby-button" id="mb-settings-reset" title="Reset to Server Defaults">
-            <span>Load Server Defaults</span>
+        <button is="emby-button" type="button" class="raised button-cancel emby-button" id="mb-settings-reset" title="${t.resetTitle}">
+            <span>${t.resetBtn}</span>
         </button>
         <button is="emby-button" type="button" class="raised button-submit emby-button" id="mb-settings-save">
-            <span>Save & Reload</span>
+            <span>${t.saveBtn}</span>
         </button>
     </div>
     `;
@@ -4078,7 +4209,7 @@ const MediaBarEnhancedSettingsManager = {
 
     // Reset Handler
     popup.querySelector('#mb-settings-reset').addEventListener('click', () => {
-        if (confirm("Reset all local Media Bar settings to server defaults?")) {
+        if (confirm(t.confirmReset)) {
             Object.keys(localStorage).forEach(key => {
                 if (key.startsWith('mediaBarEnhanced-')) {
                     localStorage.removeItem(key);
