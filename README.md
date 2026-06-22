@@ -53,17 +53,26 @@ Normal mode like the original with additional trailer button
 Trailer modal
 <br><br><br>
 
-<img width="1920" height="994" alt="config" src="https://github.com/user-attachments/assets/5492c384-a5c4-47ee-9428-3d9de2748e63" />
+<img width="1919" height="996" alt="admin_mbe" src="https://github.com/user-attachments/assets/ed04ceb5-e401-4dc6-ad53-022d8bb26e99" />
 Excerpt from the config: E.g. here you can simply add your items that should be displayed
 <br><br>
 </details>
 
+<details>
+<summary>Client side settings menu</summary>
+
+<img width="1080" height="2199" alt="css_mbe" src="https://github.com/user-attachments/assets/1a8aa1b0-2cd0-486d-8adf-91560ed2d6fe" />
+Supported languages (English, German, Spanish, French, Italian)
+</details>
 
 <details>
 <summary>Mobile Layout</summary> 
 
 ![demo_mobile](https://github.com/user-attachments/assets/d11a7ed0-ceb7-43c3-9b22-09510251e0aa)
-<br>If trailer on mobile is eenabled...
+
+![demo_mobile_16-9](https://github.com/user-attachments/assets/4116c3ab-0de3-4928-82e9-938802e06aa3)
+
+<br>If trailer on mobile is enabled...
 <br><br><br>
 
 <img width="1080" height="2199" alt="mobile" src="https://github.com/user-attachments/assets/f0a0cc0d-f019-45f5-96c8-a5de14bf92ba" />
@@ -72,7 +81,20 @@ Normal mode like the original with additional trailer button
 
 <img width="1080" height="2199" alt="trailer_modal_mobile" src="https://github.com/user-attachments/assets/944f9b82-9c9b-411f-883b-877b65ed933f" />
 Trailer modal in portrait mode
-<br><br>
+<br><br><br>
+
+<img width="1080" height="2340" alt="16-9" src="https://github.com/user-attachments/assets/216cff8d-900d-4add-b6cf-b782cfc2fb6e" />
+
+Compact 16:9 mode
+<br><br><br>
+
+<img width="1080" height="2340" alt="4-3" src="https://github.com/user-attachments/assets/9d6e6139-c381-45cb-9671-a7686e85efdd" />
+
+Classic 4:3 mode
+
+<img width="1080" height="2199" alt="mobile" src="https://github.com/user-attachments/assets/f0a0cc0d-f019-45f5-96c8-a5de14bf92ba" />
+Normal mode like the original with additional trailer button
+<br><br><br>
 </details>
 
 
