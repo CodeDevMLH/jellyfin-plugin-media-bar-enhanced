@@ -764,6 +764,15 @@
     font-size: 2.2rem !important;
   }
 
+  .progress-bar-navbar {
+    top: 108px !important;
+  }
+
+  body.media-bar-mobile-16-9 .progress-bar-navbar,
+  body.media-bar-mobile-4-3 .progress-bar-navbar {
+    top: 4px !important;
+  }
+
   body.media-bar-mobile-16-9 #slides-container {
     position: absolute !important;
     top: 104px !important;
@@ -2453,7 +2462,7 @@ select.media-bar-select option {
 .progress-bar-navbar {
   top: var(--header-height, 4.5rem);
   left: 4px;
-  width: calc(100% - 4px);
+  width: calc(100% - 8px);
   height: 4px;
   background-color: rgba(0, 164, 220, 0.2);
   border-radius: 2px;
@@ -2461,7 +2470,7 @@ select.media-bar-select option {
 
 .progress-bar-dots {
   bottom: 0px;
-  left: 6px;
+  left: 5px;
   width: calc(100% - 10px);
   height: 5px;
   background-color: #686868;
