@@ -29,6 +29,9 @@
   }
   window.mediaBarEnhancedLoaded = true;
 
+  // MARK: Version
+  const PLUGIN_VERSION = "3.0.1.0";
+
   //Core Module Configuration
   const CONFIG = {
     IMAGE_SVG: {
@@ -498,8 +501,7 @@
         accessToken: apiClient._serverInfo.AccessToken || "Not Found",
         serverId: apiClient._serverInfo.Id || "Not Found",
         serverAddress: apiClient._serverAddress || "Not Found",
-        // MARK: Version
-        pluginVersion: "3.0.0.0",
+        pluginVersion: PLUGIN_VERSION,
       };
 
       if (callback && typeof callback === "function") {
@@ -4684,17 +4686,30 @@
             }
 
             if (!container.querySelector('.media-bar-sidebar-settings-link')) {
+              const customItems = Array.from(container.querySelectorAll('[data-plugin-sidebar-priority]'));
+              const nextElement = customItems.find(el => {
+                const p = parseInt(el.getAttribute('data-plugin-sidebar-priority'), 10);
+                return p > 10;
+              });
+
               // Add sidebar section header if not present
-              if (!container.querySelector('.media-bar-sidebar-header')) {
-                const header = document.createElement('h3');
+              let header = container.querySelector('.media-bar-sidebar-header');
+              if (!header) {
+                header = document.createElement('h3');
                 header.className = 'sidebarHeader media-bar-sidebar-header';
                 header.textContent = 'Media Bar';
-                container.appendChild(header);
+                header.setAttribute('data-plugin-sidebar-priority', '10');
+                if (nextElement) {
+                  container.insertBefore(header, nextElement);
+                } else {
+                  container.appendChild(header);
+                }
               }
 
               const link = document.createElement('a');
               link.className = 'sidebarLink navMenuOption media-bar-sidebar-settings-link';
               link.href = '#';
+              link.setAttribute('data-plugin-sidebar-priority', '10');
 
               // Add logo icon
               const logoImg = document.createElement('img');
@@ -4736,7 +4751,11 @@
                 this.toggleSettingsPopup(link);
               });
 
-              container.appendChild(link);
+              if (nextElement) {
+                container.insertBefore(link, nextElement);
+              } else {
+                container.appendChild(link);
+              }
             }
           });
         }
