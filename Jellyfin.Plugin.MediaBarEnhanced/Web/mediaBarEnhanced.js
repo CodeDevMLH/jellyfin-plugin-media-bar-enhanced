@@ -22,343 +22,533 @@
  * - many other settings in the advanced settings tab
  */
 
-//Core Module Configuration
-const CONFIG = {
-  IMAGE_SVG: {
-    freshTomato:
-      '<svg id="svg3390" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" height="18" viewBox="0 0 138.75 141.25" width="18" version="1.1" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/"><metadata id="metadata3396"><rdf:RDF><cc:Work rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/><dc:title/></cc:Work></rdf:RDF></metadata><g id="layer1" fill="#f93208"><path id="path3412" d="m20.154 40.829c-28.149 27.622-13.657 61.011-5.734 71.931 35.254 41.954 92.792 25.339 111.89-5.9071 4.7608-8.2027 22.554-53.467-23.976-78.009z"/><path id="path3471" d="m39.613 39.265 4.7778-8.8607 28.406-5.0384 11.119 9.2082z"/></g><g id="layer2"><path id="path3437" d="m39.436 8.5696 8.9682-5.2826 6.7569 15.479c3.7925-6.3226 13.79-16.316 24.939-4.6684-4.7281 1.2636-7.5161 3.8553-7.7397 8.4768 15.145-4.1697 31.343 3.2127 33.539 9.0911-10.951-4.314-27.695 10.377-41.771 2.334 0.009 15.045-12.617 16.636-19.902 17.076 2.077-4.996 5.591-9.994 1.474-14.987-7.618 8.171-13.874 10.668-33.17 4.668 4.876-1.679 14.843-11.39 24.448-11.425-6.775-2.467-12.29-2.087-17.814-1.475 2.917-3.961 12.149-15.197 28.625-8.476z" fill="#02902e"/></g></svg>',
-    rottenTomato:
-      '<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" viewBox="0 0 145 140" width="20" height="18"><path fill="#0fc755" d="M47.4 35.342c-13.607-7.935-12.32-25.203 2.097-31.88 26.124-6.531 29.117 13.78 22.652 30.412-6.542 24.11 18.095 23.662 19.925 10.067 3.605-18.412 19.394-26.695 31.67-16.359 12.598 12.135 7.074 36.581-17.827 34.187-16.03-1.545-19.552 19.585.839 21.183 32.228 1.915 42.49 22.167 31.04 35.865-15.993 15.15-37.691-4.439-45.512-19.505-6.8-9.307-17.321.11-13.423 6.502 12.983 19.465 2.923 31.229-10.906 30.62-13.37-.85-20.96-9.06-13.214-29.15 3.897-12.481-8.595-15.386-16.57-5.45-11.707 19.61-28.865 13.68-33.976 4.19-3.243-7.621-2.921-25.846 24.119-23.696 16.688 4.137 11.776-12.561-.63-13.633-9.245-.443-30.501-7.304-22.86-24.54 7.34-11.056 24.958-11.768 33.348 6.293 3.037 4.232 8.361 11.042 18.037 5.033 3.51-5.197 1.21-13.9-8.809-20.135z"/></svg>',
-  },
-  shuffleInterval: 7000,
-  retryInterval: 500,
-  minSwipeDistance: 50,
-  loadingCheckInterval: 100,
-  maxPlotLength: 360,
-  maxMovies: 15,
-  maxTvShows: 15,
-  maxItems: 500,
-  preloadCount: 3,
-  fadeTransitionDuration: 500,
-  maxPaginationDots: 15,
-  showPaginationDots: true,
-  maxParentalRating: null,
-  maxDaysRecent: null,
-  slideAnimationEnabled: true,
-  enableVideoBackdrop: true,
-  useSponsorBlock: true,
-  preferLocalTrailers: false,
-  randomizeLocalTrailers: false,
-  preferLocalBackdrops: false,
-  randomizeThemeVideos: false,
-  includeWatchedContent: false,
-  waitForTrailerToEnd: true,
-  startMuted: true,
-  fullWidthVideo: true,
-  enableMobileVideo: false,
-  showTrailerButton: true,
-  enableKeyboardControls: true,
-  alwaysShowArrows: false,
-  hideArrowsOnMobile: true,
-  enableCustomOverlay: false,
-  customOverlayText: "",
-  customOverlayImageUrl: "",
-  customOverlayStyle: "Shadowed",
-  customOverlayImageStyle: "None",
-  customOverlayPriority: "Image",
-  customOverlayPositionX: 0,
-  customOverlayPositionY: 0,
-  customOverlayScale: 100,
-  backdropVideoDelay: 0,
-  constrainPlotWidth: false,
-  enableCustomMediaIds: true,
-  enableSeasonalContent: false,
-  customMediaIds: "",
-  enableLoadingScreen: true,
-  enableClientSideSettings: false,
-  sortBy: "Random",
-  sortOrder: "Ascending",
-  applyLimitsToCustomIds: false,
-  seasonalSections: "[]",
-  excludeSeasonalContent: true,
-  maxCachedItems: 20,
-  isEnabled: true,
-};
-
-const CLIENT_MENU_TRANSLATIONS = {
-  'en': {
-    title: 'Media Bar Settings',
-    enabledLabel: 'Enable Media Bar Enhanced',
-    enabledDesc: 'Toggle the entire media bar visibility.',
-    videoBackdropsLabel: 'Enable Trailer Backdrops',
-    videoBackdropsDesc: 'Play trailers as background videos.',
-    trailerButtonLabel: 'Show Trailer Button',
-    trailerButtonDesc: 'Show button to play trailer in popup (only backdrops without trailer)',
-    mobileVideoLabel: 'Enable Trailer On Mobile',
-    mobileVideoDesc: 'Allow trailer backdrops on mobile devices.',
-    waitForTrailerLabel: 'Wait For Trailer To End',
-    waitForTrailerDesc: 'Wait for the trailer to finish before changing slides.',
-    slideAnimationsLabel: 'Enable Animations',
-    slideAnimationsDesc: 'Enable zooming-in effect (only on background images)',
-    resetBtn: 'Load Server Defaults',
-    resetTitle: 'Reset to Server Defaults',
-    saveBtn: 'Save & Reload',
-    confirmReset: 'Reset all local Media Bar settings to server defaults?'
-  },
-  'de': {
-    title: 'Media Bar Einstellungen',
-    enabledLabel: 'Media Bar Enhanced aktivieren',
-    enabledDesc: 'Schaltet die gesamte Media Bar ein/aus.',
-    videoBackdropsLabel: 'Trailer-Hintergründe aktivieren',
-    videoBackdropsDesc: 'Spielt Trailer als Hintergrundvideo ab.',
-    trailerButtonLabel: 'Trailer-Button anzeigen',
-    trailerButtonDesc: 'Zeigt einen Button zum Abspielen von Trailern an (für Kacheln ohne Video-Daten).',
-    mobileVideoLabel: 'Trailer auf Handys aktivieren',
-    mobileVideoDesc: 'Erlaubt Trailer-Hintergründe auf mobilen Geräten.',
-    waitForTrailerLabel: 'Auf Trailer-Ende warten',
-    waitForTrailerDesc: 'Wartet, bis der Trailer beendet ist, bevor die nächste Kachel gezeigt wird.',
-    slideAnimationsLabel: 'Animationen aktivieren',
-    slideAnimationsDesc: 'Aktiviert einen Zoom-Effekt (nur für Hintergrundbilder).',
-    resetBtn: 'Server-Standardwerte laden',
-    resetTitle: 'Auf Server-Standardwerte zurücksetzen',
-    saveBtn: 'Speichern & Neu laden',
-    confirmReset: 'Alle lokalen Media Bar Einstellungen auf Server-Standardwerte zurücksetzen?'
-  },
-  'es': {
-    title: 'Ajustes de Media Bar',
-    enabledLabel: 'Habilitar Media Bar Enhanced',
-    enabledDesc: 'Activa o desactiva toda la Media Bar.',
-    videoBackdropsLabel: 'Habilitar fondos de tráiler',
-    videoBackdropsDesc: 'Reproducir tráilers como videos de fondo.',
-    trailerButtonLabel: 'Mostrar botón de tráiler',
-    trailerButtonDesc: 'Muestra un botón para reproducir el tráiler en una ventana emergente (solo para fondos sin video).',
-    mobileVideoLabel: 'Habilitar tráiler en móviles',
-    mobileVideoDesc: 'Permitir fondos de tráiler en dispositivos móviles.',
-    waitForTrailerLabel: 'Esperar a que termine el tráiler',
-    waitForTrailerDesc: 'Espera a que el tráiler termine antes de cambiar de diapositiva.',
-    slideAnimationsLabel: 'Habilitar animaciones',
-    slideAnimationsDesc: 'Habilita el efecto de zoom (solo en imágenes de fondo).',
-    resetBtn: 'Cargar valores del servidor',
-    resetTitle: 'Restablecer a valores del servidor',
-    saveBtn: 'Guardar y recargar',
-    confirmReset: '¿Restablecer todos los ajustes locales de Media Bar a los valores predeterminados del servidor?'
-  },
-  'fr': {
-    title: 'Paramètres de Media Bar',
-    enabledLabel: 'Activer Media Bar Enhanced',
-    enabledDesc: 'Active ou désactive toute la Media Bar.',
-    videoBackdropsLabel: 'Activer les fonds de bande-annonce',
-    videoBackdropsDesc: 'Lire les bandes-annonces comme vidéos en arrière-plan.',
-    trailerButtonLabel: 'Afficher le bouton bande-annonce',
-    trailerButtonDesc: 'Affiche un bouton pour lire la bande-annonce dans une popup (uniquement pour les fonds sans vidéo).',
-    mobileVideoLabel: 'Activer les bandes-annonces sur mobile',
-    mobileVideoDesc: 'Autoriser les bandes-annonces en arrière-plan sur les appareils mobiles.',
-    waitForTrailerLabel: 'Attendre la fin de la bande-annonce',
-    waitForTrailerDesc: 'Attendre la fin de la bande-annonce avant de changer de diapositive.',
-    slideAnimationsLabel: 'Activer les animations',
-    slideAnimationsDesc: 'Activer l\'effet de zoom (uniquement sur les images d\'arrière-plan).',
-    resetBtn: 'Charger les valeurs par défaut',
-    resetTitle: 'Réinitialiser aux valeurs du serveur',
-    saveBtn: 'Enregistrer et recharger',
-    confirmReset: 'Réinitialiser tous les paramètres locaux de Media Bar aux valeurs par défaut du serveur ?'
-  },
-  'it': {
-    title: 'Impostazioni Media Bar',
-    enabledLabel: 'Abilita Media Bar Enhanced',
-    enabledDesc: 'Attiva o disattiva l\'intera Media Bar.',
-    videoBackdropsLabel: 'Abilita sfondi trailer',
-    videoBackdropsDesc: 'Riproduci trailer come video in background.',
-    trailerButtonLabel: 'Mostra pulsante trailer',
-    trailerButtonDesc: 'Mostra il pulsante per riprodurre il trailer (solo per sfondi senza video).',
-    mobileVideoLabel: 'Abilita trailer su mobile',
-    mobileVideoDesc: 'Consenti sfondi trailer sui dispositivi mobili.',
-    waitForTrailerLabel: 'Attendi fine trailer',
-    waitForTrailerDesc: 'Attende la fine del trailer prima di cambiare diapositiva.',
-    slideAnimationsLabel: 'Abilita animazioni',
-    slideAnimationsDesc: 'Abilita l\'effetto zoom (solo sulle immagini di sfondo).',
-    resetBtn: 'Carica valori del server',
-    resetTitle: 'Ripristina valori del server',
-    saveBtn: 'Salva e ricarica',
-    confirmReset: 'Ripristinare tutte le impostazioni locali di Media Bar ai valori predefiniti del server?'
-  }
-};
-
-// State management
-const STATE = {
-  jellyfinData: {
-    userId: null,
-    appName: null,
-    appVersion: null,
-    deviceName: null,
-    deviceId: null,
-    accessToken: null,
-    serverAddress: null,
-  },
-  slideshow: {
-    hasInitialized: false,
-    isTransitioning: false,
-    isPaused: false,
-    currentSlideIndex: 0,
-    focusedSlide: null,
-    containerFocused: false,
-    slideInterval: null,
-    itemIds: [],
-    loadedItems: {},
-    createdSlides: {},
-    totalItems: 0,
-    isLoading: false,
-    videoPlayers: {},
-    sponsorBlockInterval: null,
-    isMuted: CONFIG.startMuted,
-    customTrailerUrls: {},
-    ytPromise: null,
-    autoplayTimeouts: [],
-    playSignals: {},
-  },
-};
-
-// Request throttling system
-const requestQueue = [];
-let isProcessingQueue = false;
-
-/**
- * Process the next request in the queue with throttling
- */
-const processNextRequest = () => {
-  if (requestQueue.length === 0) {
-    isProcessingQueue = false;
+(function () {
+  if (window.mediaBarEnhancedLoaded) {
+    console.warn("🎬 Media Bar Enhanced already loaded, skipping duplicate execution.");
     return;
   }
+  window.mediaBarEnhancedLoaded = true;
 
-  isProcessingQueue = true;
-  const { url, callback } = requestQueue.shift();
+  //Core Module Configuration
+  const CONFIG = {
+    IMAGE_SVG: {
+      freshTomato:
+        '<svg id="svg3390" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" height="18" viewBox="0 0 138.75 141.25" width="18" version="1.1" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/"><metadata id="metadata3396"><rdf:RDF><cc:Work rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/><dc:title/></cc:Work></rdf:RDF></metadata><g id="layer1" fill="#f93208"><path id="path3412" d="m20.154 40.829c-28.149 27.622-13.657 61.011-5.734 71.931 35.254 41.954 92.792 25.339 111.89-5.9071 4.7608-8.2027 22.554-53.467-23.976-78.009z"/><path id="path3471" d="m39.613 39.265 4.7778-8.8607 28.406-5.0384 11.119 9.2082z"/></g><g id="layer2"><path id="path3437" d="m39.436 8.5696 8.9682-5.2826 6.7569 15.479c3.7925-6.3226 13.79-16.316 24.939-4.6684-4.7281 1.2636-7.5161 3.8553-7.7397 8.4768 15.145-4.1697 31.343 3.2127 33.539 9.0911-10.951-4.314-27.695 10.377-41.771 2.334 0.009 15.045-12.617 16.636-19.902 17.076 2.077-4.996 5.591-9.994 1.474-14.987-7.618 8.171-13.874 10.668-33.17 4.668 4.876-1.679 14.843-11.39 24.448-11.425-6.775-2.467-12.29-2.087-17.814-1.475 2.917-3.961 12.149-15.197 28.625-8.476z" fill="#02902e"/></g></svg>',
+      rottenTomato:
+        '<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" viewBox="0 0 145 140" width="20" height="18"><path fill="#0fc755" d="M47.4 35.342c-13.607-7.935-12.32-25.203 2.097-31.88 26.124-6.531 29.117 13.78 22.652 30.412-6.542 24.11 18.095 23.662 19.925 10.067 3.605-18.412 19.394-26.695 31.67-16.359 12.598 12.135 7.074 36.581-17.827 34.187-16.03-1.545-19.552 19.585.839 21.183 32.228 1.915 42.49 22.167 31.04 35.865-15.993 15.15-37.691-4.439-45.512-19.505-6.8-9.307-17.321.11-13.423 6.502 12.983 19.465 2.923 31.229-10.906 30.62-13.37-.85-20.96-9.06-13.214-29.15 3.897-12.481-8.595-15.386-16.57-5.45-11.707 19.61-28.865 13.68-33.976 4.19-3.243-7.621-2.921-25.846 24.119-23.696 16.688 4.137 11.776-12.561-.63-13.633-9.245-.443-30.501-7.304-22.86-24.54 7.34-11.056 24.958-11.768 33.348 6.293 3.037 4.232 8.361 11.042 18.037 5.033 3.51-5.197 1.21-13.9-8.809-20.135z"/></svg>',
+    },
+    shuffleInterval: 7000,
+    retryInterval: 500,
+    minSwipeDistance: 50,
+    loadingCheckInterval: 100,
+    maxPlotLength: 360,
+    maxMovies: 20,
+    maxTvShows: 20,
+    maxItems: 20,
+    preloadCount: 3,
+    fadeTransitionDuration: 500,
+    maxPaginationDots: 15,
+    showPaginationDots: true,
+    maxParentalRating: null,
+    maxDaysRecent: null,
+    slideAnimationEnabled: true,
+    enableVideoBackdrop: true,
+    useSponsorBlock: true,
+    preferLocalTrailers: false,
+    randomizeLocalTrailers: false,
+    preferLocalBackdrops: false,
+    randomizeThemeVideos: false,
+    includeWatchedContent: false,
+    waitForTrailerToEnd: true,
+    startMuted: true,
+    defaultTrailerVolume: 40,
+    fullWidthVideo: true,
+    enableMobileVideo: false,
+    showTrailerButton: true,
+    enableKeyboardControls: true,
+    alwaysShowArrows: false,
+    hideArrowsOnMobile: true,
+    enableCustomOverlay: false,
+    customOverlayText: "",
+    customOverlayImageUrl: "",
+    customOverlayStyle: "Shadowed",
+    customOverlayImageStyle: "None",
+    customOverlayPriority: "Image",
+    customOverlayPositionX: 0,
+    customOverlayPositionY: 0,
+    customOverlayScale: 100,
+    backdropVideoDelay: 0,
+    constrainPlotWidth: false,
+    enableCustomMediaIds: true,
+    enableSeasonalContent: false,
+    customMediaIds: "",
+    enableLoadingScreen: true,
+    enableClientSideSettings: true,
+    sortBy: "Random",
+    sortOrder: "Ascending",
+    applyLimitsToCustomIds: false,
+    seasonalSections: "[]",
+    excludeSeasonalContent: true,
+    maxCachedItems: 20,
+    isEnabled: true,
+    mobileCompactMode: "Original",
+    clientMenuLocation: "Sidebar",
+    transitionEffect: "Fade",
+    showProgressBar: true,
+    progressBarLocation: "Dots",
+    customPlaylists: "[]",
+    forceSlideCounter: false,
+  };
 
-  fetch(url)
-    .then((response) => {
-      if (response.ok) {
-        return response;
-      }
-      throw new Error(`Failed to fetch: ${response.status}`);
-    })
-    .then(callback)
-    .catch((error) => {
-      console.error("🎬 Media Bar:", "Error in throttled request:", error);
-    })
-    .finally(() => {
-      setTimeout(processNextRequest, 100);
-    });
-};
-
-/**
- * Add a request to the throttled queue
- * @param {string} url - URL to fetch
- * @param {Function} callback - Callback to run on successful fetch
- */
-const addThrottledRequest = (url, callback) => {
-  requestQueue.push({ url, callback });
-  if (!isProcessingQueue) {
-    processNextRequest();
-  }
-};
-
-/**
- * Checks if the user is currently logged in
- * @returns {boolean} True if logged in, false otherwise
- */
-
-const isUserLoggedIn = () => {
-  try {
-    return (
-      window.ApiClient &&
-      window.ApiClient._currentUser &&
-      window.ApiClient._currentUser.Id &&
-      window.ApiClient._serverInfo &&
-      window.ApiClient._serverInfo.AccessToken
-    );
-  } catch (error) {
-    console.error("🎬 Media Bar:", "Error checking login status:", error);
-    return false;
-  }
-};
-
-/**
- * Detects if the current device is a low-power device (Smart TVs, etc.)
- * @returns {boolean} True if running on a low-power device
- */
-const isLowPowerDevice = () => {
-  return /webOS|LG Browser|SMART-TV|SmartTV|Tizen|Viera|NetCast|Roku|VIDAA/i.test(navigator.userAgent);
-};
-
-/**
- * Initializes Jellyfin data from ApiClient
- * @param {Function} callback - Function to call once data is initialized
- */
-const initJellyfinData = (callback) => {
-  if (!window.ApiClient) {
-    console.warn("🎬 Media Bar:", "⏳ window.ApiClient is not available yet. Retrying...");
-    setTimeout(() => initJellyfinData(callback), CONFIG.retryInterval);
-    return;
-  }
-
-  try {
-    const apiClient = window.ApiClient;
-    STATE.jellyfinData = {
-      userId: apiClient.getCurrentUserId() || "Not Found",
-      appName: apiClient._appName || "Not Found",
-      appVersion: apiClient._appVersion || "Not Found",
-      deviceName: apiClient._deviceName || "Not Found",
-      deviceId: apiClient._deviceId || "Not Found",
-      accessToken: apiClient._serverInfo.AccessToken || "Not Found",
-      serverId: apiClient._serverInfo.Id || "Not Found",
-      serverAddress: apiClient._serverAddress || "Not Found",
-    };
-    if (callback && typeof callback === "function") {
-      callback();
+  const CLIENT_MENU_TRANSLATIONS = {
+    'en': {
+      title: 'Media Bar Settings',
+      groupGeneral: 'General',
+      groupTrailers: 'Trailers & Backdrops',
+      groupLayout: 'Layout & Volume',
+      enabledLabel: 'Enable Media Bar Enhanced',
+      enabledDesc: 'Toggle the entire media bar visibility.',
+      videoBackdropsLabel: 'Enable Trailer Backdrops',
+      videoBackdropsDesc: 'Play trailers as background videos.',
+      trailerButtonLabel: 'Show Trailer Button',
+      trailerButtonDesc: 'Show button to play trailer in popup (only backdrops without trailer)',
+      mobileVideoLabel: 'Enable Trailer On Mobile',
+      mobileVideoDesc: 'Allow trailer backdrops on mobile devices.',
+      waitForTrailerLabel: 'Wait For Trailer To End',
+      waitForTrailerDesc: 'Wait for the trailer to finish before changing slides.',
+      slideAnimationsLabel: 'Enable Animations',
+      slideAnimationsDesc: 'Enable zooming-in effect (only on background images)',
+      mobileModeLabel: 'Mobile Aspect Ratio',
+      mobileModeDesc: 'Height of the media bar on portrait mobile devices.',
+      defaultTrailerVolumeLabel: 'Default Trailer Volume',
+      defaultTrailerVolumeDesc: 'Set default volume for trailer playback (in %).',
+      clientMenuLocationLabel: 'Settings Button Location',
+      clientMenuLocationDesc: 'Choose where the settings button is displayed (Navbar, Sidebar, or Both).',
+      transitionEffectLabel: 'Transition Effect',
+      transitionEffectDesc: 'Select the transition style between slides.',
+      showProgressBarLabel: 'Show Progress Bar',
+      showProgressBarDesc: 'Display timing progress line.',
+      progressBarLocationLabel: 'Progress Bar Location',
+      progressBarLocationDesc: 'Choose where the timing progress bar is displayed.',
+      progressBarLocationDots: 'Under Dots / Counter',
+      progressBarLocationNavbar: 'Top (Under Header)',
+      forceSlideCounterLabel: 'Always Use Slide Counter',
+      forceSlideCounterDesc: 'Force numeric slide counter instead of pagination dots.',
+      activePlaylistLabel: 'Active Playlist',
+      activePlaylistDesc: 'Select which custom playlist to display.',
+      optionMobileModeOriginal: 'Original (65vh)',
+      optionMobileMode16_9: '16:9 (Compact)',
+      optionMobileMode4_3: '4:3 (Classic)',
+      optionMenuLocationNavbar: 'Navbar',
+      optionMenuLocationSidebar: 'Sidebar',
+      optionMenuLocationBoth: 'Both',
+      optionTransitionFade: 'Crossfade',
+      optionTransitionSlideLeft: 'Slide Left',
+      optionTransitionSlideRight: 'Slide Right',
+      optionTransitionSlideUp: 'Slide Up',
+      optionTransitionSlideDown: 'Slide Down',
+      optionTransitionZoomIn: 'Zoom In',
+      optionTransitionZoomOut: 'Zoom Out',
+      resetBtn: 'Load Server Defaults',
+      resetTitle: 'Reset to Server Defaults',
+      saveBtn: 'Save & Reload',
+      confirmReset: 'Reset all local Media Bar settings to server defaults?'
+    },
+    'de': {
+      title: 'Media Bar Einstellungen',
+      groupGeneral: 'Allgemein',
+      groupTrailers: 'Trailer & Hintergründe',
+      groupLayout: 'Layout & Lautstärke',
+      transitionEffectLabel: 'Übergangseffekt',
+      transitionEffectDesc: 'Wähle den Effekt für den Folienwechsel.',
+      showProgressBarLabel: 'Fortschrittsbalken anzeigen',
+      showProgressBarDesc: 'Zeigt einen Balken für die Timer-Dauer.',
+      progressBarLocationLabel: 'Position des Fortschrittsbalkens',
+      progressBarLocationDesc: 'Wähle aus, wo der Timer-Fortschrittsbalken angezeigt wird.',
+      progressBarLocationDots: 'Unter den Punkten / Counter',
+      progressBarLocationNavbar: 'Oben (Unter Kopfzeile)',
+      forceSlideCounterLabel: 'Zähler anstelle von Punkten erzwingen',
+      forceSlideCounterDesc: 'Erzwingt den numerischen Diashow-Zähler anstelle der Navigationspunkte.',
+      activePlaylistLabel: 'Aktive Playlist',
+      activePlaylistDesc: 'Wähle aus, welche Kachel-Playlist geladen wird.',
+      optionMobileModeOriginal: 'Original (65vh)',
+      optionMobileMode16_9: '16:9 (Kompakt)',
+      optionMobileMode4_3: '4:3 (Klassisch)',
+      optionMenuLocationNavbar: 'Kopfzeile (Navbar)',
+      optionMenuLocationSidebar: 'Seitenleiste (Sidebar)',
+      optionMenuLocationBoth: 'Beide (Kopf- & Seitenleiste)',
+      optionTransitionFade: 'Überblenden (Crossfade)',
+      optionTransitionSlideLeft: 'Nach links schieben',
+      optionTransitionSlideRight: 'Nach rechts schieben',
+      optionTransitionSlideUp: 'Nach oben schieben',
+      optionTransitionSlideDown: 'Nach unten schieben',
+      optionTransitionZoomIn: 'Heranzoomen (Zoom In)',
+      optionTransitionZoomOut: 'Herauszoomen (Zoom Out)',
+      enabledLabel: 'Media Bar Enhanced aktivieren',
+      enabledDesc: 'Schaltet die gesamte Media Bar ein/aus.',
+      videoBackdropsLabel: 'Trailer-Hintergründe aktivieren',
+      videoBackdropsDesc: 'Spielt Trailer als Hintergrundvideo ab.',
+      trailerButtonLabel: 'Trailer-Button anzeigen',
+      trailerButtonDesc: 'Zeigt einen Button zum Abspielen von Trailern an (für Kacheln ohne Video-Daten).',
+      mobileVideoLabel: 'Trailer auf Handys aktivieren',
+      mobileVideoDesc: 'Erlaubt Trailer-Hintergründe auf mobilen Geräten.',
+      waitForTrailerLabel: 'Auf Trailer-Ende warten',
+      waitForTrailerDesc: 'Wartet, bis der Trailer beendet ist, bevor die nächste Kachel gezeigt wird.',
+      slideAnimationsLabel: 'Animationen aktivieren',
+      slideAnimationsDesc: 'Aktiviert einen Zoom-Effekt (nur für Hintergrundbilder).',
+      mobileModeLabel: 'Mobiles Seitenverhältnis',
+      mobileModeDesc: 'Höhe der Media Bar auf mobilen Geräten im Hochformat.',
+      defaultTrailerVolumeLabel: 'Standard-Lautstärke',
+      defaultTrailerVolumeDesc: 'Standard-Lautstärke für die Trailer-Wiedergabe (in %).',
+      clientMenuLocationLabel: 'Ort der Einstellungen',
+      clientMenuLocationDesc: 'Wähle aus, wo das Einstellungs-Symbol angezeigt wird (Kopfzeile, Seitenleiste oder Beide).',
+      resetBtn: 'Server-Standardwerte laden',
+      resetTitle: 'Auf Server-Standardwerte zurücksetzen',
+      saveBtn: 'Speichern & Neu laden',
+      confirmReset: 'Alle lokalen Media Bar Einstellungen auf Server-Standardwerte zurücksetzen?'
+    },
+    'es': {
+      title: 'Ajustes de Media Bar',
+      groupGeneral: 'General',
+      groupTrailers: 'Tráilers y fondos',
+      groupLayout: 'Diseño y volumen',
+      enabledLabel: 'Habilitar Media Bar Enhanced',
+      enabledDesc: 'Activa o desactiva toda la Media Bar.',
+      videoBackdropsLabel: 'Habilitar fondos de tráiler',
+      videoBackdropsDesc: 'Reproducir tráilers como videos de fondo.',
+      trailerButtonLabel: 'Mostrar botón de tráiler',
+      trailerButtonDesc: 'Muestra un botón para reproducir el tráiler en una ventana emergente (solo para fondos sin video).',
+      mobileVideoLabel: 'Habilitar tráiler en móviles',
+      mobileVideoDesc: 'Permitir fondos de tráiler en dispositivos móviles.',
+      waitForTrailerLabel: 'Esperar a que termine el tráiler',
+      waitForTrailerDesc: 'Espera a que el tráiler termine antes de cambiar de diapositiva.',
+      slideAnimationsLabel: 'Habilitar animaciones',
+      slideAnimationsDesc: 'Habilita el efecto de zoom (solo en imágenes de fondo).',
+      mobileModeLabel: 'Relación de aspecto móvil',
+      mobileModeDesc: 'Altura de la barra de medios en dispositivos móviles (vertical).',
+      defaultTrailerVolumeLabel: 'Volumen predeterminado del tráiler',
+      defaultTrailerVolumeDesc: 'Ajustar el volumen predeterminado del tráiler (en %).',
+      clientMenuLocationLabel: 'Ubicación de ajustes',
+      clientMenuLocationDesc: 'Elige dónde se muestra el botón de ajustes (Barra de navegación, Menú lateral o Ambos).',
+      transitionEffectLabel: 'Efecto de transición',
+      transitionEffectDesc: 'Selecciona el estilo de transición entre diapositivas.',
+      showProgressBarLabel: 'Mostrar barra de progreso',
+      showProgressBarDesc: 'Muestra una línea de progreso de tiempo.',
+      progressBarLocationLabel: 'Ubicación de la barra de progreso',
+      progressBarLocationDesc: 'Elige dónde se muestra la barra de progreso de tiempo.',
+      progressBarLocationDots: 'Debajo de los puntos / contador',
+      progressBarLocationNavbar: 'Parte superior (debajo de la cabecera)',
+      forceSlideCounterLabel: 'Forzar contador numérico',
+      forceSlideCounterDesc: 'Fuerza el contador numérico de diapositivas en lugar de los puntos de paginación.',
+      activePlaylistLabel: 'Lista de reproducción activa',
+      activePlaylistDesc: 'Selecciona qué lista de reproducción de mosaico mostrar.',
+      optionMobileModeOriginal: 'Original (65vh)',
+      optionMobileMode16_9: '16:9 (Compacto)',
+      optionMobileMode4_3: '4:3 (Clásico)',
+      optionMenuLocationNavbar: 'Barra de navegación',
+      optionMenuLocationSidebar: 'Menú lateral',
+      optionMenuLocationBoth: 'Ambos',
+      optionTransitionFade: 'Desvanecimiento cruzado',
+      optionTransitionSlideLeft: 'Deslizar a la izquierda',
+      optionTransitionSlideRight: 'Deslizar a la derecha',
+      optionTransitionSlideUp: 'Deslizar hacia arriba',
+      optionTransitionSlideDown: 'Deslizar hacia abajo',
+      optionTransitionZoomIn: 'Acercar (Zoom In)',
+      optionTransitionZoomOut: 'Alejar (Zoom Out)',
+      resetBtn: 'Cargar valores del servidor',
+      resetTitle: 'Restablecer a valores del servidor',
+      saveBtn: 'Guardar y recargar',
+      confirmReset: '¿Restablecer todos los ajustes locales de Media Bar a los valores predeterminados del servidor?'
+    },
+    'fr': {
+      title: 'Paramètres de Media Bar',
+      groupGeneral: 'Général',
+      groupTrailers: 'Bande-annonce & Fonds',
+      groupLayout: 'Mise en page & Volume',
+      enabledLabel: 'Activer Media Bar Enhanced',
+      enabledDesc: 'Active ou désactive toute la Media Bar.',
+      videoBackdropsLabel: 'Activer les fonds de bande-annonce',
+      videoBackdropsDesc: 'Lire les bandes-annonces comme vidéos en arrière-plan.',
+      trailerButtonLabel: 'Afficher le bouton bande-annonce',
+      trailerButtonDesc: 'Affiche un bouton pour lire la bande-annonce dans une popup (uniquement pour les fonds sans vidéo).',
+      mobileVideoLabel: 'Activer les bandes-annonces sur mobile',
+      mobileVideoDesc: 'Autoriser les bandes-annonces en arrière-plan sur les appareils mobiles.',
+      waitForTrailerLabel: 'Attendre la fin de la bande-annonce',
+      waitForTrailerDesc: 'Attendre la fin de la bande-annonce avant de changer de diapositive.',
+      slideAnimationsLabel: 'Activer les animations',
+      slideAnimationsDesc: 'Activer l\'effet de zoom (uniquement sur les images d\'arrière-plan).',
+      mobileModeLabel: 'Format d\'image mobile',
+      mobileModeDesc: 'Hauteur de la barre multimédia sur les appareils mobiles (portrait).',
+      defaultTrailerVolumeLabel: 'Volume par défaut de la bande-annonce',
+      defaultTrailerVolumeDesc: 'Définir le volume par défaut de la bande-annonce (en %).',
+      clientMenuLocationLabel: 'Emplacement des paramètres',
+      clientMenuLocationDesc: 'Choisissez où afficher le bouton des paramètres (Barre de navigation, Menu latéral ou Les deux).',
+      transitionEffectLabel: 'Effet de transition',
+      transitionEffectDesc: 'Sélectionnez le style de transition entre les diapositives.',
+      showProgressBarLabel: 'Afficher la barre de progression',
+      showProgressBarDesc: 'Affiche une ligne de progression temporelle.',
+      progressBarLocationLabel: 'Emplacement de la barre de progression',
+      progressBarLocationDesc: 'Choisissez où la barre de progression temporelle est affichée.',
+      progressBarLocationDots: 'Sous les points / compteur',
+      progressBarLocationNavbar: 'En haut (sous l\'en-tête)',
+      forceSlideCounterLabel: 'Toujours utiliser le compteur',
+      forceSlideCounterDesc: 'Force le compteur de diapositives numérique au lieu des points de pagination.',
+      activePlaylistLabel: 'Liste de lecture active',
+      activePlaylistDesc: 'Sélectionnez la liste de lecture personnalisée à afficher.',
+      optionMobileModeOriginal: 'Original (65vh)',
+      optionMobileMode16_9: '16:9 (Compact)',
+      optionMobileMode4_3: '4:3 (Classique)',
+      optionMenuLocationNavbar: 'Barre de navigation',
+      optionMenuLocationSidebar: 'Menu latéral',
+      optionMenuLocationBoth: 'Les deux',
+      optionTransitionFade: 'Fondu enchaîné',
+      optionTransitionSlideLeft: 'Glisser vers la gauche',
+      optionTransitionSlideRight: 'Glisser vers la droite',
+      optionTransitionSlideUp: 'Glisser vers le haut',
+      optionTransitionSlideDown: 'Glisser vers le bas',
+      optionTransitionZoomIn: 'Zoom avant (Zoom In)',
+      optionTransitionZoomOut: 'Zoom arrière (Zoom Out)',
+      resetBtn: 'Charger les valeurs par défaut',
+      resetTitle: 'Réinitialiser aux valeurs du serveur',
+      saveBtn: 'Enregistrer et recharger',
+      confirmReset: 'Réinitialiser tous les paramètres locaux de Media Bar aux valeurs par défaut du serveur ?'
+    },
+    'it': {
+      title: 'Impostazioni Media Bar',
+      groupGeneral: 'Generale',
+      groupTrailers: 'Trailer & Sfondi',
+      groupLayout: 'Layout & Volume',
+      enabledLabel: 'Abilita Media Bar Enhanced',
+      enabledDesc: 'Attiva o disattiva l\'intera Media Bar.',
+      videoBackdropsLabel: 'Abilita sfondi trailer',
+      videoBackdropsDesc: 'Riproduci trailer come video in background.',
+      trailerButtonLabel: 'Mostra pulsante trailer',
+      trailerButtonDesc: 'Mostra il pulsante per riprodurre il trailer (solo per sfondi senza video).',
+      mobileVideoLabel: 'Abilita trailer su mobile',
+      mobileVideoDesc: 'Consenti sfondi trailer sui dispositivi mobili.',
+      waitForTrailerLabel: 'Attendi fine trailer',
+      waitForTrailerDesc: 'Attende la fine del trailer prima di cambiare diapositiva.',
+      slideAnimationsLabel: 'Abilita animazioni',
+      slideAnimationsDesc: 'Abilita l\'effetto zoom (solo sulle immagini di sfondo).',
+      mobileModeLabel: 'Proporzioni mobile',
+      mobileModeDesc: 'Altezza della barra multimediale sui dispositivi mobili in verticale.',
+      defaultTrailerVolumeLabel: 'Volume predefinito del trailer',
+      defaultTrailerVolumeDesc: 'Imposta il volume predefinito per il trailer (in %).',
+      clientMenuLocationLabel: 'Posizione impostazioni',
+      clientMenuLocationDesc: 'Scegli dove mostrare il pulsante delle impostazioni (Barra di navigazione, Menu laterale o Entrambi).',
+      transitionEffectLabel: 'Effetto di transizione',
+      transitionEffectDesc: 'Seleziona lo stile di transizione tra le diapositive.',
+      showProgressBarLabel: 'Mostra barra di avanzamento',
+      showProgressBarDesc: 'Mostra una linea di avanzamento del tempo.',
+      progressBarLocationLabel: 'Posizione della barra di avanzamento',
+      progressBarLocationDesc: 'Scegli dove mostrare la barra di avanzamento del tempo.',
+      progressBarLocationDots: 'Sotto i punti / contatore',
+      progressBarLocationNavbar: 'In alto (sotto l\'intestazione)',
+      forceSlideCounterLabel: 'Forza contatore diapositive',
+      forceSlideCounterDesc: 'Forza il contatore numerico delle diapositive al posto dei punti di paginazione.',
+      activePlaylistLabel: 'Playlist attiva',
+      activePlaylistDesc: 'Seleziona quale playlist personalizzata visualizzare.',
+      optionMobileModeOriginal: 'Originale (65vh)',
+      optionMobileMode16_9: '16:9 (Compatto)',
+      optionMobileMode4_3: '4:3 (Classico)',
+      optionMenuLocationNavbar: 'Barra di navigazione',
+      optionMenuLocationSidebar: 'Menu laterale',
+      optionMenuLocationBoth: 'Entrambi',
+      optionTransitionFade: 'Dissolvenza in linea (Crossfade)',
+      optionTransitionSlideLeft: 'Scorri a sinistra',
+      optionTransitionSlideRight: 'Scorri a destra',
+      optionTransitionSlideUp: 'Scorri verso l\'alto',
+      optionTransitionSlideDown: 'Scorri verso il basso',
+      optionTransitionZoomIn: 'Ingrandisci (Zoom In)',
+      optionTransitionZoomOut: 'Rimpicciolisci (Zoom Out)',
+      resetBtn: 'Carica valori del server',
+      resetTitle: 'Ripristina valori del server',
+      saveBtn: 'Salva e ricarica',
+      confirmReset: 'Ripristinare tutte le impostazioni locali di Media Bar ai valori predefiniti del server?'
     }
-  } catch (error) {
-    console.error("🎬 Media Bar:", "Error initializing Jellyfin data:", error);
-    setTimeout(() => initJellyfinData(callback), CONFIG.retryInterval);
-  }
-};
+  };
 
-/**
- * Initializes localization by loading translation chunks
- */
-const initLocalization = async () => {
-  try {
-    const locale = await LocalizationUtils.getCurrentLocale();
-    await LocalizationUtils.loadTranslations(locale);
-    console.log("🎬 Media Bar:", "✅ Localization initialized");
-  } catch (error) {
-    console.error("🎬 Media Bar:", "Error initializing localization:", error);
-  }
-};
+  // State management
+  const STATE = {
+    jellyfinData: {
+      userId: null,
+      appName: null,
+      appVersion: null,
+      deviceName: null,
+      deviceId: null,
+      accessToken: null,
+      serverAddress: null,
+    },
+    slideshow: {
+      hasInitialized: false,
+      isTransitioning: false,
+      isPaused: false,
+      currentSlideIndex: 0,
+      focusedSlide: null,
+      containerFocused: false,
+      slideInterval: null,
+      itemIds: [],
+      loadedItems: {},
+      createdSlides: {},
+      totalItems: 0,
+      isLoading: false,
+      videoPlayers: {},
+      sponsorBlockInterval: null,
+      isMuted: CONFIG.startMuted,
+      customTrailerUrls: {},
+      ytPromise: null,
+      autoplayTimeouts: [],
+      playSignals: {},
+      failsafeTimeout: null,
+      isVideoPlaying: false,
+    },
+  };
 
-/**
- * Creates and displays loading screen
- */
+  // Request throttling system
+  const requestQueue = [];
+  let isProcessingQueue = false;
 
-const initLoadingScreen = () => {
-  const currentPath = window.location.href.toLowerCase().replace(window.location.origin, "");
-  const isHomePage =
-    currentPath.includes("/web/#/home.html") ||
-    currentPath.includes("/web/#/home") ||
-    currentPath.includes("/web/index.html#/home.html") ||
-    currentPath === "/web/index.html#/home" ||
-    currentPath.endsWith("/web/");
+  /**
+   * Process the next request in the queue with throttling
+   */
+  const processNextRequest = () => {
+    if (requestQueue.length === 0) {
+      isProcessingQueue = false;
+      return;
+    }
 
-  if (!isHomePage) return;
+    isProcessingQueue = true;
+    const { url, callback } = requestQueue.shift();
 
-  // Check LocalStorage for cached preference to avoid flash
-  const cachedSetting = localStorage.getItem('mediaBarEnhanced-enableLoadingScreen');
-  if (cachedSetting === 'false') {
-    return;
-  }
+    fetch(url)
+      .then((response) => {
+        if (response.ok) {
+          return response;
+        }
+        throw new Error(`Failed to fetch: ${response.status}`);
+      })
+      .then(callback)
+      .catch((error) => {
+        console.error("🎬 Media Bar:", "Error in throttled request:", error);
+      })
+      .finally(() => {
+        setTimeout(processNextRequest, 100);
+      });
+  };
 
-  const loadingDiv = document.createElement("div");
-  loadingDiv.className = "bar-loading";
-  loadingDiv.id = "page-loader";
-  loadingDiv.innerHTML = `
+  /**
+   * Add a request to the throttled queue
+   * @param {string} url - URL to fetch
+   * @param {Function} callback - Callback to run on successful fetch
+   */
+  const addThrottledRequest = (url, callback) => {
+    requestQueue.push({ url, callback });
+    if (!isProcessingQueue) {
+      processNextRequest();
+    }
+  };
+
+  /**
+   * Checks if the user is currently logged in
+   * @returns {boolean} True if logged in, false otherwise
+   */
+
+  const isUserLoggedIn = () => {
+    try {
+      return (
+        window.ApiClient &&
+        window.ApiClient._currentUser &&
+        window.ApiClient._currentUser.Id &&
+        window.ApiClient._serverInfo &&
+        window.ApiClient._serverInfo.AccessToken
+      );
+    } catch (error) {
+      console.error("🎬 Media Bar:", "Error checking login status:", error);
+      return false;
+    }
+  };
+
+  /**
+   * Detects if the current device is a low-power device (Smart TVs, etc.)
+   * @returns {boolean} True if running on a low-power device
+   */
+  const isLowPowerDevice = () => {
+    return /webOS|LG Browser|SMART-TV|SmartTV|Tizen|Viera|NetCast|Roku|VIDAA/i.test(navigator.userAgent);
+  };
+
+  /**
+   * Initializes Jellyfin data from ApiClient
+   * @param {Function} callback - Function to call once data is initialized
+   */
+  const initJellyfinData = (callback) => {
+    if (!window.ApiClient) {
+      console.warn("🎬 Media Bar:", "⏳ window.ApiClient is not available yet. Retrying...");
+      setTimeout(() => initJellyfinData(callback), CONFIG.retryInterval);
+      return;
+    }
+
+    try {
+      const apiClient = window.ApiClient;
+      STATE.jellyfinData = {
+        userId: apiClient.getCurrentUserId() || "Not Found",
+        appName: apiClient._appName || "Not Found",
+        appVersion: apiClient._appVersion || "Not Found",
+        deviceName: apiClient._deviceName || "Not Found",
+        deviceId: apiClient._deviceId || "Not Found",
+        accessToken: apiClient._serverInfo.AccessToken || "Not Found",
+        serverId: apiClient._serverInfo.Id || "Not Found",
+        serverAddress: apiClient._serverAddress || "Not Found",
+        // MARK: Version
+        pluginVersion: "3.0.0.0",
+      };
+
+      if (callback && typeof callback === "function") {
+        callback();
+      }
+    } catch (error) {
+      console.error("🎬 Media Bar:", "Error initializing Jellyfin data:", error);
+      setTimeout(() => initJellyfinData(callback), CONFIG.retryInterval);
+    }
+  };
+
+  /**
+   * Initializes localization by loading translation chunks
+   */
+  const initLocalization = async () => {
+    try {
+      const locale = await LocalizationUtils.getCurrentLocale();
+      await LocalizationUtils.loadTranslations(locale);
+      console.log("🎬 Media Bar:", "✅ Localization initialized");
+    } catch (error) {
+      console.error("🎬 Media Bar:", "Error initializing localization:", error);
+    }
+  };
+
+  /**
+   * Creates and displays loading screen
+   */
+
+  const initLoadingScreen = () => {
+    const currentPath = window.location.href.toLowerCase().replace(window.location.origin, "");
+    const isHomePage =
+      currentPath.includes("/web/#/home.html") ||
+      currentPath.includes("/web/#/home") ||
+      currentPath.includes("/web/index.html#/home.html") ||
+      currentPath === "/web/index.html#/home" ||
+      currentPath.endsWith("/web/");
+
+    if (!isHomePage) return;
+
+    // Check LocalStorage for cached preference to avoid flash
+    const cachedSetting = localStorage.getItem('mediaBarEnhanced-enableLoadingScreen');
+    if (cachedSetting === 'false') {
+      return;
+    }
+
+    const loadingDiv = document.createElement("div");
+    loadingDiv.className = "bar-loading";
+    loadingDiv.id = "page-loader";
+    loadingDiv.innerHTML = `
     <div class="loader-content">
       <h1>
         <div class="splashLogo"></div>
@@ -370,1708 +560,1786 @@ const initLoadingScreen = () => {
       </div>
     </div>
   `;
-  document.body.appendChild(loadingDiv);
+    document.body.appendChild(loadingDiv);
 
-  requestAnimationFrame(() => {
-    document.querySelector(".bar-loading h1 div").style.opacity = "1";
-  });
+    requestAnimationFrame(() => {
+      document.querySelector(".bar-loading h1 div").style.opacity = "1";
+    });
 
-  const progressBar = document.getElementById("progress-bar");
-  const unfilledBar = document.getElementById("unfilled-bar");
+    const progressBar = document.getElementById("progress-bar");
+    const unfilledBar = document.getElementById("unfilled-bar");
 
-  let progress = 0;
-  let lastIncrement = 5;
+    let progress = 0;
+    let lastIncrement = 5;
 
-  const progressInterval = setInterval(() => {
-    if (progress < 95) {
-      lastIncrement = Math.max(0.5, lastIncrement * 0.98);
-      const randomFactor = 0.8 + Math.random() * 0.4;
-      const increment = lastIncrement * randomFactor;
-      progress += increment;
-      progress = Math.min(progress, 95);
+    const progressInterval = setInterval(() => {
+      if (progress < 95) {
+        lastIncrement = Math.max(0.5, lastIncrement * 0.98);
+        const randomFactor = 0.8 + Math.random() * 0.4;
+        const increment = lastIncrement * randomFactor;
+        progress += increment;
+        progress = Math.min(progress, 95);
 
-      progressBar.style.width = `${progress}%`;
-      unfilledBar.style.width = `${100 - progress}%`;
-    }
-  }, 150);
+        progressBar.style.width = `${progress}%`;
+        unfilledBar.style.width = `${100 - progress}%`;
+      }
+    }, 150);
 
-  const checkInterval = setInterval(() => {
-    const loginFormLoaded = document.querySelector(".manualLoginForm");
-    const activeTab = document.querySelector(".pageTabContent.is-active");
+    const checkInterval = setInterval(() => {
+      const loginFormLoaded = document.querySelector(".manualLoginForm");
+      const activeTab = document.querySelector(".pageTabContent.is-active");
 
-    if (loginFormLoaded) {
-      finishLoading();
-      return;
-    }
+      if (loginFormLoaded) {
+        finishLoading();
+        return;
+      }
 
-    if (activeTab) {
-      const tabIndex = activeTab.getAttribute("data-index");
+      if (activeTab) {
+        const tabIndex = activeTab.getAttribute("data-index");
 
-      if (tabIndex === "0") {
-        const homeSections = document.querySelector(".homeSectionsContainer");
-        const slidesContainer = document.querySelector("#slides-container");
+        if (tabIndex === "0") {
+          const homeSections = document.querySelector(".homeSectionsContainer");
+          const slidesContainer = document.querySelector("#slides-container");
 
-        if (homeSections && slidesContainer) {
-          finishLoading();
-        }
-      } else {
-        if (
-          activeTab.children.length > 0 ||
-          activeTab.innerText.trim().length > 0
-        ) {
-          finishLoading();
+          if (homeSections && slidesContainer) {
+            finishLoading();
+          }
+        } else {
+          if (
+            activeTab.children.length > 0 ||
+            activeTab.innerText.trim().length > 0
+          ) {
+            finishLoading();
+          }
         }
       }
-    }
-  }, CONFIG.loadingCheckInterval);
+    }, CONFIG.loadingCheckInterval);
 
-  const finishLoading = () => {
-    clearInterval(progressInterval);
-    clearInterval(checkInterval);
-    progressBar.style.transition = "width 300ms ease-in-out";
-    progressBar.style.width = "100%";
-    unfilledBar.style.width = "0%";
+    const finishLoading = () => {
+      clearInterval(progressInterval);
+      clearInterval(checkInterval);
+      progressBar.style.transition = "width 300ms ease-in-out";
+      progressBar.style.width = "100%";
+      unfilledBar.style.width = "0%";
 
-    progressBar.addEventListener("transitionend", () => {
-      requestAnimationFrame(() => {
-        const loader = document.querySelector(".bar-loading");
-        if (loader) {
-          loader.style.opacity = "0";
-          setTimeout(() => {
-            loader.remove();
-          }, 300);
-        }
+      progressBar.addEventListener("transitionend", () => {
+        requestAnimationFrame(() => {
+          const loader = document.querySelector(".bar-loading");
+          if (loader) {
+            loader.style.opacity = "0";
+            setTimeout(() => {
+              loader.remove();
+            }, 300);
+          }
+        });
       });
-    });
+    };
+
+    // Global Failsafe, force remove loading screen after 15 seconds to prevent infinite lockouts
+    setTimeout(() => {
+      const loader = document.querySelector(".bar-loading");
+      if (loader) {
+        console.warn("🎬 Media Bar:", "Loading screen timed out! Forcing removal as a failsafe.");
+        finishLoading();
+      }
+    }, 15000);
   };
 
-  // Global Failsafe, force remove loading screen after 15 seconds to prevent infinite lockouts
-  setTimeout(() => {
-    const loader = document.querySelector(".bar-loading");
-    if (loader) {
-      console.warn("🎬 Media Bar:", "Loading screen timed out! Forcing removal as a failsafe.");
-      finishLoading();
+  /**
+   * Resets the slideshow state completely
+   */
+  const resetSlideshowState = () => {
+    console.log("🎬 Media Bar:", "🔄 Resetting slideshow state...");
+
+    if (STATE.slideshow.slideInterval) {
+      STATE.slideshow.slideInterval.stop();
     }
-  }, 15000);
-};
 
-/**
- * Resets the slideshow state completely
- */
-const resetSlideshowState = () => {
-  console.log("🎬 Media Bar:", "🔄 Resetting slideshow state...");
+    // Destroy all video players
+    if (STATE.slideshow.videoPlayers) {
+      Object.values(STATE.slideshow.videoPlayers).forEach(player => {
+        if (player && typeof player.destroy === 'function') {
+          player.destroy();
+        }
+      });
+      STATE.slideshow.videoPlayers = {};
+    }
 
-  if (STATE.slideshow.slideInterval) {
-    STATE.slideshow.slideInterval.stop();
-  }
+    if (STATE.slideshow.sponsorBlockInterval) {
+      clearInterval(STATE.slideshow.sponsorBlockInterval);
+      STATE.slideshow.sponsorBlockInterval = null;
+    }
 
-  // Destroy all video players
-  if (STATE.slideshow.videoPlayers) {
-    Object.values(STATE.slideshow.videoPlayers).forEach(player => {
-      if (player && typeof player.destroy === 'function') {
-        player.destroy();
+    const container = document.getElementById("slides-container");
+    if (container) {
+      while (container.firstChild) {
+        container.removeChild(container.firstChild);
       }
-    });
-    STATE.slideshow.videoPlayers = {};
-  }
-
-  if (STATE.slideshow.sponsorBlockInterval) {
-    clearInterval(STATE.slideshow.sponsorBlockInterval);
-    STATE.slideshow.sponsorBlockInterval = null;
-  }
-
-  const container = document.getElementById("slides-container");
-  if (container) {
-    while (container.firstChild) {
-      container.removeChild(container.firstChild);
     }
-  }
 
-  STATE.slideshow.hasInitialized = false;
-  STATE.slideshow.isTransitioning = false;
-  STATE.slideshow.isPaused = false;
-  STATE.slideshow.currentSlideIndex = 0;
-  STATE.slideshow.focusedSlide = null;
-  STATE.slideshow.containerFocused = false;
-  STATE.slideshow.slideInterval = null;
-  STATE.slideshow.itemIds = [];
-  STATE.slideshow.loadedItems = {};
-  STATE.slideshow.createdSlides = {};
-  STATE.slideshow.customTrailerUrls = {};
-  STATE.slideshow.totalItems = 0;
-  STATE.slideshow.isLoading = false;
-  STATE.slideshow.playSignals = {};
-  STATE.slideshow.hasTrailer = {};
-};
+    STATE.slideshow.hasInitialized = false;
+    STATE.slideshow.isTransitioning = false;
+    STATE.slideshow.isPaused = false;
+    STATE.slideshow.currentSlideIndex = 0;
+    STATE.slideshow.focusedSlide = null;
+    STATE.slideshow.containerFocused = false;
+    STATE.slideshow.slideInterval = null;
+    STATE.slideshow.itemIds = [];
+    STATE.slideshow.loadedItems = {};
+    STATE.slideshow.createdSlides = {};
+    STATE.slideshow.customTrailerUrls = {};
+    STATE.slideshow.totalItems = 0;
+    STATE.slideshow.isLoading = false;
+    STATE.slideshow.playSignals = {};
+    STATE.slideshow.hasTrailer = {};
+    if (STATE.slideshow.failsafeTimeout) {
+      clearTimeout(STATE.slideshow.failsafeTimeout);
+      STATE.slideshow.failsafeTimeout = null;
+    }
+    STATE.slideshow.isVideoPlaying = false;
+  };
 
-/**
- * Watches for login status changes
- */
-const startLoginStatusWatcher = () => {
-  let wasLoggedIn = false;
+  /**
+   * Watches for login status changes
+   */
+  const startLoginStatusWatcher = () => {
+    let wasLoggedIn = false;
 
-  setInterval(() => {
-    const isLoggedIn = isUserLoggedIn();
+    setInterval(() => {
+      const isLoggedIn = isUserLoggedIn();
 
-    if (isLoggedIn !== wasLoggedIn) {
-      if (isLoggedIn) {
-        console.log("🎬 Media Bar:", "👤 User logged in. Initializing slideshow...");
+      if (isLoggedIn !== wasLoggedIn) {
+        if (isLoggedIn) {
+          console.log("🎬 Media Bar:", "👤 User logged in. Initializing slideshow...");
+          if (!STATE.slideshow.hasInitialized) {
+            waitForApiClientAndInitialize();
+          } else {
+            console.log("🎬 Media Bar:", "🔄 Slideshow already initialized, skipping");
+          }
+        } else {
+          console.log("🎬 Media Bar:", "👋 User logged out. Stopping slideshow...");
+          resetSlideshowState();
+        }
+        wasLoggedIn = isLoggedIn;
+      }
+    }, 2000);
+  };
+
+  /**
+   * Wait for ApiClient to initialize before starting the slideshow
+   */
+  const waitForApiClientAndInitialize = () => {
+    if (window.slideshowCheckInterval) {
+      clearInterval(window.slideshowCheckInterval);
+    }
+
+    window.slideshowCheckInterval = setInterval(() => {
+      if (!window.ApiClient) {
+        console.log("🎬 Media Bar:", "⏳ ApiClient not available yet. Waiting...");
+        return;
+      }
+
+      if (
+        window.ApiClient._currentUser &&
+        window.ApiClient._currentUser.Id &&
+        window.ApiClient._serverInfo &&
+        window.ApiClient._serverInfo.AccessToken
+      ) {
+        console.log("🎬 Media Bar:",
+          "🔓 User is fully logged in. Starting slideshow initialization..."
+        );
+        clearInterval(window.slideshowCheckInterval);
+
         if (!STATE.slideshow.hasInitialized) {
-          waitForApiClientAndInitialize();
+          initJellyfinData(async () => {
+            console.log("🎬 Media Bar:", "✅ Jellyfin API client initialized successfully");
+            await initLocalization();
+            await fetchPluginConfig();
+            slidesInit();
+          });
         } else {
           console.log("🎬 Media Bar:", "🔄 Slideshow already initialized, skipping");
         }
       } else {
-        console.log("🎬 Media Bar:", "👋 User logged out. Stopping slideshow...");
-        resetSlideshowState();
+        console.log("🎬 Media Bar:",
+          "🔒 Authentication incomplete. Waiting for complete login..."
+        );
       }
-      wasLoggedIn = isLoggedIn;
-    }
-  }, 2000);
-};
+    }, CONFIG.retryInterval);
+  };
 
-/**
- * Wait for ApiClient to initialize before starting the slideshow
- */
-const waitForApiClientAndInitialize = () => {
-  if (window.slideshowCheckInterval) {
-    clearInterval(window.slideshowCheckInterval);
-  }
-
-  window.slideshowCheckInterval = setInterval(() => {
-    if (!window.ApiClient) {
-      console.log("🎬 Media Bar:", "⏳ ApiClient not available yet. Waiting...");
-      return;
-    }
-
-    if (
-      window.ApiClient._currentUser &&
-      window.ApiClient._currentUser.Id &&
-      window.ApiClient._serverInfo &&
-      window.ApiClient._serverInfo.AccessToken
-    ) {
-      console.log("🎬 Media Bar:", 
-        "🔓 User is fully logged in. Starting slideshow initialization..."
-      );
-      clearInterval(window.slideshowCheckInterval);
-
-      if (!STATE.slideshow.hasInitialized) {
-        initJellyfinData(async () => {
-          console.log("🎬 Media Bar:", "✅ Jellyfin API client initialized successfully");
-          await initLocalization();
-          await fetchPluginConfig();
-          slidesInit();
-        });
-      } else {
-        console.log("🎬 Media Bar:", "🔄 Slideshow already initialized, skipping");
-      }
-    } else {
-      console.log("🎬 Media Bar:", 
-        "🔒 Authentication incomplete. Waiting for complete login..."
-      );
-    }
-  }, CONFIG.retryInterval);
-};
-
-const fetchPluginConfig = async () => {
-  try {
-    const response = await fetch('../MediaBarEnhanced/Config');
-    if (response.ok) {
-      const pluginConfig = await response.json();
-      if (pluginConfig) {
-        for (const key in pluginConfig) {
-          const camelKey = key.charAt(0).toLowerCase() + key.slice(1);
-          if (CONFIG.hasOwnProperty(camelKey)) {
-            CONFIG[camelKey] = pluginConfig[key];
+  const fetchPluginConfig = async () => {
+    try {
+      const response = await fetch('../MediaBarEnhanced/Config');
+      if (response.ok) {
+        const pluginConfig = await response.json();
+        if (pluginConfig) {
+          for (const key in pluginConfig) {
+            const camelKey = key.charAt(0).toLowerCase() + key.slice(1);
+            if (CONFIG.hasOwnProperty(camelKey)) {
+              CONFIG[camelKey] = pluginConfig[key];
+            }
           }
-        }
-        STATE.slideshow.isMuted = CONFIG.startMuted;
+          STATE.slideshow.isMuted = CONFIG.startMuted;
 
-        if (!CONFIG.enableLoadingScreen) {
-          const loader = document.querySelector(".bar-loading");
-          if (loader) {
-            loader.remove();
+          if (!CONFIG.enableLoadingScreen) {
+            const loader = document.querySelector(".bar-loading");
+            if (loader) {
+              loader.remove();
+            }
           }
+
+          // Sync to LocalStorage for next load
+          localStorage.setItem('mediaBarEnhanced-enableLoadingScreen', CONFIG.enableLoadingScreen);
+
+          console.log("🎬 Media Bar:", "✅ MediaBarEnhanced config loaded", CONFIG);
+        }
+      }
+    } catch (e) {
+      console.error("🎬 Media Bar:", "Failed to load MediaBarEnhanced config", e);
+    }
+  };
+
+  waitForApiClientAndInitialize();
+
+  /**
+   * Utility functions for slide creation and management
+   */
+  const SlideUtils = {
+    /**
+     * Sorts items based on configuration
+     * @param {Array<Object>} items - Array of item objects
+     * @param {string} sortBy - Sort criteria
+     * @param {string} sortOrder - Sort order 'Ascending' or 'Descending'
+     * @returns {Array<Object>} Sorted array of items
+     */
+    sortItems(items, sortBy, sortOrder) {
+      if (sortBy === 'Random' || sortBy === 'Original') {
+        return items;
+      }
+
+      const simpleCompare = (a, b) => {
+        if (a < b) return -1;
+        if (a > b) return 1;
+        return 0;
+      };
+
+      const sorted = [...items].sort((a, b) => {
+        let valA, valB;
+
+        switch (sortBy) {
+          case 'PremiereDate':
+            valA = new Date(a.PremiereDate).getTime();
+            valB = new Date(b.PremiereDate).getTime();
+            break;
+          case 'ProductionYear':
+            valA = a.ProductionYear || 0;
+            valB = b.ProductionYear || 0;
+            break;
+          case 'CriticRating':
+            valA = a.CriticRating || 0;
+            valB = b.CriticRating || 0;
+            break;
+          case 'CommunityRating':
+            valA = a.CommunityRating || 0;
+            valB = b.CommunityRating || 0;
+            break;
+          case 'Runtime':
+            valA = a.RunTimeTicks || 0;
+            valB = b.RunTimeTicks || 0;
+            break;
+          case 'Name':
+            valA = (a.Name || '').toLowerCase();
+            valB = (b.Name || '').toLowerCase();
+            break;
+          default:
+            return 0;
         }
 
-        // Sync to LocalStorage for next load
-        localStorage.setItem('mediaBarEnhanced-enableLoadingScreen', CONFIG.enableLoadingScreen);
-
-        console.log("🎬 Media Bar:", "✅ MediaBarEnhanced config loaded", CONFIG);
-      }
-    }
-  } catch (e) {
-    console.error("🎬 Media Bar:", "Failed to load MediaBarEnhanced config", e);
-  }
-};
-
-waitForApiClientAndInitialize();
-
-/**
- * Utility functions for slide creation and management
- */
-const SlideUtils = {
-  /**
-   * Sorts items based on configuration
-   * @param {Array<Object>} items - Array of item objects
-   * @param {string} sortBy - Sort criteria
-   * @param {string} sortOrder - Sort order 'Ascending' or 'Descending'
-   * @returns {Array<Object>} Sorted array of items
-   */
-  sortItems(items, sortBy, sortOrder) {
-    if (sortBy === 'Random' || sortBy === 'Original') {
-      return items;
-    }
-
-    const simpleCompare = (a, b) => {
-      if (a < b) return -1;
-      if (a > b) return 1;
-      return 0;
-    };
-
-    const sorted = [...items].sort((a, b) => {
-      let valA, valB;
-
-      switch (sortBy) {
-        case 'PremiereDate':
-          valA = new Date(a.PremiereDate).getTime();
-          valB = new Date(b.PremiereDate).getTime();
-          break;
-        case 'ProductionYear':
-           valA = a.ProductionYear || 0;
-           valB = b.ProductionYear || 0;
-           break;
-        case 'CriticRating':
-           valA = a.CriticRating || 0;
-           valB = b.CriticRating || 0;
-           break;
-        case 'CommunityRating':
-          valA = a.CommunityRating || 0;
-          valB = b.CommunityRating || 0;
-          break;
-        case 'Runtime':
-          valA = a.RunTimeTicks || 0;
-          valB = b.RunTimeTicks || 0;
-          break;
-        case 'Name':
-          valA = (a.Name || '').toLowerCase();
-          valB = (b.Name || '').toLowerCase();
-          break;
-        default:
-          return 0;
-      }
-
-      return simpleCompare(valA, valB);
-    });
-
-    if (sortOrder === 'Descending') {
-      sorted.reverse();
-    }
-
-    return sorted;
-  },
-
-  /**
-   * Shuffles array elements randomly
-   * @param {Array} array - Array to shuffle
-   * @returns {Array} Shuffled array
-   */
-  shuffleArray(array) {
-    const newArray = [...array];
-    for (let i = newArray.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
-    }
-    return newArray;
-  },
-
-  /**
-   * Truncates text to specified length and adds ellipsis
-   * @param {HTMLElement} element - Element containing text to truncate
-   * @param {number} maxLength - Maximum length before truncation
-   */
-  truncateText(element, maxLength) {
-    if (!element) return;
-
-    const text = element.innerText || element.textContent;
-    if (text && text.length > maxLength) {
-      element.innerText = text.substring(0, maxLength) + "...";
-    }
-  },
-
-  /**
-   * Creates a separator icon element
-   * @returns {HTMLElement} Separator element
-   */
-  createSeparator() {
-    const separator = document.createElement("i");
-    separator.className = "material-icons fiber_manual_record separator-icon"; //material-icons radio_button_off
-    return separator;
-  },
-
-  /**
-   * Creates a DOM element with attributes and properties
-   * @param {string} tag - Element tag name
-   * @param {Object} attributes - Element attributes
-   * @param {string|HTMLElement} [content] - Element content
-   * @returns {HTMLElement} Created element
-   */
-  createElement(tag, attributes = {}, content = null) {
-    const element = document.createElement(tag);
-
-    Object.entries(attributes).forEach(([key, value]) => {
-      if (key === "style" && typeof value === "object") {
-        Object.entries(value).forEach(([prop, val]) => {
-          element.style[prop] = val;
-        });
-      } else if (key === "className") {
-        element.className = value;
-      } else if (key === "innerHTML") {
-        element.innerHTML = value;
-      } else if (key === "onclick" && typeof value === "function") {
-        element.addEventListener("click", value);
-      } else {
-        element.setAttribute(key, value);
-      }
-    });
-
-    if (content) {
-      if (typeof content === "string") {
-        element.textContent = content;
-      } else {
-        element.appendChild(content);
-      }
-    }
-
-    return element;
-  },
-
-  /**
-   * Find or create the slides container
-   * @returns {HTMLElement} Slides container element
-   */
-  getOrCreateSlidesContainer() {
-    let container = document.getElementById("slides-container");
-    if (!container) {
-      container = this.createElement("div", { 
-        id: "slides-container",
-        className: "noautofocus",
-        tabIndex: "-1"
+        return simpleCompare(valA, valB);
       });
-      document.body.appendChild(container);
-    }
-    return container;
-  },
 
-  /**
-   * Formats genres into a readable string
-   * @param {Array} genresArray - Array of genre strings
-   * @returns {string} Formatted genres string
-   */
-  parseGenres(genresArray) {
-    if (Array.isArray(genresArray) && genresArray.length > 0) {
-      return genresArray.slice(0, 3).join(this.createSeparator().outerHTML);
-    }
-    return "No Genre Available";
-  },
+      if (sortOrder === 'Descending') {
+        sorted.reverse();
+      }
 
-  /**
-   * Creates a loading indicator
-   * @returns {HTMLElement} Loading indicator element
-   */
-  createLoadingIndicator() {
-    const loadingIndicator = this.createElement("div", {
-      className: "slide-loading-indicator",
-      innerHTML: `
+      return sorted;
+    },
+
+    /**
+     * Shuffles array elements randomly
+     * @param {Array} array - Array to shuffle
+     * @returns {Array} Shuffled array
+     */
+    shuffleArray(array) {
+      const newArray = [...array];
+      for (let i = newArray.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+      }
+      return newArray;
+    },
+
+    /**
+     * Truncates text to specified length and adds ellipsis
+     * @param {HTMLElement} element - Element containing text to truncate
+     * @param {number} maxLength - Maximum length before truncation
+     */
+    truncateText(element, maxLength) {
+      if (!element) return;
+
+      const text = element.innerText || element.textContent;
+      if (text && text.length > maxLength) {
+        element.innerText = text.substring(0, maxLength) + "...";
+      }
+    },
+
+    /**
+     * Creates a separator icon element
+     * @returns {HTMLElement} Separator element
+     */
+    createSeparator() {
+      const separator = document.createElement("i");
+      separator.className = "material-icons fiber_manual_record separator-icon"; //material-icons radio_button_off
+      return separator;
+    },
+
+    /**
+     * Creates a DOM element with attributes and properties
+     * @param {string} tag - Element tag name
+     * @param {Object} attributes - Element attributes
+     * @param {string|HTMLElement} [content] - Element content
+     * @returns {HTMLElement} Created element
+     */
+    createElement(tag, attributes = {}, content = null) {
+      const element = document.createElement(tag);
+
+      Object.entries(attributes).forEach(([key, value]) => {
+        if (key === "style" && typeof value === "object") {
+          Object.entries(value).forEach(([prop, val]) => {
+            element.style[prop] = val;
+          });
+        } else if (key === "className") {
+          element.className = value;
+        } else if (key === "innerHTML") {
+          element.innerHTML = value;
+        } else if (key === "onclick" && typeof value === "function") {
+          element.addEventListener("click", value);
+        } else {
+          element.setAttribute(key, value);
+        }
+      });
+
+      if (content) {
+        if (typeof content === "string") {
+          element.textContent = content;
+        } else {
+          element.appendChild(content);
+        }
+      }
+
+      return element;
+    },
+
+    /**
+     * Find or create the slides container
+     * @returns {HTMLElement} Slides container element
+     */
+    getOrCreateSlidesContainer() {
+      let container = document.getElementById("slides-container");
+      if (!container) {
+        container = this.createElement("div", {
+          id: "slides-container",
+          className: "noautofocus",
+          tabIndex: "-1"
+        });
+        document.body.appendChild(container);
+      }
+      return container;
+    },
+
+    /**
+     * Formats genres into a readable string
+     * @param {Array} genresArray - Array of genre strings
+     * @returns {string} Formatted genres string
+     */
+    parseGenres(genresArray) {
+      if (Array.isArray(genresArray) && genresArray.length > 0) {
+        return genresArray.slice(0, 3).join(this.createSeparator().outerHTML);
+      }
+      return "No Genre Available";
+    },
+
+    /**
+     * Creates a loading indicator
+     * @returns {HTMLElement} Loading indicator element
+     */
+    createLoadingIndicator() {
+      const loadingIndicator = this.createElement("div", {
+        className: "slide-loading-indicator",
+        innerHTML: `
         <div class="spinner">
           <div class="bounce1"></div>
           <div class="bounce2"></div>
           <div class="bounce3"></div>
         </div>
       `,
-    });
-    return loadingIndicator;
-  },
-
-  /**
-   * Loads the YouTube IFrame API if not already loaded
-   * @returns {Promise<void>}
-   */
-  loadYouTubeIframeAPI() {
-    if (STATE.slideshow.ytPromise) return STATE.slideshow.ytPromise;
-
-    STATE.slideshow.ytPromise = new Promise((resolve) => {
-      if (window.YT && window.YT.Player) {
-        resolve(window.YT);
-        return;
-      }
-
-      window.onYouTubeIframeAPIReady = () => resolve(window.YT);
-      
-      if (!document.querySelector('script[src*="youtube.com/iframe_api"]')) {
-        const tag = document.createElement('script');
-        tag.src = "https://www.youtube.com/iframe_api";
-        const firstScriptTag = document.getElementsByTagName('script')[0];
-        if (firstScriptTag && firstScriptTag.parentNode) {
-          firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-        } else {
-          document.head.appendChild(tag);
-        }
-      }
-    });
-    
-    return STATE.slideshow.ytPromise;
-  },
-
-  /**
-   * Opens a modal video player
-   * @param {string} url - Video URL
-   */
-  openVideoModal(url) {
-    const existingModal = document.getElementById('video-modal-overlay');
-    if (existingModal) existingModal.remove();
-
-    if (STATE.slideshow.slideInterval) {
-      STATE.slideshow.slideInterval.stop();
-    }
-    STATE.slideshow.isPaused = true;
-
-    const overlay = this.createElement('div', {
-      id: 'video-modal-overlay'
-    });
-
-    const closeModal = () => {
-      overlay.remove();
-      STATE.slideshow.isPaused = false;
-      if (STATE.slideshow.slideInterval) {
-        STATE.slideshow.slideInterval.start();
-      }
-    };
-
-    const closeButton = this.createElement('button', {
-      className: 'modal-close-button',
-      innerHTML: '<i class="material-icons">close</i>',
-      onclick: closeModal
-    });
-
-    const contentContainer = this.createElement('div', {
-      className: 'video-modal-content'
-    });
-
-    let videoId = null;
-    let isYoutube = false;
-
-    try {
-      const urlObj = new URL(url);
-      if (urlObj.hostname.includes('youtube.com') || urlObj.hostname.includes('youtu.be')) {
-        isYoutube = true;
-        videoId = urlObj.searchParams.get('v');
-        if (!videoId && urlObj.hostname.includes('youtu.be')) {
-          videoId = urlObj.pathname.substring(1);
-        }
-      }
-    } catch (e) {
-      console.warn("🎬 Media Bar:", "Invalid URL for modal:", url);
-    }
-
-    if (isYoutube && videoId) {
-      const ytIframe = this.createElement('iframe', {
-        id: 'modal-yt-player',
-        src: `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&controls=1&iv_load_policy=3&rel=0&playsinline=1`,
-        allow: 'autoplay; encrypted-media',
-        style: 'width: 100%; height: 100%; border: none;',
-        referrerpolicy: 'strict-origin-when-cross-origin',
-        allowfullscreen: 'true'
       });
+      return loadingIndicator;
+    },
 
-      contentContainer.appendChild(ytIframe);
-      overlay.append(closeButton, contentContainer);
-      document.body.appendChild(overlay);
-    } else {
-      const video = this.createElement('video', {
-        src: url,
-        controls: true,
-        autoplay: true,
-        className: 'video-modal-player'
-      });
-      video.setAttribute('playsinline', '');
-      contentContainer.appendChild(video);
-      overlay.append(closeButton, contentContainer);
-      document.body.appendChild(overlay);
-    }
+    /**
+     * Loads the YouTube IFrame API if not already loaded
+     * @returns {Promise<void>}
+     */
+    loadYouTubeIframeAPI() {
+      if (STATE.slideshow.ytPromise) return STATE.slideshow.ytPromise;
 
-    overlay.addEventListener('click', (e) => {
-      if (e.target === overlay) {
-        closeModal();
-      }
-    });
-  },
-};
-
-/**
- * Localization utilities for fetching and using Jellyfin translations
- */
-const LocalizationUtils = {
-  translations: {},
-  locale: null,
-  isLoading: {},
-  cachedLocale: null,
-  chunkUrlCache: {},
-
-  /**
-   * Gets the current locale from user preference, server config, or HTML tag
-   * @returns {Promise<string>} Locale code (e.g., "de", "en-us")
-   */
-  async getCurrentLocale() {
-    if (this.cachedLocale) {
-      return this.cachedLocale;
-    }
-
-    let locale = null;
-
-    try {
-      if (window.ApiClient && typeof window.ApiClient.deviceId === 'function') {
-        const deviceId = window.ApiClient.deviceId();
-        if (deviceId) {
-          const deviceKey = `${deviceId}-language`;
-          const val = localStorage.getItem(deviceKey);
-          if (val) locale = val.toLowerCase();
-        }
-      }
-      if (!locale) {
-        const val = localStorage.getItem("language");
-        if (val) locale = val.toLowerCase();
-      }
-    } catch (e) {
-      console.warn("🎬 Media Bar:", "Could not access localStorage for language:", e);
-    }
-
-    if (!locale) {
-      const langAttr = document.documentElement.getAttribute("lang");
-      if (langAttr) {
-        locale = langAttr.toLowerCase();
-      }
-    }
-
-    if (window.ApiClient && STATE.jellyfinData && STATE.jellyfinData.accessToken) {
-      try {
-        const userId = window.ApiClient.getCurrentUserId();
-        if (userId) {
-          const userUrl = `${STATE.jellyfinData.serverAddress}/Users/${userId}`;
-          const userResponse = await fetch(userUrl, {
-            headers: ApiUtils.getAuthHeaders(),
-          });
-          if (userResponse.ok) {
-            const userData = await userResponse.json();
-            if (userData.Configuration && userData.Configuration.AudioLanguagePreference) {
-              locale = userData.Configuration.AudioLanguagePreference.toLowerCase();
-            }
-          }
-        }
-      } catch (error) {
-        console.warn("🎬 Media Bar:", "Could not fetch user audio language preference:", error);
-      }
-    }
-
-    if (!locale && window.ApiClient && (STATE.jellyfinData && STATE.jellyfinData.accessToken)) {
-      try {
-        const configUrl = `${STATE.jellyfinData.serverAddress}/System/Configuration`;
-        const configResponse = await fetch(configUrl, {
-          headers: ApiUtils.getAuthHeaders(),
-        });
-        if (configResponse.ok) {
-          const configData = await configResponse.json();
-          if (configData.PreferredMetadataLanguage) {
-            locale = configData.PreferredMetadataLanguage.toLowerCase();
-            if (configData.MetadataCountryCode) {
-              locale = `${locale}-${configData.MetadataCountryCode.toLowerCase()}`;
-            }
-          }
-        }
-      } catch (error) {
-        console.warn("🎬 Media Bar:", "Could not fetch server metadata language preference:", error);
-      }
-    }
-
-    if (!locale) {
-      const navLang = navigator.language || navigator.userLanguage;
-      locale = navLang ? navLang.toLowerCase() : "en-us";
-    }
-
-    // Convert 3-letter country codes to 2-letter if necessary
-    if (locale.length === 3) {
-      const countriesData = await window.ApiClient.getCountries();
-      const countryData = Object.values(countriesData).find(countryData => countryData.ThreeLetterISORegionName === locale.toUpperCase());
-      if (countryData) {
-        locale = countryData.TwoLetterISORegionName.toLowerCase();
-      }
-    }
-
-    this.cachedLocale = locale;
-    return locale;
-  },
-
-  /**
-   * Finds the translation chunk URL from performance entries
-   * @param {string} locale - Locale code
-   * @returns {string|null} URL to translation chunk or null
-   */
-  findTranslationChunkUrl(locale) {
-    const localePrefix = locale.split('-')[0];
-
-    if (this.chunkUrlCache[localePrefix]) {
-      return this.chunkUrlCache[localePrefix];
-    }
-
-    if (window.performance && window.performance.getEntriesByType) {
-      try {
-        const resources = window.performance.getEntriesByType('resource');
-        for (const resource of resources) {
-          const url = resource.name || resource.url;
-          if (url && url.includes(`${localePrefix}-json`) && url.includes('.chunk.js')) {
-            this.chunkUrlCache[localePrefix] = url;
-            return url;
-          }
-        }
-      } catch (e) {
-        console.warn("🎬 Media Bar:", "Error checking performance entries:", e);
-      }
-    }
-
-    this.chunkUrlCache[localePrefix] = null;
-    return null;
-  },
-
-  /**
-   * Fetches and loads translations from the chunk JSON
-   * @param {string} locale - Locale code
-   * @returns {Promise<void>}
-   */
-  async loadTranslations(locale) {
-    if (this.translations[locale]) return;
-    if (this.isLoading[locale]) {
-      await this.isLoading[locale];
-      return;
-    }
-
-    const loadPromise = (async () => {
-      try {
-        const chunkUrl = this.findTranslationChunkUrl(locale);
-        if (!chunkUrl) {
+      STATE.slideshow.ytPromise = new Promise((resolve) => {
+        if (window.YT && window.YT.Player) {
+          resolve(window.YT);
           return;
         }
 
-        const response = await fetch(chunkUrl);
-        if (!response.ok) {
-          throw new Error(`Failed to fetch translations: ${response.statusText}`);
-        }
+        window.onYouTubeIframeAPIReady = () => resolve(window.YT);
 
-        /**
-         * @example
-         * Standard version
-         * ```js
-         * "use strict";
-         * (self.webpackChunk = self.webpackChunk || []).push([[62634], {
-         *   30985: function(e) {
-         *     e.exports = JSON.parse('{"Absolute":"..."}')
-         *   }
-         * }]);
-         * ```
-         *
-         * Minified version
-         * ```js
-         * "use strict";(self.webpackChunk=self.webpackChunk||[]).push([[24072],{60715:function(e){e.exports=JSON.parse('{"Absolute":"..."}')}}]);
-         * ```
-         */
-        const chunkText = await response.text();
-
-        const replaceEscaped = (text) =>
-          text.replace(/\\"/g, '"').replace(/\\n/g, '\n').replace(/\\\\/g, '\\').replace(/\\'/g, "'");
-
-        // 1. Try to remove start and end wrappers first
-        try {
-          // Matches from start of file to the beginning of JSON.parse('
-          const START = /^(.*)JSON\.parse\(['"]/gms;
-          // Matches from the end of the JSON string to the end of the file
-          const END = /['"]?\)?\s*}?(\r\n|\r|\n)?}?]?\)?;(\r\n|\r|\n)?$/gms;
-
-          const jsonString = replaceEscaped(chunkText.replace(START, '').replace(END, ''));
-          this.translations[locale] = JSON.parse(jsonString);
-          return;
-        } catch (e) {
-          console.error("🎬 Media Bar:", 'Failed to parse JSON from standard extraction.');
-          // Try alternative extraction below
-        }
-
-        // 2. Try to extract only the JSON string directly
-        let jsonMatch = chunkText.match(/JSON\.parse\(['"](.*?)['"]\)/);
-        if (jsonMatch) {
-          try {
-            const jsonString = replaceEscaped(jsonMatch[1]);
-            this.translations[locale] = JSON.parse(jsonString);
-            return;
-          } catch (e) {
-            console.error("🎬 Media Bar:", 'Failed to parse JSON from direct extraction.');
-            // Try direct extraction
+        if (!document.querySelector('script[src*="youtube.com/iframe_api"]')) {
+          const tag = document.createElement('script');
+          tag.src = "https://www.youtube.com/iframe_api";
+          const firstScriptTag = document.getElementsByTagName('script')[0];
+          if (firstScriptTag && firstScriptTag.parentNode) {
+            firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+          } else {
+            document.head.appendChild(tag);
           }
-        }
-
-        // 3. Fallback: extract everything between the first { and the last }
-        const jsonStart = chunkText.indexOf('{');
-        const jsonEnd = chunkText.lastIndexOf('}') + 1;
-        if (jsonStart !== -1 && jsonEnd > jsonStart) {
-          const jsonString = chunkText.substring(jsonStart, jsonEnd);
-          try {
-            this.translations[locale] = JSON.parse(jsonString);
-            return;
-          } catch (e) {
-            console.error("🎬 Media Bar:", "Failed to parse JSON from chunk:", e);
-          }
-        }
-      } catch (error) {
-        console.error("🎬 Media Bar:", "Error loading translations:", error);
-      } finally {
-        delete this.isLoading[locale];
-      }
-    })();
-
-    this.isLoading[locale] = loadPromise;
-    await loadPromise;
-  },
-
-  /**
-   * Gets a localized string (synchronous - translations must be loaded first)
-   * @param {string} key - Localization key (e.g., "EndsAtValue", "Play")
-   * @param {string} fallback - Fallback English string
-   * @param {...any} args - Optional arguments for placeholders (e.g., {0}, {1})
-   * @returns {string} Localized string or fallback
-   */
-  getLocalizedString(key, fallback, ...args) {
-    const locale = this.cachedLocale || 'en-us';
-    let translated = (this.translations[locale] && this.translations[locale][key]) || fallback;
-
-    if (args.length > 0) {
-      for (let i = 0; i < args.length; i++) {
-        translated = translated.replace(new RegExp(`\\{${i}\\}`, 'g'), args[i]);
-      }
-    }
-
-    return translated;
-  }
-};
-
-/**
- * API utilities for fetching data from Jellyfin server
- */
-const ApiUtils = {
-  /**
-   * Fetches details for a specific item by ID
-   * @param {string} itemId - Item ID
-   * @returns {Promise<Object>} Item details
-   */
-  async fetchItemDetails(itemId) {
-    try {
-      if (STATE.slideshow.loadedItems[itemId]) {
-        return STATE.slideshow.loadedItems[itemId];
-      }
-
-      const response = await fetch(
-        // `${STATE.jellyfinData.serverAddress}/Items/${itemId}`,
-        `${STATE.jellyfinData.serverAddress}/Items/${itemId}?Fields=Overview,RemoteTrailers,Genres,CommunityRating,CriticRating,OfficialRating,PremiereDate,ProductionYear,MediaSources,RunTimeTicks,LocalTrailerCount`,
-        {
-          headers: this.getAuthHeaders(),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(`Failed to fetch item details: ${response.statusText}`);
-      }
-
-      const itemData = await response.json();
-
-      STATE.slideshow.loadedItems[itemId] = itemData;
-
-      const cacheKeys = Object.keys(STATE.slideshow.loadedItems);
-      if (cacheKeys.length >= CONFIG.maxCachedItems) {
-        delete STATE.slideshow.loadedItems[cacheKeys[0]];
-      }
-
-      return itemData;
-    } catch (error) {
-      console.error("🎬 Media Bar:", `Error fetching details for item ${itemId}:`, error);
-      return null;
-    }
-  },
-
-  /**
-   * Fetches random items from the server
-   * @returns {Promise<Array>} Array of item objects
-   */
-  async fetchItemIdsFromServer() {
-    try {
-      if (
-        !STATE.jellyfinData.accessToken ||
-        STATE.jellyfinData.accessToken === "Not Found"
-      ) {
-        console.warn("🎬 Media Bar:", "Access token not available. Delaying API request...");
-        return [];
-      }
-
-      if (
-        !STATE.jellyfinData.serverAddress ||
-        STATE.jellyfinData.serverAddress === "Not Found"
-      ) {
-        console.warn("🎬 Media Bar:", "Server address not available. Delaying API request...");
-        return [];
-      }
-
-      console.log("🎬 Media Bar:", "Fetching random items from server...");
-
-      let sortParams = `sortBy=${CONFIG.sortBy}`;
-
-      if (CONFIG.sortBy === 'Random' || CONFIG.sortBy === 'Original') {
-          sortParams = 'sortBy=Random';
-      } else {
-        sortParams += `&sortOrder=${CONFIG.sortOrder}`;
-      }
-
-      // Filter by isPlayed=False unless IncludeWatchedContent is enabled
-      const playedFilter = CONFIG.includeWatchedContent ? '' : '&isPlayed=False';
-      
-      let parentalFilter = '';
-      if (CONFIG.maxParentalRating) {
-        parentalFilter = `&MaxOfficialRating=${CONFIG.maxParentalRating}`;
-      }
-
-      let dateFilter = '';
-      if (CONFIG.maxDaysRecent) {
-        const pastDate = new Date();
-        pastDate.setDate(pastDate.getDate() - CONFIG.maxDaysRecent);
-        dateFilter = `&minDateLastSaved=${pastDate.toISOString()}`;
-      }
-      
-      // Exclude seasonal content from random lists
-      let excludeFilter = '';
-      if (CONFIG.excludeSeasonalContent && CONFIG.seasonalSections) {
-        try {
-            const sections = JSON.parse(CONFIG.seasonalSections || "[]");
-            let allExcludedIds = [];
-            
-            for (const section of sections) {
-                if (section.MediaIds) {
-                    const idsInThisSection = section.MediaIds.split(/[\n,]/)
-                        .map((line) => {
-                            const urlMatch = line.match(/\[(.*?)\]/);
-                            let id = line;
-                            if (urlMatch) {
-                                id = line.replace(/\[.*?\]/, '').trim();
-                                const guidMatch = id.match(/([0-9a-f]{32})/i);
-                                if (guidMatch) { id = guidMatch[1]; } else { id = id.split('|')[0].trim(); }
-                            }
-                            return id.trim();
-                        })
-                        .filter((id) => id);
-                    
-                    allExcludedIds.push(...idsInThisSection);
-                }
-            }
-            
-            if (allExcludedIds.length > 0) {
-                 excludeFilter = `&ExcludeItemIds=${allExcludedIds.join(',')}`;
-            }
-        } catch(e) {
-             console.error("🎬 Media Bar:", "Error extracting seasonal IDs for exclusion:", e);
-        }
-      }
-
-      const fetchItems = async (currentDateFilter) => {
-        const url = `${STATE.jellyfinData.serverAddress}/Items?IncludeItemTypes=Movie,Series&Recursive=true&hasOverview=true&imageTypes=Logo,Backdrop&${sortParams}${playedFilter}${parentalFilter}${currentDateFilter}${excludeFilter}&enableUserData=true&Limit=${CONFIG.maxItems}&fields=Id,DateCreated`;
-        const resp = await fetch(url, { headers: this.getAuthHeaders() });
-        return resp;
-      };
-
-      let response = await fetchItems(dateFilter);
-
-      if (!response.ok) {
-        console.error("🎬 Media Bar:", 
-          `Failed to fetch items: ${response.status} ${response.statusText}`
-        );
-        return [];
-      }
-
-      let data = await response.json();
-      let items = data.Items || [];
-
-      // Local exact DateCreated filter: minDateLastSaved pulls items that were merely modified recently (e.g. metadata updates)
-      // explicitly discard them if their actual DateCreated is older than X days
-      if (CONFIG.maxDaysRecent && dateFilter !== '') {
-        const pastDate = new Date();
-        pastDate.setDate(pastDate.getDate() - CONFIG.maxDaysRecent);
-        items = items.filter(item => {
-            if (!item.DateCreated) return true;
-            return new Date(item.DateCreated) >= pastDate;
-        });
-      }
-
-      // Fallback: If we have a date filter but no items are returned, try again without it
-      if (items.length === 0 && dateFilter !== '') {
-        console.warn("🎬 Media Bar:", `No items found within the last ${CONFIG.maxDaysRecent} days. Falling back to random fetching.`);
-        response = await fetchItems('');
-        
-        if (response.ok) {
-            data = await response.json();
-            items = data.Items || [];
-        }
-      }
-
-      console.log("🎬 Media Bar:", `Successfully fetched ${items.length} random items from server`);
-
-      return items.map((item) => item.Id);
-    } catch (error) {
-      console.error("🎬 Media Bar:", "Error fetching item IDs:", error);
-      return [];
-    }
-  },
-
-  /**
-   * Fetches items filtered by genres and/or tags from the server.
-   * Multiple genres are OR'd (union). Multiple tags are OR'd (union).
-   * Genres + Tags combined are AND'd (items must match at least one genre AND at least one tag).
-   * @param {string[]} genres - Genre names to filter by
-   * @param {string[]} tags - Tag names to filter by
-   * @returns {Promise<string[]>} Array of item IDs
-   */
-  async fetchItemsByGenresAndTags(genres = [], tags = []) {
-    try {
-      if (!STATE.jellyfinData.accessToken || STATE.jellyfinData.accessToken === "Not Found") {
-        console.warn("🎬 Media Bar:", "Access token not available for genre/tag fetch.");
-        return [];
-      }
-
-      if (!STATE.jellyfinData.serverAddress || STATE.jellyfinData.serverAddress === "Not Found") {
-        console.warn("🎬 Media Bar:", "Server address not available for genre/tag fetch.");
-        return [];
-      }
-
-      let genreParam = '';
-      if (genres.length > 0) {
-        genreParam = `&genres=${genres.map(g => encodeURIComponent(g)).join('|')}`;
-      }
-
-      let tagParam = '';
-      if (tags.length > 0) {
-        tagParam = `&tags=${tags.map(t => encodeURIComponent(t)).join('|')}`;
-      }
-
-      // Apply same filters as fetchItemIdsFromServer
-      let sortParams = `sortBy=${CONFIG.sortBy}`;
-      if (CONFIG.sortBy === 'Random' || CONFIG.sortBy === 'Original') {
-        sortParams = 'sortBy=Random';
-      } else {
-        sortParams += `&sortOrder=${CONFIG.sortOrder}`;
-      }
-
-      const playedFilter = CONFIG.includeWatchedContent ? '' : '&isPlayed=False';
-      
-      let parentalFilter = '';
-      if (CONFIG.maxParentalRating) {
-        parentalFilter = `&MaxOfficialRating=${CONFIG.maxParentalRating}`;
-      }
-
-      let dateFilter = '';
-      if (CONFIG.maxDaysRecent) {
-        const pastDate = new Date();
-        pastDate.setDate(pastDate.getDate() - CONFIG.maxDaysRecent);
-        dateFilter = `&minDateLastSaved=${pastDate.toISOString()}`;
-      }
-
-      // Exclude seasonal content from genre/tag results
-      let excludeFilter = '';
-      if (CONFIG.excludeSeasonalContent && CONFIG.seasonalSections) {
-        try {
-          const sections = JSON.parse(CONFIG.seasonalSections || "[]");
-          let allExcludedIds = [];
-          for (const section of sections) {
-            if (section.MediaIds) {
-              const idsInThisSection = section.MediaIds.split(/[\n,]/)
-                .map((line) => {
-                  const urlMatch = line.match(/\[(.*?)\]/);
-                  let id = line;
-                  if (urlMatch) {
-                    id = line.replace(/\[.*?\]/, '').trim();
-                    const guidMatch = id.match(/([0-9a-f]{32})/i);
-                    if (guidMatch) { id = guidMatch[1]; } else { id = id.split('|')[0].trim(); }
-                  }
-                  return id.trim();
-                })
-                .filter((id) => id && !id.match(/^(genre|tag):/i));
-              allExcludedIds.push(...idsInThisSection);
-            }
-          }
-          if (allExcludedIds.length > 0) {
-            excludeFilter = `&ExcludeItemIds=${allExcludedIds.join(',')}`;
-          }
-        } catch(e) {
-          console.error("🎬 Media Bar:", "Error extracting seasonal IDs for exclusion:", e);
-        }
-      }
-
-      console.log("🎬 Media Bar:", `Fetching items by genre/tag filter (genres: [${genres.join(', ')}], tags: [${tags.join(', ')}])...`);
-
-      const url = `${STATE.jellyfinData.serverAddress}/Items?IncludeItemTypes=Movie,Series&Recursive=true&hasOverview=true&imageTypes=Logo,Backdrop&${sortParams}${playedFilter}${parentalFilter}${dateFilter}${excludeFilter}${genreParam}${tagParam}&enableUserData=true&Limit=${CONFIG.maxItems}&fields=Id,DateCreated,Type`;
-      const response = await fetch(url, { headers: this.getAuthHeaders() });
-
-      if (!response.ok) {
-        console.error("🎬 Media Bar:", `Failed to fetch items by genre/tag: ${response.status} ${response.statusText}`);
-        return [];
-      }
-
-      const data = await response.json();
-      let items = data.Items || [];
-
-      // Apply exact DateCreated filter (same as fetchItemIdsFromServer)
-      if (CONFIG.maxDaysRecent && dateFilter !== '') {
-        const pastDate = new Date();
-        pastDate.setDate(pastDate.getDate() - CONFIG.maxDaysRecent);
-        items = items.filter(item => {
-          if (!item.DateCreated) return true;
-          return new Date(item.DateCreated) >= pastDate;
-        });
-      }
-
-      console.log("🎬 Media Bar:", `Found ${items.length} items matching genre/tag filters`);
-
-      return items.map(item => ({ Id: item.Id, Type: item.Type }));
-    } catch (error) {
-      console.error("🎬 Media Bar:", "Error fetching items by genre/tag:", error);
-      return [];
-    }
-  },
-  /**
-   * Get authentication headers for API requests
-   * @returns {Object} Headers object
-   */
-  getAuthHeaders() {
-    return {
-      Authorization: `MediaBrowser Client="${STATE.jellyfinData.appName}", Device="${STATE.jellyfinData.deviceName}", DeviceId="${STATE.jellyfinData.deviceId}", Version="${STATE.jellyfinData.appVersion}", Token="${STATE.jellyfinData.accessToken}"`,
-    };
-  },
-
-  /**
-   * Send a command to play an item
-   * @param {string} itemId - Item ID to play
-   * @returns {Promise<boolean>} Success status
-   */
-  async playItem(itemId) {
-    try {
-      const sessionId = await this.getSessionId();
-      if (!sessionId) {
-        console.error("🎬 Media Bar:", "Session ID not found.");
-        return false;
-      }
-
-      const playUrl = `${STATE.jellyfinData.serverAddress}/Sessions/${sessionId}/Playing?playCommand=PlayNow&itemIds=${itemId}`;
-      const playResponse = await fetch(playUrl, {
-        method: "POST",
-        headers: this.getAuthHeaders(),
-      });
-
-      if (!playResponse.ok) {
-        throw new Error(
-          `Failed to send play command: ${playResponse.statusText}`
-        );
-      }
-
-      console.log("🎬 Media Bar:", "Play command sent successfully to session:", sessionId);
-      return true;
-    } catch (error) {
-      console.error("🎬 Media Bar:", "Error sending play command:", error);
-      return false;
-    }
-  },
-
-  /**
-   * Gets current session ID
-   * @returns {Promise<string|null>} Session ID or null
-   */
-  async getSessionId() {
-    try {
-      const response = await fetch(
-        `${STATE.jellyfinData.serverAddress
-        }/Sessions?deviceId=${encodeURIComponent(STATE.jellyfinData.deviceId)}`,
-        {
-          headers: this.getAuthHeaders(),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(`Failed to fetch session data: ${response.statusText}`);
-      }
-
-      const sessions = await response.json();
-
-      if (!sessions || sessions.length === 0) {
-        console.warn("🎬 Media Bar:", 
-          "No sessions found for deviceId:",
-          STATE.jellyfinData.deviceId
-        );
-        return null;
-      }
-
-      return sessions[0].Id;
-    } catch (error) {
-      console.error("🎬 Media Bar:", "Error fetching session data:", error);
-      return null;
-    }
-  },
-
-  //Favorites
-
-  async toggleFavorite(itemId, button) {
-    try {
-      const userId = STATE.jellyfinData.userId;
-      const isFavorite = button.classList.contains("favorited");
-
-      const url = `${STATE.jellyfinData.serverAddress}/Users/${userId}/FavoriteItems/${itemId}`;
-      const method = isFavorite ? "DELETE" : "POST";
-
-      const response = await fetch(url, {
-        method,
-        headers: {
-          ...ApiUtils.getAuthHeaders(),
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`Failed to toggle favorite: ${response.statusText}`);
-      }
-      button.classList.toggle("favorited", !isFavorite);
-    } catch (error) {
-      console.error("🎬 Media Bar:", "Error toggling favorite:", error);
-    }
-  },
-
-  /**
-   * Fetches SponsorBlock segments for a YouTube video
-   * @param {string} videoId - YouTube Video ID
-   * @returns {Promise<Object>} Object containing intro and outro segments
-   */
-  async fetchSponsorBlockData(videoId) {
-    if (!CONFIG.useSponsorBlock) return { intro: null, outro: null };
-
-    // Return cached result if available
-    if (!this._sponsorBlockCache) this._sponsorBlockCache = {};
-    if (this._sponsorBlockCache[videoId]) {
-      return this._sponsorBlockCache[videoId];
-    }
-
-    try {
-      const response = await fetch(`https://sponsor.ajay.app/api/skipSegments?videoID=${videoId}&categories=["intro","outro"]`);
-      if (!response.ok) {
-        const result = { intro: null, outro: null };
-        this._sponsorBlockCache[videoId] = result;
-        return result;
-      }
-
-      const segments = await response.json();
-      let intro = null;
-      let outro = null;
-
-      segments.forEach(segment => {
-        if (segment.category === "intro" && Array.isArray(segment.segment)) {
-          intro = segment.segment;
-        } else if (segment.category === "outro" && Array.isArray(segment.segment)) {
-          outro = segment.segment;
         }
       });
 
-      const result = { intro, outro };
-      this._sponsorBlockCache[videoId] = result;
-      return result;
-    } catch (error) {
-      console.warn("🎬 Media Bar:", 'Error fetching SponsorBlock data:', error);
-      return { intro: null, outro: null };
-    }
-  },
+      return STATE.slideshow.ytPromise;
+    },
 
-  /**
-   * Searches for a Collection or Playlist by name
-   * @param {string} name - Name to search for
-   * @returns {Promise<string|null>} ID of the first match or null
-   */
-  async findCollectionOrPlaylistByName(name) {
-    try {
-      const response = await fetch(
-        `${STATE.jellyfinData.serverAddress}/Items?IncludeItemTypes=BoxSet,Playlist&Recursive=true&searchTerm=${encodeURIComponent(name)}&Limit=1&fields=Id&userId=${STATE.jellyfinData.userId}`,
-        {
-          headers: this.getAuthHeaders(),
-        }
-      );
+    /**
+     * Opens a modal video player
+     * @param {string} url - Video URL
+     */
+    openVideoModal(url) {
+      const existingModal = document.getElementById('video-modal-overlay');
+      if (existingModal) existingModal.remove();
 
-      if (!response.ok) {
-        console.warn("🎬 Media Bar:", `Failed to search for '${name}'`);
-        return null;
-      }
-
-      const data = await response.json();
-      if (data.Items && data.Items.length > 0) {
-        return data.Items[0].Id;
-      }
-      return null;
-    } catch (error) {
-      console.error("🎬 Media Bar:", `Error searching for '${name}':`, error);
-      return null;
-    }
-  },
-
-  /**
-   * Fetches items belonging to a collection (BoxSet)
-   * @param {string} collectionId - ID of the collection
-   * @returns {Promise<Array>} Array of item IDs
-   */
-  async fetchCollectionItems(collectionId) {
-    try {
-      const response = await fetch(
-        `${STATE.jellyfinData.serverAddress}/Items?ParentId=${collectionId}&Recursive=true&IncludeItemTypes=Movie,Series&fields=Id,Type&userId=${STATE.jellyfinData.userId}`,
-        {
-          headers: this.getAuthHeaders(),
-        }
-      );
-
-      if (!response.ok) {
-        console.warn("🎬 Media Bar:", `Failed to fetch collection items for ${collectionId}`);
-        return [];
-      }
-
-      const data = await response.json();
-      const items = data.Items || [];
-      console.log("🎬 Media Bar:", `Resolved collection ${collectionId} to ${items.length} items`);
-      return items.map(i => ({ Id: i.Id, Type: i.Type }));
-    } catch (error) {
-      console.error("🎬 Media Bar:", `Error fetching collection items for ${collectionId}:`, error);
-      return [];
-    }
-  },
-
-  /**
-   * Fetches the first local trailer for an item
-   * @param {string} itemId - Item ID
-   * @returns {Promise<Object|null>} Trailer data object {id, url} or null
-   */
-  async fetchLocalTrailer(itemId) {
-    try {
-      const response = await fetch(
-        `${STATE.jellyfinData.serverAddress}/Users/${STATE.jellyfinData.userId}/Items/${itemId}/LocalTrailers`,
-        {
-          headers: this.getAuthHeaders(),
-        }
-      );
-
-      if (!response.ok) {
-        return null;
-      }
-
-        const trailers = await response.json();
-        if (trailers && trailers.length > 0) {
-            
-            let trailer;
-            if (CONFIG.randomizeLocalTrailers && trailers.length > 1) {
-                const randomIndex = Math.floor(Math.random() * trailers.length);
-                trailer = trailers[randomIndex];
-                 console.log("🎬 Media Bar:", `Using random local trailer (${randomIndex + 1}/${trailers.length}) for ${itemId}: ${trailer.Name}`);
-            } else {
-                trailer = trailers[0];
-            }
-
-            const mediaSourceId = trailer.MediaSources && trailer.MediaSources[0] ? trailer.MediaSources[0].Id : trailer.Id;
-
-            return {
-                id: trailer.Id,
-                url: `${STATE.jellyfinData.serverAddress}/Videos/${trailer.Id}/stream.mp4?mediaSourceId=${mediaSourceId}&api_key=${STATE.jellyfinData.accessToken}&static=true`
-            };
-        }
-        return null;
-    } catch (error) {
-      console.error("🎬 Media Bar:", `Error fetching local trailer for ${itemId}:`, error);
-      return null;
-    }
-  },
-
-  /**
-   * Fetches theme videos for an item
-   * @param {string} itemId - Item ID
-   * @returns {Promise<Object|null>} Theme video data object {id, url} or null
-   */
-  async fetchThemeVideos(itemId) {
-    try {
-      const response = await fetch(
-          `${STATE.jellyfinData.serverAddress}/Items/${itemId}/ThemeVideos?userId=${STATE.jellyfinData.userId}`, 
-          { headers: this.getAuthHeaders() }
-      );
-      
-      if (response.ok) {
-           const data = await response.json();
-           const items = Array.isArray(data) ? data : (data.Items || []);
-           
-           if (items.length > 0) {
-               let video;
-               if (CONFIG.randomizeThemeVideos && items.length > 1) {
-                   const randomIndex = Math.floor(Math.random() * items.length);
-                   video = items[randomIndex];
-                   console.log("🎬 Media Bar:", `Found Theme Video (Random ${randomIndex + 1}/${items.length}) via ThemeVideos endpoint: ${video.Name} (${video.Id})`);
-               } else {
-                   video = items[0];
-                   console.log("🎬 Media Bar:", `Found Theme Video (First) via ThemeVideos endpoint: ${video.Name} (${video.Id})`);
-               }
-
-               return {
-                   id: video.Id,
-                   url: `${STATE.jellyfinData.serverAddress}/Videos/${video.Id}/stream.mp4?api_key=${STATE.jellyfinData.accessToken}&static=true`
-               };
-           }
-      }
-      return null;
-    } catch (error) {
-      console.error("🎬 Media Bar:", `Error fetching theme videos for ${itemId}:`, error);
-      return null;
-    }
-  }
-};
-
-/**
- * Class for managing slide timing
- */
-class SlideTimer {
-  /**
-   * Creates a new slide timer
-   * @param {Function} callback - Function to call on interval
-   * @param {number} interval - Interval in milliseconds
-   */
-  constructor(callback, interval) {
-    this.callback = callback;
-    this.interval = interval;
-    this.timerId = null;
-    this.start();
-  }
-
-  /**
-   * Stops the timer
-   * @returns {SlideTimer} This instance for chaining
-   */
-  stop() {
-    if (this.timerId) {
-      clearInterval(this.timerId);
-      this.timerId = null;
-    }
-    return this;
-  }
-
-  /**
-   * Starts the timer
-   * @returns {SlideTimer} This instance for chaining
-   */
-  start() {
-    if (!this.timerId) {
-      this.timerId = setInterval(this.callback, this.interval);
-    }
-    return this;
-  }
-
-  /**
-   * Restarts the timer
-   * @returns {SlideTimer} This instance for chaining
-   */
-  restart() {
-    return this.stop().start();
-  }
-}
-
-/**
- * Observer for handling slideshow visibility based on current page
- */
-const VisibilityObserver = {
-  wasVisible: false,
-  updateVisibility() {
-    const videoPlayer = document.querySelector('.videoPlayerContainer');
-    const trailerPlayer = document.querySelector('.youtubePlayerContainer');
-    
-    // If a full screen video player is active, hide slideshow and stop playback
-    if ((videoPlayer && !videoPlayer.classList.contains('hide')) || (trailerPlayer && !trailerPlayer.classList.contains('hide'))) {
-        const container = document.getElementById("slides-container");
-        if (container) {
-            container.style.display = "none";
-            container.style.visibility = "hidden";
-            container.style.pointerEvents = "none";
-        }
-        if (STATE.slideshow.slideInterval) {
-            STATE.slideshow.slideInterval.stop();
-        }
-        SlideshowManager.stopAllPlayback();
-        return;
-    }
-
-    const activeTab = document.querySelector(".emby-tab-button-active");
-    const container = document.getElementById("slides-container");
-
-    if (!container) return;
-
-    const isVisible =
-      (window.location.hash === "#/home.html" ||
-        window.location.hash === "#/home") &&
-      activeTab &&
-      activeTab.getAttribute("data-index") === "0";
-
-    container.style.display = isVisible ? "block" : "none";
-    container.style.visibility = isVisible ? "visible" : "hidden";
-    container.style.pointerEvents = isVisible ? "auto" : "none";
-
-    if (isVisible && !this.wasVisible) {
-      if (STATE.slideshow.hasInitialized && STATE.slideshow.itemIds.length > 0) {
-        SlideshowManager.updateCurrentSlide(STATE.slideshow.currentSlideIndex);
-      }
-      if (STATE.slideshow.slideInterval && !STATE.slideshow.isPaused) {
-        STATE.slideshow.slideInterval.start();
-        SlideshowManager.resumeActivePlayback();
-      }
-    } else if (!isVisible && this.wasVisible) {
       if (STATE.slideshow.slideInterval) {
         STATE.slideshow.slideInterval.stop();
       }
-      SlideshowManager.stopAllPlayback();
+      STATE.slideshow.isPaused = true;
 
-      // Free memory: destroy players and slides
-      if (STATE.slideshow.videoPlayers) {
-        Object.values(STATE.slideshow.videoPlayers).forEach((player) => {
-          if (player) {
-            if (typeof player.destroy === "function") {
-              try { player.destroy(); } catch (e) {}
-            } else if (player.tagName === 'VIDEO') {
-              try { player.removeAttribute('src'); player.load(); player.remove(); } catch (e) {}
-            }
-          }
-        });
-        STATE.slideshow.videoPlayers = {};
-      }
-      container.querySelectorAll(".slide").forEach((slide) => slide.remove());
-      STATE.slideshow.createdSlides = {};
-      STATE.slideshow.hasTrailer = {};
-    }
+      const overlay = this.createElement('div', {
+        id: 'video-modal-overlay'
+      });
 
-    this.wasVisible = isVisible;
-  },
-
-  /**
-   * Initializes visibility observer
-   */
-  init() {
-    const observer = new MutationObserver(() => this.updateVisibility());
-    observer.observe(document.body, { childList: true, subtree: true });
-
-    document.body.addEventListener("click", () => this.updateVisibility());
-    window.addEventListener("hashchange", () => this.updateVisibility());
-
-    this.updateVisibility();
-  },
-};
-
-/**
- * Slideshow UI creation and management
- */
-const SlideCreator = {
-  /**
-   * Builds a tag-based image URL for cache-friendly image requests
-   * @param {Object} item - Item data containing ImageTags
-   * @param {string} imageType - Image type (Backdrop, Logo, Primary, etc.)
-   * @param {number} [index] - Image index (for Backdrop, Primary, etc.)
-   * @param {string} serverAddress - Server address
-   * @param {number} [quality] - Image quality (0-100). If tag is available, both tag and quality are used.
-   * @returns {string} Image URL with tag parameter (and quality if tag available), or quality-only fallback
-   */
-  buildImageUrl(item, imageType, index, serverAddress, quality) {
-    const itemId = item.Id;
-    let tag = null;
-
-    // Handle Backdrop images
-    if (imageType === "Backdrop") {
-      // Check BackdropImageTags array first
-      if (item.BackdropImageTags && Array.isArray(item.BackdropImageTags) && item.BackdropImageTags.length > 0) {
-        const backdropIndex = index !== undefined ? index : 0;
-        if (backdropIndex < item.BackdropImageTags.length) {
-          tag = item.BackdropImageTags[backdropIndex];
+      const closeModal = () => {
+        overlay.remove();
+        STATE.slideshow.isPaused = false;
+        if (STATE.slideshow.slideInterval) {
+          STATE.slideshow.slideInterval.start();
         }
-      }
-      // Fallback to ImageTags.Backdrop if BackdropImageTags not available
-      if (!tag && item.ImageTags && item.ImageTags.Backdrop) {
-        tag = item.ImageTags.Backdrop;
-      }
-    } else {
-      // For other image types (Logo, Primary, etc.), use ImageTags
-      if (item.ImageTags && item.ImageTags[imageType]) {
-        tag = item.ImageTags[imageType];
-      }
-    }
+      };
 
-    // Build base URL path
-    let baseUrl;
-    if (index !== undefined) {
-      baseUrl = `${serverAddress}/Items/${itemId}/Images/${imageType}/${index}`;
-    } else {
-      baseUrl = `${serverAddress}/Items/${itemId}/Images/${imageType}`;
-    }
+      const closeButton = this.createElement('button', {
+        className: 'modal-close-button',
+        innerHTML: '<i class="material-icons">close</i>',
+        onclick: closeModal
+      });
 
-    // Build URL with tag and quality if tag is available, otherwise quality-only fallback
-    if (tag) {
-      // Use both tag and quality for cacheable, quality-controlled images
-      const qualityParam = quality !== undefined ? `&quality=${quality}` : '';
-      return `${baseUrl}?tag=${tag}${qualityParam}`;
-    } else {
-      // Fallback to quality-only URL if no tag is available
-      const qualityParam = quality !== undefined ? quality : 90;
-      return `${baseUrl}?quality=${qualityParam}`;
-    }
-  },
+      const contentContainer = this.createElement('div', {
+        className: 'video-modal-content'
+      });
 
-  /**
-   * Creates a slide element for an item
-   * @param {Object} item - Item data
-   * @param {string} title - Title type (Movie/TV Show)
-   * @returns {HTMLElement} Slide element
-   */
-  createSlideElement(item, title) {
-    if (!item || !item.Id) {
-      console.error("🎬 Media Bar:", "Invalid item data:", item);
-      return null;
-    }
-
-    const itemId = item.Id;
-    const serverAddress = STATE.jellyfinData.serverAddress;
-
-    const slide = SlideUtils.createElement("a", {
-      className: "slide",
-      target: "_top",
-      rel: "noreferrer",
-      tabIndex: 0,
-      "data-item-id": itemId,
-    });
-
-    let videoBackdrop;
-    let backdrop;
-    let isVideo = false;
-    let trailerUrl = null;
-
-    // 1. Check for Remote/Local Trailers
-    // Priority: Custom Config URL > (PreferLocal -> Local) > Metadata RemoteTrailer
-
-    // 1a. Custom URL override
-    if (STATE.slideshow.customTrailerUrls && STATE.slideshow.customTrailerUrls[itemId]) {
-      const customValue = STATE.slideshow.customTrailerUrls[itemId];
-      
-      // Check if the custom value is a Jellyfin Item ID (GUID)
-      const guidMatch = customValue.match(/^([0-9a-f]{32})$/i);
-      
-      if (guidMatch) {
-          const videoId = guidMatch[1];
-          console.log("🎬 Media Bar:", `Using custom local video ID for ${itemId}: ${videoId}`);
-          
-          trailerUrl = {
-              id: videoId,
-              url: `${STATE.jellyfinData.serverAddress}/Videos/${videoId}/stream.mp4?api_key=${STATE.jellyfinData.accessToken}&static=true`
-          };
-      } else {
-          // Assume it's a standard URL (YouTube, etc.)
-          trailerUrl = customValue;
-          console.log("🎬 Media Bar:", `Using custom trailer URL for ${itemId}: ${trailerUrl}`);
-      }
-    }
-    // 1b. Check Theme Video if preferred (Local Backdrop)
-    else if (CONFIG.preferLocalBackdrops && item.themeVideoUrl) {
-        trailerUrl = item.themeVideoUrl;
-        console.log("🎬 Media Bar:", `Using theme video (local backdrop) for ${itemId}: ${trailerUrl.url || trailerUrl}`);
-    } 
-    // 1c. Check Local Trailer if preferred
-    else if (CONFIG.preferLocalTrailers && item.LocalTrailerCount > 0 && item.localTrailerUrl) {
-         trailerUrl = item.localTrailerUrl;
-         console.log("🎬 Media Bar:", `Using local trailer for ${itemId}: ${trailerUrl}`);
-    }
-    // 1d. Fallback to Remote Trailer
-    else if (item.RemoteTrailers && item.RemoteTrailers.length > 0) {
-      trailerUrl = item.RemoteTrailers[0].Url;
-    }
-    // 1e. Final Fallback to Local Trailer (even if not preferred)
-    else if (item.LocalTrailerCount > 0 && item.localTrailerUrl) {
-         trailerUrl = item.localTrailerUrl;
-         console.log("🎬 Media Bar:", `Using local trailer fallback for ${itemId}: ${trailerUrl}`);
-    }
-
-    const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    
-    // Client Setting Overrides
-    const enableVideo = MediaBarEnhancedSettingsManager.getSetting('videoBackdrops', CONFIG.enableVideoBackdrop);
-    const enableMobileVideo = MediaBarEnhancedSettingsManager.getSetting('mobileVideo', CONFIG.enableMobileVideo);
-    
-    const shouldPlayVideo = enableVideo && (!isMobile || enableMobileVideo);
-
-    if (trailerUrl && shouldPlayVideo) {
-      STATE.slideshow.hasTrailer = STATE.slideshow.hasTrailer || {};
-      STATE.slideshow.hasTrailer[itemId] = true;
-      let isYoutube = false;
       let videoId = null;
+      let isYoutube = false;
 
       try {
-        let urlToCheck = trailerUrl;
-        if (typeof trailerUrl === 'object' && trailerUrl.url) {
-            urlToCheck = trailerUrl.url;
-        }
-
-        const urlObjChecked = new URL(urlToCheck);
-        if (urlObjChecked.hostname.includes('youtube.com') || urlObjChecked.hostname.includes('youtu.be')) {
+        const urlObj = new URL(url);
+        if (urlObj.hostname.includes('youtube.com') || urlObj.hostname.includes('youtu.be')) {
           isYoutube = true;
-          videoId = urlObjChecked.searchParams.get('v');
-          if (!videoId && urlObjChecked.hostname.includes('youtu.be')) {
-            videoId = urlObjChecked.pathname.substring(1);
+          videoId = urlObj.searchParams.get('v');
+          if (!videoId && urlObj.hostname.includes('youtu.be')) {
+            videoId = urlObj.pathname.substring(1);
           }
         }
       } catch (e) {
-        console.warn("🎬 Media Bar:", "Invalid trailer URL:", trailerUrl);
+        console.warn("🎬 Media Bar:", "Invalid URL for modal:", url);
       }
 
-      const isLowPower = isLowPowerDevice();
-      const isIOSApp = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-      const limitVideos = isLowPower || isIOSApp;
-      const itemIndex = STATE.slideshow.itemIds ? STATE.slideshow.itemIds.indexOf(itemId) : -1;
-      const isActiveSlide = itemIndex !== -1 && itemIndex === STATE.slideshow.currentSlideIndex;
-      // Limit YouTube iframe bulk creation on low power devices OR iOS (which kills the WebProcess on OOM)
-      const shouldCreateVideo = !limitVideos || isActiveSlide;
+      if (isYoutube && videoId) {
+        const ytIframe = this.createElement('iframe', {
+          id: 'modal-yt-player',
+          src: `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&controls=1&iv_load_policy=3&rel=0&playsinline=1`,
+          allow: 'autoplay; encrypted-media',
+          style: 'width: 100%; height: 100%; border: none;',
+          referrerpolicy: 'strict-origin-when-cross-origin',
+          allowfullscreen: 'true'
+        });
 
-      if (isYoutube && videoId && shouldCreateVideo) {
-        isVideo = true;
-        // Create container for YouTube API
-        const videoClass = CONFIG.fullWidthVideo ? "video-backdrop-full" : "video-backdrop-default";
+        contentContainer.appendChild(ytIframe);
+        overlay.append(closeButton, contentContainer);
+        document.body.appendChild(overlay);
+      } else {
+        const video = this.createElement('video', {
+          src: url,
+          controls: true,
+          autoplay: true,
+          className: 'video-modal-player'
+        });
+        video.setAttribute('playsinline', '');
+        contentContainer.appendChild(video);
+        overlay.append(closeButton, contentContainer);
+        document.body.appendChild(overlay);
+      }
 
-        // Create a wrapper for opacity transition
-        videoBackdrop = SlideUtils.createElement("div", {
+      overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) {
+          closeModal();
+        }
+      });
+    },
+  };
+
+  /**
+   * Localization utilities for fetching and using Jellyfin translations
+   */
+  const LocalizationUtils = {
+    translations: {},
+    locale: null,
+    isLoading: {},
+    cachedLocale: null,
+    chunkUrlCache: {},
+
+    /**
+     * Gets the current locale from user preference, server config, or HTML tag
+     * @returns {Promise<string>} Locale code (e.g., "de", "en-us")
+     */
+    async getCurrentLocale() {
+      if (this.cachedLocale) {
+        return this.cachedLocale;
+      }
+
+      let locale = null;
+
+      try {
+        if (window.ApiClient && typeof window.ApiClient.deviceId === 'function') {
+          const deviceId = window.ApiClient.deviceId();
+          if (deviceId) {
+            const deviceKey = `${deviceId}-language`;
+            const val = localStorage.getItem(deviceKey);
+            if (val) locale = val.toLowerCase();
+          }
+        }
+        if (!locale) {
+          const val = localStorage.getItem("language");
+          if (val) locale = val.toLowerCase();
+        }
+      } catch (e) {
+        console.warn("🎬 Media Bar:", "Could not access localStorage for language:", e);
+      }
+
+      if (!locale) {
+        const langAttr = document.documentElement.getAttribute("lang");
+        if (langAttr) {
+          locale = langAttr.toLowerCase();
+        }
+      }
+
+      if (window.ApiClient && STATE.jellyfinData && STATE.jellyfinData.accessToken) {
+        try {
+          const userId = window.ApiClient.getCurrentUserId();
+          if (userId) {
+            const userUrl = `${STATE.jellyfinData.serverAddress}/Users/${userId}`;
+            const userResponse = await fetch(userUrl, {
+              headers: ApiUtils.getAuthHeaders(),
+            });
+            if (userResponse.ok) {
+              const userData = await userResponse.json();
+              if (userData.Configuration && userData.Configuration.AudioLanguagePreference) {
+                locale = userData.Configuration.AudioLanguagePreference.toLowerCase();
+              }
+            }
+          }
+        } catch (error) {
+          console.warn("🎬 Media Bar:", "Could not fetch user audio language preference:", error);
+        }
+      }
+
+      if (!locale && window.ApiClient && (STATE.jellyfinData && STATE.jellyfinData.accessToken)) {
+        try {
+          const configUrl = `${STATE.jellyfinData.serverAddress}/System/Configuration`;
+          const configResponse = await fetch(configUrl, {
+            headers: ApiUtils.getAuthHeaders(),
+          });
+          if (configResponse.ok) {
+            const configData = await configResponse.json();
+            if (configData.PreferredMetadataLanguage) {
+              locale = configData.PreferredMetadataLanguage.toLowerCase();
+              if (configData.MetadataCountryCode) {
+                locale = `${locale}-${configData.MetadataCountryCode.toLowerCase()}`;
+              }
+            }
+          }
+        } catch (error) {
+          console.warn("🎬 Media Bar:", "Could not fetch server metadata language preference:", error);
+        }
+      }
+
+      if (!locale) {
+        const navLang = navigator.language || navigator.userLanguage;
+        locale = navLang ? navLang.toLowerCase() : "en-us";
+      }
+
+      // Convert 3-letter country codes to 2-letter if necessary
+      if (locale.length === 3) {
+        const countriesData = await window.ApiClient.getCountries();
+        const countryData = Object.values(countriesData).find(countryData => countryData.ThreeLetterISORegionName === locale.toUpperCase());
+        if (countryData) {
+          locale = countryData.TwoLetterISORegionName.toLowerCase();
+        }
+      }
+
+      this.cachedLocale = locale;
+      return locale;
+    },
+
+    /**
+     * Finds the translation chunk URL from performance entries
+     * @param {string} locale - Locale code
+     * @returns {string|null} URL to translation chunk or null
+     */
+    findTranslationChunkUrl(locale) {
+      const localePrefix = locale.split('-')[0];
+
+      if (this.chunkUrlCache[localePrefix]) {
+        return this.chunkUrlCache[localePrefix];
+      }
+
+      if (window.performance && window.performance.getEntriesByType) {
+        try {
+          const resources = window.performance.getEntriesByType('resource');
+          for (const resource of resources) {
+            const url = resource.name || resource.url;
+            if (url && url.includes(`${localePrefix}-json`) && url.includes('.chunk.js')) {
+              this.chunkUrlCache[localePrefix] = url;
+              return url;
+            }
+          }
+        } catch (e) {
+          console.warn("🎬 Media Bar:", "Error checking performance entries:", e);
+        }
+      }
+
+      this.chunkUrlCache[localePrefix] = null;
+      return null;
+    },
+
+    /**
+     * Fetches and loads translations from the chunk JSON
+     * @param {string} locale - Locale code
+     * @returns {Promise<void>}
+     */
+    async loadTranslations(locale) {
+      if (this.translations[locale]) return;
+      if (this.isLoading[locale]) {
+        await this.isLoading[locale];
+        return;
+      }
+
+      const loadPromise = (async () => {
+        try {
+          const chunkUrl = this.findTranslationChunkUrl(locale);
+          if (!chunkUrl) {
+            return;
+          }
+
+          const response = await fetch(chunkUrl);
+          if (!response.ok) {
+            throw new Error(`Failed to fetch translations: ${response.statusText}`);
+          }
+
+          /**
+           * @example
+           * Standard version
+           * ```js
+           * "use strict";
+           * (self.webpackChunk = self.webpackChunk || []).push([[62634], {
+           *   30985: function(e) {
+           *     e.exports = JSON.parse('{"Absolute":"..."}')
+           *   }
+           * }]);
+           * ```
+           *
+           * Minified version
+           * ```js
+           * "use strict";(self.webpackChunk=self.webpackChunk||[]).push([[24072],{60715:function(e){e.exports=JSON.parse('{"Absolute":"..."}')}}]);
+           * ```
+           */
+          const chunkText = await response.text();
+
+          const replaceEscaped = (text) =>
+            text.replace(/\\"/g, '"').replace(/\\n/g, '\n').replace(/\\\\/g, '\\').replace(/\\'/g, "'");
+
+          // 1. Try to remove start and end wrappers first
+          try {
+            // Matches from start of file to the beginning of JSON.parse('
+            const START = /^(.*)JSON\.parse\(['"]/gms;
+            // Matches from the end of the JSON string to the end of the file
+            const END = /['"]?\)?\s*}?(\r\n|\r|\n)?}?]?\)?;(\r\n|\r|\n)?$/gms;
+
+            const jsonString = replaceEscaped(chunkText.replace(START, '').replace(END, ''));
+            this.translations[locale] = JSON.parse(jsonString);
+            return;
+          } catch (e) {
+            console.error("🎬 Media Bar:", 'Failed to parse JSON from standard extraction.');
+            // Try alternative extraction below
+          }
+
+          // 2. Try to extract only the JSON string directly
+          let jsonMatch = chunkText.match(/JSON\.parse\(['"](.*?)['"]\)/);
+          if (jsonMatch) {
+            try {
+              const jsonString = replaceEscaped(jsonMatch[1]);
+              this.translations[locale] = JSON.parse(jsonString);
+              return;
+            } catch (e) {
+              console.error("🎬 Media Bar:", 'Failed to parse JSON from direct extraction.');
+              // Try direct extraction
+            }
+          }
+
+          // 3. Fallback: extract everything between the first { and the last }
+          const jsonStart = chunkText.indexOf('{');
+          const jsonEnd = chunkText.lastIndexOf('}') + 1;
+          if (jsonStart !== -1 && jsonEnd > jsonStart) {
+            const jsonString = chunkText.substring(jsonStart, jsonEnd);
+            try {
+              this.translations[locale] = JSON.parse(jsonString);
+              return;
+            } catch (e) {
+              console.error("🎬 Media Bar:", "Failed to parse JSON from chunk:", e);
+            }
+          }
+        } catch (error) {
+          console.error("🎬 Media Bar:", "Error loading translations:", error);
+        } finally {
+          delete this.isLoading[locale];
+        }
+      })();
+
+      this.isLoading[locale] = loadPromise;
+      await loadPromise;
+    },
+
+    /**
+     * Gets a localized string (synchronous - translations must be loaded first)
+     * @param {string} key - Localization key (e.g., "EndsAtValue", "Play")
+     * @param {string} fallback - Fallback English string
+     * @param {...any} args - Optional arguments for placeholders (e.g., {0}, {1})
+     * @returns {string} Localized string or fallback
+     */
+    getLocalizedString(key, fallback, ...args) {
+      const locale = this.cachedLocale || 'en-us';
+      let translated = (this.translations[locale] && this.translations[locale][key]) || fallback;
+
+      if (args.length > 0) {
+        for (let i = 0; i < args.length; i++) {
+          translated = translated.replace(new RegExp(`\\{${i}\\}`, 'g'), args[i]);
+        }
+      }
+
+      return translated;
+    }
+  };
+
+  /**
+   * API utilities for fetching data from Jellyfin server
+   */
+  const ApiUtils = {
+    /**
+     * Fetches details for a specific item by ID
+     * @param {string} itemId - Item ID
+     * @returns {Promise<Object>} Item details
+     */
+    async fetchItemDetails(itemId) {
+      try {
+        if (STATE.slideshow.loadedItems[itemId]) {
+          return STATE.slideshow.loadedItems[itemId];
+        }
+
+        const response = await fetch(
+          // `${STATE.jellyfinData.serverAddress}/Items/${itemId}`,
+          `${STATE.jellyfinData.serverAddress}/Items/${itemId}?Fields=Overview,RemoteTrailers,Genres,CommunityRating,CriticRating,OfficialRating,PremiereDate,ProductionYear,MediaSources,RunTimeTicks,LocalTrailerCount`,
+          {
+            headers: this.getAuthHeaders(),
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch item details: ${response.statusText}`);
+        }
+
+        const itemData = await response.json();
+
+        STATE.slideshow.loadedItems[itemId] = itemData;
+
+        const cacheKeys = Object.keys(STATE.slideshow.loadedItems);
+        if (cacheKeys.length >= CONFIG.maxCachedItems) {
+          delete STATE.slideshow.loadedItems[cacheKeys[0]];
+        }
+
+        return itemData;
+      } catch (error) {
+        console.error("🎬 Media Bar:", `Error fetching details for item ${itemId}:`, error);
+        return null;
+      }
+    },
+
+    /**
+     * Fetches random items from the server
+     * @returns {Promise<Array>} Array of item objects
+     */
+    async fetchItemIdsFromServer() {
+      try {
+        if (
+          !STATE.jellyfinData.accessToken ||
+          STATE.jellyfinData.accessToken === "Not Found"
+        ) {
+          console.warn("🎬 Media Bar:", "Access token not available. Delaying API request...");
+          return [];
+        }
+
+        if (
+          !STATE.jellyfinData.serverAddress ||
+          STATE.jellyfinData.serverAddress === "Not Found"
+        ) {
+          console.warn("🎬 Media Bar:", "Server address not available. Delaying API request...");
+          return [];
+        }
+
+        console.log("🎬 Media Bar:", "Fetching random items from server...");
+
+        let itemTypes = [];
+        if (CONFIG.maxMovies > 0) itemTypes.push("Movie");
+        if (CONFIG.maxTvShows > 0) itemTypes.push("Series");
+
+        if (itemTypes.length === 0) {
+          console.log("🎬 Media Bar:", "Both Max Movies and Max TV Shows are set to 0. No items to fetch.");
+          return [];
+        }
+
+        let sortParams = `sortBy=${CONFIG.sortBy}`;
+
+        if (CONFIG.sortBy === 'Random' || CONFIG.sortBy === 'Original') {
+          sortParams = 'sortBy=Random';
+        } else {
+          sortParams += `&sortOrder=${CONFIG.sortOrder}`;
+        }
+
+        // Filter by isPlayed=False unless IncludeWatchedContent is enabled
+        const playedFilter = CONFIG.includeWatchedContent ? '' : '&isPlayed=False';
+
+        let parentalFilter = '';
+        if (CONFIG.maxParentalRating) {
+          parentalFilter = `&MaxOfficialRating=${CONFIG.maxParentalRating}`;
+        }
+
+        let dateFilter = '';
+        if (CONFIG.maxDaysRecent) {
+          const pastDate = new Date();
+          pastDate.setDate(pastDate.getDate() - CONFIG.maxDaysRecent);
+          dateFilter = `&minDateLastSaved=${pastDate.toISOString()}`;
+        }
+
+        // Exclude seasonal content from random lists
+        let excludeFilter = '';
+        if (CONFIG.excludeSeasonalContent && CONFIG.seasonalSections) {
+          try {
+            const sections = JSON.parse(CONFIG.seasonalSections || "[]");
+            let allExcludedIds = [];
+
+            for (const section of sections) {
+              if (section.MediaIds) {
+                const idsInThisSection = section.MediaIds.split(/[\n,]/)
+                  .map((line) => {
+                    const urlMatch = line.match(/\[(.*?)\]/);
+                    let id = line;
+                    if (urlMatch) {
+                      id = line.replace(/\[.*?\]/, '').trim();
+                      const guidMatch = id.match(/([0-9a-f]{32})/i);
+                      if (guidMatch) { id = guidMatch[1]; } else { id = id.split('|')[0].trim(); }
+                    }
+                    return id.trim();
+                  })
+                  .filter((id) => id);
+
+                allExcludedIds.push(...idsInThisSection);
+              }
+            }
+
+            if (allExcludedIds.length > 0) {
+              excludeFilter = `&ExcludeItemIds=${allExcludedIds.join(',')}`;
+            }
+          } catch (e) {
+            console.error("🎬 Media Bar:", "Error extracting seasonal IDs for exclusion:", e);
+          }
+        }
+
+        const fetchItems = async (currentDateFilter) => {
+          const url = `${STATE.jellyfinData.serverAddress}/Items?IncludeItemTypes=${itemTypes.join(",")}&Recursive=true&hasOverview=true&imageTypes=Logo,Backdrop&${sortParams}${playedFilter}${parentalFilter}${currentDateFilter}${excludeFilter}&enableUserData=true&Limit=${CONFIG.maxItems}&fields=Id,Type,DateCreated`;
+          const resp = await fetch(url, { headers: this.getAuthHeaders() });
+          return resp;
+        };
+
+        let response = await fetchItems(dateFilter);
+
+        if (!response.ok) {
+          console.error("🎬 Media Bar:",
+            `Failed to fetch items: ${response.status} ${response.statusText}`
+          );
+          return [];
+        }
+
+        let data = await response.json();
+        let items = data.Items || [];
+
+        // Local exact DateCreated filter: minDateLastSaved pulls items that were merely modified recently (e.g. metadata updates)
+        // explicitly discard them if their actual DateCreated is older than X days
+        if (CONFIG.maxDaysRecent && dateFilter !== '') {
+          const pastDate = new Date();
+          pastDate.setDate(pastDate.getDate() - CONFIG.maxDaysRecent);
+          items = items.filter(item => {
+            if (!item.DateCreated) return true;
+            return new Date(item.DateCreated) >= pastDate;
+          });
+        }
+
+        // Fallback: If we have a date filter but no items are returned, try again without it
+        if (items.length === 0 && dateFilter !== '') {
+          console.warn("🎬 Media Bar:", `No items found within the last ${CONFIG.maxDaysRecent} days. Falling back to random fetching.`);
+          response = await fetchItems('');
+
+          if (response.ok) {
+            data = await response.json();
+            items = data.Items || [];
+          }
+        }
+
+        // Apply Content Limits (MaxMovies, MaxTvShows)
+        let movieCount = 0;
+        let showCount = 0;
+        let keptItems = [];
+
+        for (const item of items) {
+          if (item.Type === 'Movie') {
+            if (movieCount < CONFIG.maxMovies) {
+              movieCount++;
+              keptItems.push(item);
+            }
+          } else if (item.Type === 'Series' || item.Type === 'Season' || item.Type === 'Episode') {
+            if (showCount < CONFIG.maxTvShows) {
+              showCount++;
+              keptItems.push(item);
+            }
+          } else {
+            keptItems.push(item);
+          }
+        }
+        items = keptItems;
+
+        console.log("🎬 Media Bar:", `Successfully fetched ${items.length} random items from server (Movies: ${movieCount}, Shows: ${showCount})`);
+
+        return items.map((item) => item.Id);
+      } catch (error) {
+        console.error("🎬 Media Bar:", "Error fetching item IDs:", error);
+        return [];
+      }
+    },
+
+    /**
+     * Fetches items filtered by genres and/or tags from the server.
+     * Multiple genres are OR'd (union). Multiple tags are OR'd (union).
+     * Genres + Tags combined are AND'd (items must match at least one genre AND at least one tag).
+     * @param {string[]} genres - Genre names to filter by
+     * @param {string[]} tags - Tag names to filter by
+     * @returns {Promise<string[]>} Array of item IDs
+     */
+    async fetchItemsByGenresAndTags(genres = [], tags = []) {
+      try {
+        if (!STATE.jellyfinData.accessToken || STATE.jellyfinData.accessToken === "Not Found") {
+          console.warn("🎬 Media Bar:", "Access token not available for genre/tag fetch.");
+          return [];
+        }
+
+        if (!STATE.jellyfinData.serverAddress || STATE.jellyfinData.serverAddress === "Not Found") {
+          console.warn("🎬 Media Bar:", "Server address not available for genre/tag fetch.");
+          return [];
+        }
+
+        let itemTypes = [];
+        if (CONFIG.maxMovies > 0) itemTypes.push("Movie");
+        if (CONFIG.maxTvShows > 0) itemTypes.push("Series");
+
+        if (itemTypes.length === 0) {
+          console.log("🎬 Media Bar:", "Both Max Movies and Max TV Shows are set to 0. No items to fetch.");
+          return [];
+        }
+
+        let genreParam = '';
+        if (genres.length > 0) {
+          genreParam = `&genres=${genres.map(g => encodeURIComponent(g)).join('|')}`;
+        }
+
+        let tagParam = '';
+        if (tags.length > 0) {
+          tagParam = `&tags=${tags.map(t => encodeURIComponent(t)).join('|')}`;
+        }
+
+        // Apply same filters as fetchItemIdsFromServer
+        let sortParams = `sortBy=${CONFIG.sortBy}`;
+        if (CONFIG.sortBy === 'Random' || CONFIG.sortBy === 'Original') {
+          sortParams = 'sortBy=Random';
+        } else {
+          sortParams += `&sortOrder=${CONFIG.sortOrder}`;
+        }
+
+        const playedFilter = CONFIG.includeWatchedContent ? '' : '&isPlayed=False';
+
+        let parentalFilter = '';
+        if (CONFIG.maxParentalRating) {
+          parentalFilter = `&MaxOfficialRating=${CONFIG.maxParentalRating}`;
+        }
+
+        let dateFilter = '';
+        if (CONFIG.maxDaysRecent) {
+          const pastDate = new Date();
+          pastDate.setDate(pastDate.getDate() - CONFIG.maxDaysRecent);
+          dateFilter = `&minDateLastSaved=${pastDate.toISOString()}`;
+        }
+
+        // Exclude seasonal content from genre/tag results
+        let excludeFilter = '';
+        if (CONFIG.excludeSeasonalContent && CONFIG.seasonalSections) {
+          try {
+            const sections = JSON.parse(CONFIG.seasonalSections || "[]");
+            let allExcludedIds = [];
+            for (const section of sections) {
+              if (section.MediaIds) {
+                const idsInThisSection = section.MediaIds.split(/[\n,]/)
+                  .map((line) => {
+                    const urlMatch = line.match(/\[(.*?)\]/);
+                    let id = line;
+                    if (urlMatch) {
+                      id = line.replace(/\[.*?\]/, '').trim();
+                      const guidMatch = id.match(/([0-9a-f]{32})/i);
+                      if (guidMatch) { id = guidMatch[1]; } else { id = id.split('|')[0].trim(); }
+                    }
+                    return id.trim();
+                  })
+                  .filter((id) => id && !id.match(/^(genre|tag):/i));
+                allExcludedIds.push(...idsInThisSection);
+              }
+            }
+            if (allExcludedIds.length > 0) {
+              excludeFilter = `&ExcludeItemIds=${allExcludedIds.join(',')}`;
+            }
+          } catch (e) {
+            console.error("🎬 Media Bar:", "Error extracting seasonal IDs for exclusion:", e);
+          }
+        }
+
+        console.log("🎬 Media Bar:", `Fetching items by genre/tag filter (genres: [${genres.join(', ')}], tags: [${tags.join(', ')}])...`);
+
+        const url = `${STATE.jellyfinData.serverAddress}/Items?IncludeItemTypes=${itemTypes.join(",")}&Recursive=true&hasOverview=true&imageTypes=Logo,Backdrop&${sortParams}${playedFilter}${parentalFilter}${dateFilter}${excludeFilter}${genreParam}${tagParam}&enableUserData=true&Limit=${CONFIG.maxItems}&fields=Id,DateCreated,Type`;
+        const response = await fetch(url, { headers: this.getAuthHeaders() });
+
+        if (!response.ok) {
+          console.error("🎬 Media Bar:", `Failed to fetch items by genre/tag: ${response.status} ${response.statusText}`);
+          return [];
+        }
+
+        const data = await response.json();
+        let items = data.Items || [];
+
+        // Apply exact DateCreated filter (same as fetchItemIdsFromServer)
+        if (CONFIG.maxDaysRecent && dateFilter !== '') {
+          const pastDate = new Date();
+          pastDate.setDate(pastDate.getDate() - CONFIG.maxDaysRecent);
+          items = items.filter(item => {
+            if (!item.DateCreated) return true;
+            return new Date(item.DateCreated) >= pastDate;
+          });
+        }
+
+        console.log("🎬 Media Bar:", `Found ${items.length} items matching genre/tag filters`);
+
+        return items.map(item => ({ Id: item.Id, Type: item.Type }));
+      } catch (error) {
+        console.error("🎬 Media Bar:", "Error fetching items by genre/tag:", error);
+        return [];
+      }
+    },
+    /**
+     * Get authentication headers for API requests
+     * @returns {Object} Headers object
+     */
+    getAuthHeaders() {
+      return {
+        Authorization: `MediaBrowser Client="${STATE.jellyfinData.appName}", Device="${STATE.jellyfinData.deviceName}", DeviceId="${STATE.jellyfinData.deviceId}", Version="${STATE.jellyfinData.appVersion}", Token="${STATE.jellyfinData.accessToken}"`,
+      };
+    },
+
+    /**
+     * Send a command to play an item
+     * @param {string} itemId - Item ID to play
+     * @returns {Promise<boolean>} Success status
+     */
+    async playItem(itemId) {
+      try {
+        const sessionId = await this.getSessionId();
+        if (!sessionId) {
+          console.error("🎬 Media Bar:", "Session ID not found.");
+          return false;
+        }
+
+        const playUrl = `${STATE.jellyfinData.serverAddress}/Sessions/${sessionId}/Playing?playCommand=PlayNow&itemIds=${itemId}`;
+        const playResponse = await fetch(playUrl, {
+          method: "POST",
+          headers: this.getAuthHeaders(),
+        });
+
+        if (!playResponse.ok) {
+          throw new Error(
+            `Failed to send play command: ${playResponse.statusText}`
+          );
+        }
+
+        console.log("🎬 Media Bar:", "Play command sent successfully to session:", sessionId);
+        return true;
+      } catch (error) {
+        console.error("🎬 Media Bar:", "Error sending play command:", error);
+        return false;
+      }
+    },
+
+    /**
+     * Gets current session ID
+     * @returns {Promise<string|null>} Session ID or null
+     */
+    async getSessionId() {
+      try {
+        const response = await fetch(
+          `${STATE.jellyfinData.serverAddress
+          }/Sessions?deviceId=${encodeURIComponent(STATE.jellyfinData.deviceId)}`,
+          {
+            headers: this.getAuthHeaders(),
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch session data: ${response.statusText}`);
+        }
+
+        const sessions = await response.json();
+
+        if (!sessions || sessions.length === 0) {
+          console.warn("🎬 Media Bar:",
+            "No sessions found for deviceId:",
+            STATE.jellyfinData.deviceId
+          );
+          return null;
+        }
+
+        return sessions[0].Id;
+      } catch (error) {
+        console.error("🎬 Media Bar:", "Error fetching session data:", error);
+        return null;
+      }
+    },
+
+    //Favorites
+
+    async toggleFavorite(itemId, button) {
+      try {
+        const userId = STATE.jellyfinData.userId;
+        const isFavorite = button.classList.contains("favorited");
+
+        const url = `${STATE.jellyfinData.serverAddress}/Users/${userId}/FavoriteItems/${itemId}`;
+        const method = isFavorite ? "DELETE" : "POST";
+
+        const response = await fetch(url, {
+          method,
+          headers: {
+            ...ApiUtils.getAuthHeaders(),
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to toggle favorite: ${response.statusText}`);
+        }
+        button.classList.toggle("favorited", !isFavorite);
+      } catch (error) {
+        console.error("🎬 Media Bar:", "Error toggling favorite:", error);
+      }
+    },
+
+    /**
+     * Fetches SponsorBlock segments for a YouTube video
+     * @param {string} videoId - YouTube Video ID
+     * @returns {Promise<Object>} Object containing intro and outro segments
+     */
+    async fetchSponsorBlockData(videoId) {
+      if (!CONFIG.useSponsorBlock) return { intro: null, outro: null };
+
+      // Return cached result if available
+      if (!this._sponsorBlockCache) this._sponsorBlockCache = {};
+      if (this._sponsorBlockCache[videoId]) {
+        return this._sponsorBlockCache[videoId];
+      }
+
+      try {
+        const response = await fetch(`https://sponsor.ajay.app/api/skipSegments?videoID=${videoId}&categories=["intro","outro"]`);
+        if (!response.ok) {
+          const result = { intro: null, outro: null };
+          this._sponsorBlockCache[videoId] = result;
+          return result;
+        }
+
+        const segments = await response.json();
+        let intro = null;
+        let outro = null;
+
+        segments.forEach(segment => {
+          if (segment.category === "intro" && Array.isArray(segment.segment)) {
+            intro = segment.segment;
+          } else if (segment.category === "outro" && Array.isArray(segment.segment)) {
+            outro = segment.segment;
+          }
+        });
+
+        const result = { intro, outro };
+        this._sponsorBlockCache[videoId] = result;
+        return result;
+      } catch (error) {
+        console.warn("🎬 Media Bar:", 'Error fetching SponsorBlock data:', error);
+        return { intro: null, outro: null };
+      }
+    },
+
+    /**
+     * Searches for a Collection or Playlist by name
+     * @param {string} name - Name to search for
+     * @returns {Promise<string|null>} ID of the first match or null
+     */
+    async findCollectionOrPlaylistByName(name) {
+      try {
+        const response = await fetch(
+          `${STATE.jellyfinData.serverAddress}/Items?IncludeItemTypes=BoxSet,Playlist&Recursive=true&searchTerm=${encodeURIComponent(name)}&Limit=1&fields=Id&userId=${STATE.jellyfinData.userId}`,
+          {
+            headers: this.getAuthHeaders(),
+          }
+        );
+
+        if (!response.ok) {
+          console.warn("🎬 Media Bar:", `Failed to search for '${name}'`);
+          return null;
+        }
+
+        const data = await response.json();
+        if (data.Items && data.Items.length > 0) {
+          return data.Items[0].Id;
+        }
+        return null;
+      } catch (error) {
+        console.error("🎬 Media Bar:", `Error searching for '${name}':`, error);
+        return null;
+      }
+    },
+
+    /**
+     * Fetches items belonging to a collection (BoxSet)
+     * @param {string} collectionId - ID of the collection
+     * @returns {Promise<Array>} Array of item IDs
+     */
+    async fetchCollectionItems(collectionId) {
+      try {
+        let itemTypes = [];
+        if (CONFIG.maxMovies > 0) itemTypes.push("Movie");
+        if (CONFIG.maxTvShows > 0) itemTypes.push("Series");
+
+        if (itemTypes.length === 0) {
+          console.log("🎬 Media Bar:", "Both Max Movies and Max TV Shows are set to 0. No collection items to fetch.");
+          return [];
+        }
+
+        const response = await fetch(
+          `${STATE.jellyfinData.serverAddress}/Items?ParentId=${collectionId}&Recursive=true&IncludeItemTypes=${itemTypes.join(",")}&fields=Id,Type&userId=${STATE.jellyfinData.userId}`,
+          {
+            headers: this.getAuthHeaders(),
+          }
+        );
+
+        if (!response.ok) {
+          console.warn("🎬 Media Bar:", `Failed to fetch collection items for ${collectionId}`);
+          return [];
+        }
+
+        const data = await response.json();
+        const items = data.Items || [];
+        console.log("🎬 Media Bar:", `Resolved collection ${collectionId} to ${items.length} items`);
+        return items.map(i => ({ Id: i.Id, Type: i.Type }));
+      } catch (error) {
+        console.error("🎬 Media Bar:", `Error fetching collection items for ${collectionId}:`, error);
+        return [];
+      }
+    },
+
+    /**
+     * Fetches the first local trailer for an item
+     * @param {string} itemId - Item ID
+     * @returns {Promise<Object|null>} Trailer data object {id, url} or null
+     */
+    async fetchLocalTrailer(itemId) {
+      try {
+        const response = await fetch(
+          `${STATE.jellyfinData.serverAddress}/Users/${STATE.jellyfinData.userId}/Items/${itemId}/LocalTrailers`,
+          {
+            headers: this.getAuthHeaders(),
+          }
+        );
+
+        if (!response.ok) {
+          return null;
+        }
+
+        const trailers = await response.json();
+        if (trailers && trailers.length > 0) {
+
+          let trailer;
+          if (CONFIG.randomizeLocalTrailers && trailers.length > 1) {
+            const randomIndex = Math.floor(Math.random() * trailers.length);
+            trailer = trailers[randomIndex];
+            console.log("🎬 Media Bar:", `Using random local trailer (${randomIndex + 1}/${trailers.length}) for ${itemId}: ${trailer.Name}`);
+          } else {
+            trailer = trailers[0];
+          }
+
+          const mediaSourceId = trailer.MediaSources && trailer.MediaSources[0] ? trailer.MediaSources[0].Id : trailer.Id;
+
+          return {
+            id: trailer.Id,
+            url: `${STATE.jellyfinData.serverAddress}/Videos/${trailer.Id}/stream.mp4?mediaSourceId=${mediaSourceId}&api_key=${STATE.jellyfinData.accessToken}&static=true`
+          };
+        }
+        return null;
+      } catch (error) {
+        console.error("🎬 Media Bar:", `Error fetching local trailer for ${itemId}:`, error);
+        return null;
+      }
+    },
+
+    /**
+     * Fetches theme videos for an item
+     * @param {string} itemId - Item ID
+     * @returns {Promise<Object|null>} Theme video data object {id, url} or null
+     */
+    async fetchThemeVideos(itemId) {
+      try {
+        const response = await fetch(
+          `${STATE.jellyfinData.serverAddress}/Items/${itemId}/ThemeVideos?userId=${STATE.jellyfinData.userId}`,
+          { headers: this.getAuthHeaders() }
+        );
+
+        if (response.ok) {
+          const data = await response.json();
+          const items = Array.isArray(data) ? data : (data.Items || []);
+
+          if (items.length > 0) {
+            let video;
+            if (CONFIG.randomizeThemeVideos && items.length > 1) {
+              const randomIndex = Math.floor(Math.random() * items.length);
+              video = items[randomIndex];
+              console.log("🎬 Media Bar:", `Found Theme Video (Random ${randomIndex + 1}/${items.length}) via ThemeVideos endpoint: ${video.Name} (${video.Id})`);
+            } else {
+              video = items[0];
+              console.log("🎬 Media Bar:", `Found Theme Video (First) via ThemeVideos endpoint: ${video.Name} (${video.Id})`);
+            }
+
+            return {
+              id: video.Id,
+              url: `${STATE.jellyfinData.serverAddress}/Videos/${video.Id}/stream.mp4?api_key=${STATE.jellyfinData.accessToken}&static=true`
+            };
+          }
+        }
+        return null;
+      } catch (error) {
+        console.error("🎬 Media Bar:", `Error fetching theme videos for ${itemId}:`, error);
+        return null;
+      }
+    }
+  };
+
+  /**
+   * Class for managing slide timing
+   */
+  class SlideTimer {
+    /**
+     * Creates a new slide timer
+     * @param {Function} callback - Function to call on interval
+     * @param {number} interval - Interval in milliseconds
+     */
+    constructor(callback, interval) {
+      this.callback = callback;
+      this.interval = interval;
+      this.timerId = null;
+      this.start();
+    }
+
+    /**
+     * Stops the timer
+     * @returns {SlideTimer} This instance for chaining
+     */
+    stop() {
+      if (this.timerId) {
+        clearInterval(this.timerId);
+        this.timerId = null;
+      }
+      return this;
+    }
+
+    /**
+     * Starts the timer
+     * @returns {SlideTimer} This instance for chaining
+     */
+    start() {
+      if (!this.timerId) {
+        this.timerId = setInterval(this.callback, this.interval);
+      }
+      return this;
+    }
+
+    /**
+     * Restarts the timer
+     * @returns {SlideTimer} This instance for chaining
+     */
+    restart() {
+      return this.stop().start();
+    }
+  }
+
+  /**
+   * Observer for handling slideshow visibility based on current page
+   */
+  const VisibilityObserver = {
+    wasVisible: false,
+    updateVisibility() {
+      const videoPlayer = document.querySelector('.videoPlayerContainer');
+      const trailerPlayer = document.querySelector('.youtubePlayerContainer');
+
+      // If a full screen video player is active, hide slideshow and stop playback
+      if ((videoPlayer && !videoPlayer.classList.contains('hide')) || (trailerPlayer && !trailerPlayer.classList.contains('hide'))) {
+        const container = document.getElementById("slides-container");
+        if (container) {
+          container.style.display = "none";
+          container.style.visibility = "hidden";
+          container.style.pointerEvents = "none";
+        }
+        if (STATE.slideshow.slideInterval) {
+          STATE.slideshow.slideInterval.stop();
+        }
+        SlideshowManager.stopAllPlayback();
+        return;
+      }
+
+      const activeTab = document.querySelector(".emby-tab-button-active");
+      const container = document.getElementById("slides-container");
+
+      if (!container) return;
+
+      const isVisible =
+        (window.location.hash === "#/home.html" ||
+          window.location.hash === "#/home") &&
+        activeTab &&
+        activeTab.getAttribute("data-index") === "0";
+
+      container.style.display = isVisible ? "block" : "none";
+      container.style.visibility = isVisible ? "visible" : "hidden";
+      container.style.pointerEvents = isVisible ? "auto" : "none";
+
+      if (container.parentNode !== document.body) {
+        document.body.appendChild(container);
+      }
+
+      if (isVisible && !this.wasVisible) {
+        if (STATE.slideshow.hasInitialized && STATE.slideshow.itemIds.length > 0) {
+          SlideshowManager.updateCurrentSlide(STATE.slideshow.currentSlideIndex);
+        }
+        if (STATE.slideshow.slideInterval && !STATE.slideshow.isPaused) {
+          STATE.slideshow.slideInterval.start();
+          SlideshowManager.resumeActivePlayback();
+        }
+      } else if (!isVisible && this.wasVisible) {
+        if (STATE.slideshow.slideInterval) {
+          STATE.slideshow.slideInterval.stop();
+        }
+        SlideshowManager.stopAllPlayback();
+
+        // Free memory: destroy players and slides
+        if (STATE.slideshow.videoPlayers) {
+          Object.values(STATE.slideshow.videoPlayers).forEach((player) => {
+            if (player) {
+              if (typeof player.destroy === "function") {
+                try { player.destroy(); } catch (e) { }
+              } else if (player.tagName === 'VIDEO') {
+                try { player.removeAttribute('src'); player.load(); player.remove(); } catch (e) { }
+              }
+            }
+          });
+          STATE.slideshow.videoPlayers = {};
+        }
+        container.querySelectorAll(".slide").forEach((slide) => slide.remove());
+        STATE.slideshow.createdSlides = {};
+        STATE.slideshow.hasTrailer = {};
+      }
+
+      this.wasVisible = isVisible;
+    },
+
+    /**
+     * Initializes visibility observer
+     */
+    init() {
+      const observer = new MutationObserver(() => this.updateVisibility());
+      observer.observe(document.body, { childList: true, subtree: true });
+
+      document.body.addEventListener("click", () => this.updateVisibility());
+      window.addEventListener("hashchange", () => this.updateVisibility());
+
+      this.updateVisibility();
+    },
+  };
+
+  /**
+   * Slideshow UI creation and management
+   */
+  const SlideCreator = {
+    /**
+     * Builds a tag-based image URL for cache-friendly image requests
+     * @param {Object} item - Item data containing ImageTags
+     * @param {string} imageType - Image type (Backdrop, Logo, Primary, etc.)
+     * @param {number} [index] - Image index (for Backdrop, Primary, etc.)
+     * @param {string} serverAddress - Server address
+     * @param {number} [quality] - Image quality (0-100). If tag is available, both tag and quality are used.
+     * @returns {string} Image URL with tag parameter (and quality if tag available), or quality-only fallback
+     */
+    buildImageUrl(item, imageType, index, serverAddress, quality) {
+      const itemId = item.Id;
+      let tag = null;
+
+      // Handle Backdrop images
+      if (imageType === "Backdrop") {
+        // Check BackdropImageTags array first
+        if (item.BackdropImageTags && Array.isArray(item.BackdropImageTags) && item.BackdropImageTags.length > 0) {
+          const backdropIndex = index !== undefined ? index : 0;
+          if (backdropIndex < item.BackdropImageTags.length) {
+            tag = item.BackdropImageTags[backdropIndex];
+          }
+        }
+        // Fallback to ImageTags.Backdrop if BackdropImageTags not available
+        if (!tag && item.ImageTags && item.ImageTags.Backdrop) {
+          tag = item.ImageTags.Backdrop;
+        }
+      } else {
+        // For other image types (Logo, Primary, etc.), use ImageTags
+        if (item.ImageTags && item.ImageTags[imageType]) {
+          tag = item.ImageTags[imageType];
+        }
+      }
+
+      // Build base URL path
+      let baseUrl;
+      if (index !== undefined) {
+        baseUrl = `${serverAddress}/Items/${itemId}/Images/${imageType}/${index}`;
+      } else {
+        baseUrl = `${serverAddress}/Items/${itemId}/Images/${imageType}`;
+      }
+
+      // Build URL with tag and quality if tag is available, otherwise quality-only fallback
+      if (tag) {
+        // Use both tag and quality for cacheable, quality-controlled images
+        const qualityParam = quality !== undefined ? `&quality=${quality}` : '';
+        return `${baseUrl}?tag=${tag}${qualityParam}`;
+      } else {
+        // Fallback to quality-only URL if no tag is available
+        const qualityParam = quality !== undefined ? quality : 90;
+        return `${baseUrl}?quality=${qualityParam}`;
+      }
+    },
+
+    /**
+     * Creates a slide element for an item
+     * @param {Object} item - Item data
+     * @param {string} title - Title type (Movie/TV Show)
+     * @returns {HTMLElement} Slide element
+     */
+    createSlideElement(item, title) {
+      if (!item || !item.Id) {
+        console.error("🎬 Media Bar:", "Invalid item data:", item);
+        return null;
+      }
+
+      const itemId = item.Id;
+      const serverAddress = STATE.jellyfinData.serverAddress;
+
+      const slide = SlideUtils.createElement("a", {
+        className: "slide",
+        target: "_top",
+        rel: "noreferrer",
+        tabIndex: 0,
+        "data-item-id": itemId,
+        onclick: (e) => {
+          // Prevent navigation if clicking on buttons or arrows
+          if (e.target.closest('button') || e.target.closest('.arrow')) return;
+
+          // On desktop/tablets, detail navigation is handled strictly by the details button.
+          // Full slide clicking is only enabled for compact mobile modes (16:9 and 4:3) where the details button is hidden.
+          const isMobileLayout = document.body.classList.contains("media-bar-mobile-16-9") ||
+            document.body.classList.contains("media-bar-mobile-4-3");
+          if (!isMobileLayout) return;
+
+          e.preventDefault();
+          e.stopPropagation();
+          if (window.Emby && window.Emby.Page) {
+            Emby.Page.show(
+              `/details?id=${itemId}&serverId=${STATE.jellyfinData.serverId}`
+            );
+          } else {
+            window.location.href = `#/details?id=${itemId}&serverId=${STATE.jellyfinData.serverId}`;
+          }
+        }
+      });
+
+      let videoBackdrop;
+      let backdrop;
+      let isVideo = false;
+      let trailerUrl = null;
+
+      // 1. Check for Remote/Local Trailers
+      // Priority: Custom Config URL > (PreferLocal -> Local) > Metadata RemoteTrailer
+
+      // 1a. Custom URL override
+      if (STATE.slideshow.customTrailerUrls && STATE.slideshow.customTrailerUrls[itemId]) {
+        const customValue = STATE.slideshow.customTrailerUrls[itemId];
+
+        // Check if the custom value is a Jellyfin Item ID (GUID)
+        const guidMatch = customValue.match(/^([0-9a-f]{32})$/i);
+
+        if (guidMatch) {
+          const videoId = guidMatch[1];
+          console.log("🎬 Media Bar:", `Using custom local video ID for ${itemId}: ${videoId}`);
+
+          trailerUrl = {
+            id: videoId,
+            url: `${STATE.jellyfinData.serverAddress}/Videos/${videoId}/stream.mp4?api_key=${STATE.jellyfinData.accessToken}&static=true`
+          };
+        } else {
+          // Assume it's a standard URL (YouTube, etc.)
+          trailerUrl = customValue;
+          console.log("🎬 Media Bar:", `Using custom trailer URL for ${itemId}: ${trailerUrl}`);
+        }
+      }
+      // 1b. Check Theme Video if preferred (Local Backdrop)
+      else if (CONFIG.preferLocalBackdrops && item.themeVideoUrl) {
+        trailerUrl = item.themeVideoUrl;
+        console.log("🎬 Media Bar:", `Using theme video (local backdrop) for ${itemId}: ${trailerUrl.url || trailerUrl}`);
+      }
+      // 1c. Check Local Trailer if preferred
+      else if (CONFIG.preferLocalTrailers && item.LocalTrailerCount > 0 && item.localTrailerUrl) {
+        trailerUrl = item.localTrailerUrl;
+        console.log("🎬 Media Bar:", `Using local trailer for ${itemId}: ${trailerUrl}`);
+      }
+      // 1d. Fallback to Remote Trailer
+      else if (item.RemoteTrailers && item.RemoteTrailers.length > 0) {
+        trailerUrl = item.RemoteTrailers[0].Url;
+      }
+      // 1e. Final Fallback to Local Trailer (even if not preferred)
+      else if (item.LocalTrailerCount > 0 && item.localTrailerUrl) {
+        trailerUrl = item.localTrailerUrl;
+        console.log("🎬 Media Bar:", `Using local trailer fallback for ${itemId}: ${trailerUrl}`);
+      }
+
+      const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+      // Client Setting Overrides
+      const enableVideo = MediaBarEnhancedSettingsManager.getSetting('videoBackdrops', CONFIG.enableVideoBackdrop);
+      const enableMobileVideo = MediaBarEnhancedSettingsManager.getSetting('mobileVideo', CONFIG.enableMobileVideo);
+
+      const shouldPlayVideo = enableVideo && (!isMobile || enableMobileVideo);
+
+      if (trailerUrl && shouldPlayVideo) {
+        STATE.slideshow.hasTrailer = STATE.slideshow.hasTrailer || {};
+        STATE.slideshow.hasTrailer[itemId] = true;
+        let isYoutube = false;
+        let videoId = null;
+
+        try {
+          let urlToCheck = trailerUrl;
+          if (typeof trailerUrl === 'object' && trailerUrl.url) {
+            urlToCheck = trailerUrl.url;
+          }
+
+          const urlObjChecked = new URL(urlToCheck);
+          if (urlObjChecked.hostname.includes('youtube.com') || urlObjChecked.hostname.includes('youtu.be')) {
+            isYoutube = true;
+            videoId = urlObjChecked.searchParams.get('v');
+            if (!videoId && urlObjChecked.hostname.includes('youtu.be')) {
+              videoId = urlObjChecked.pathname.substring(1);
+            }
+          }
+        } catch (e) {
+          console.warn("🎬 Media Bar:", "Invalid trailer URL:", trailerUrl);
+        }
+
+        const isLowPower = isLowPowerDevice();
+        const isIOSApp = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+        const limitVideos = isLowPower || isIOSApp;
+        const itemIndex = STATE.slideshow.itemIds ? STATE.slideshow.itemIds.indexOf(itemId) : -1;
+        const isActiveSlide = itemIndex !== -1 && itemIndex === STATE.slideshow.currentSlideIndex;
+        // Limit YouTube iframe bulk creation on low power devices OR iOS (which kills the WebProcess on OOM)
+        const shouldCreateVideo = !limitVideos || isActiveSlide;
+
+        if (isYoutube && videoId && shouldCreateVideo) {
+          isVideo = true;
+          // Create container for YouTube API
+          const videoClass = CONFIG.fullWidthVideo ? "video-backdrop-full" : "video-backdrop-default";
+
+          // Create a wrapper for opacity transition
+          videoBackdrop = SlideUtils.createElement("div", {
             className: `backdrop video-backdrop ${videoClass}`,
             style: "opacity: 0; transition: opacity 1.2s ease-in-out;" // Start interrupted/transparent
-        });
+          });
 
-        // Create an iframe upfront
-        const ytPlayerIframe = SlideUtils.createElement("iframe", {
-          id: `youtube-player-${itemId}`,
-          src: `https://www.youtube-nocookie.com/embed/${videoId}?enablejsapi=1&playsinline=1&origin=${encodeURIComponent(window.location.origin)}`,
-          style: "width: 100%; height: 100%; border: none; pointer-events: none;",
-          allow: "autoplay; encrypted-media",
-          referrerpolicy: "strict-origin-when-cross-origin",
-          allowfullscreen: "true"
-        });
+          // Create an iframe upfront
+          const ytPlayerIframe = SlideUtils.createElement("iframe", {
+            id: `youtube-player-${itemId}`,
+            src: `https://www.youtube-nocookie.com/embed/${videoId}?enablejsapi=1&playsinline=1&origin=${encodeURIComponent(window.location.origin)}`,
+            style: "width: 100%; height: 100%; border: none; pointer-events: none;",
+            allow: "autoplay; encrypted-media",
+            referrerpolicy: "strict-origin-when-cross-origin",
+            allowfullscreen: "true"
+          });
 
-        videoBackdrop.appendChild(ytPlayerIframe);
+          videoBackdrop.appendChild(ytPlayerIframe);
 
-        // Load YouTube API and fetch SponsorBlock data concurrently
-        Promise.all([
-          SlideUtils.loadYouTubeIframeAPI(),
-          ApiUtils.fetchSponsorBlockData(videoId)
-        ]).then(([_, segments]) => {
+          // Load YouTube API and fetch SponsorBlock data concurrently
+          Promise.all([
+            SlideUtils.loadYouTubeIframeAPI(),
+            ApiUtils.fetchSponsorBlockData(videoId)
+          ]).then(([_, segments]) => {
             const playerVars = {
               autoplay: 0,
               mute: STATE.slideshow.isMuted ? 1 : 0,
@@ -2104,7 +2372,7 @@ const SlideCreator = {
                   event.target._startTime = playerVars.start || 0;
                   event.target._endTime = playerVars.end || undefined;
                   event.target._videoId = videoId;
-                  
+
                   // Store reference to wrapper for fading
                   event.target._wrapperDiv = videoBackdrop;
 
@@ -2112,7 +2380,7 @@ const SlideCreator = {
                     event.target.mute();
                   } else {
                     event.target.unMute();
-                    event.target.setVolume(40);
+                    event.target.setVolume(getEffectiveTrailerVolume());
                   }
 
                   const slide = document.querySelector(`.slide[data-item-id="${itemId}"]`);
@@ -2123,10 +2391,10 @@ const SlideCreator = {
                     const timeoutId = setTimeout(() => {
                       const isVideoPlayerOpenNow = document.querySelector('.videoPlayerContainer') || document.querySelector('.youtubePlayerContainer');
                       if (document.hidden || (isVideoPlayerOpenNow && !isVideoPlayerOpenNow.classList.contains('hide')) || !slide.classList.contains('active')) {
-                          try {
-                            event.target.stopVideo();
-                          } catch (e) {}
-                          return;
+                        try {
+                          event.target.stopVideo();
+                        } catch (e) { }
+                        return;
                       }
 
                       if (event.target.getPlayerState() !== YT.PlayerState.PLAYING &&
@@ -2143,51 +2411,66 @@ const SlideCreator = {
                 },
                 'onStateChange': (event) => {
                   if (event.data === YT.PlayerState.PLAYING) {
-                      const slide = document.querySelector(`.slide[data-item-id="${itemId}"]`);
-                      const isActive = slide && slide.classList.contains('active');
-                      const playAllowed = STATE.slideshow.playSignals[itemId] === true;
-                      
-                      if (!isActive) {
-                          if (event.target._wrapperDiv) {
-                              event.target._wrapperDiv.style.transition = "none";
-                              event.target._wrapperDiv.style.opacity = "0";
-                          }
-                          if (typeof event.target.stopVideo === 'function') event.target.stopVideo();
-                          return;
-                      }
+                    const slide = document.querySelector(`.slide[data-item-id="${itemId}"]`);
+                    const isActive = slide && slide.classList.contains('active');
+                    const playAllowed = STATE.slideshow.playSignals[itemId] === true;
 
-                      if (!playAllowed) {
-                          // Active slide but play signal not yet issued
-                          event.target.pauseVideo();
-                          return;
-                      }
-                      
-                      // Fade in when legitimately playing
+                    if (!isActive) {
                       if (event.target._wrapperDiv) {
-                          event.target._wrapperDiv.style.transition = "opacity 1.2s ease-in-out";
-                          event.target._wrapperDiv.style.opacity = "1";
-                      }
-                      if (CONFIG.waitForTrailerToEnd && STATE.slideshow.slideInterval) {
-                          STATE.slideshow.slideInterval.stop();
-                      }
-                  } else if (event.data === YT.PlayerState.ENDED) {
-                    if (event.target._wrapperDiv) {
                         event.target._wrapperDiv.style.transition = "none";
                         event.target._wrapperDiv.style.opacity = "0";
+                      }
+                      if (typeof event.target.stopVideo === 'function') event.target.stopVideo();
+                      return;
+                    }
+
+                    if (!playAllowed) {
+                      // Active slide but play signal not yet issued
+                      event.target.pauseVideo();
+                      return;
+                    }
+
+                    // Fade in when legitimately playing
+                    if (event.target._wrapperDiv) {
+                      event.target._wrapperDiv.style.transition = "opacity 1.2s ease-in-out";
+                      event.target._wrapperDiv.style.opacity = "1";
+                    }
+                    STATE.slideshow.isVideoPlaying = true;
+                    if (getEffectiveWaitForTrailer() && STATE.slideshow.slideInterval) {
+                      STATE.slideshow.slideInterval.stop();
+                    }
+
+                    // Start progress tracking loop for active YouTube trailer
+                    if (typeof SlideshowManager !== 'undefined') {
+                      SlideshowManager.startYouTubeProgressLoop(event.target);
+                    }
+                  } else if (event.data === YT.PlayerState.ENDED) {
+                    STATE.slideshow.isVideoPlaying = false;
+                    if (typeof SlideshowManager !== 'undefined') {
+                      SlideshowManager.stopYouTubeProgressLoop();
+                    }
+                    if (event.target._wrapperDiv) {
+                      event.target._wrapperDiv.style.transition = "none";
+                      event.target._wrapperDiv.style.opacity = "0";
                     }
                     const slide = document.querySelector(`.slide[data-item-id="${itemId}"]`);
                     if (slide && slide.classList.contains('active')) {
                       if (typeof SlideshowManager !== 'undefined' && SlideshowManager.nextSlide) SlideshowManager.nextSlide();
                     }
                   } else {
+                    STATE.slideshow.isVideoPlaying = false;
+                    if (typeof SlideshowManager !== 'undefined') {
+                      SlideshowManager.stopYouTubeProgressLoop();
+                    }
                     if (event.target._wrapperDiv) {
-                        event.target._wrapperDiv.style.transition = "opacity 0.5s ease-in-out";
-                        event.target._wrapperDiv.style.opacity = "0";
+                      event.target._wrapperDiv.style.transition = "opacity 0.5s ease-in-out";
+                      event.target._wrapperDiv.style.opacity = "0";
                     }
                   }
                 },
                 'onError': (event) => {
                   console.warn("🎬 Media Bar:", `YouTube player error ${event.data} for video ${videoId}`);
+                  STATE.slideshow.isVideoPlaying = false;
                   // Fallback to normal slideshow interval on error
                   if (STATE.slideshow.slideInterval && !STATE.slideshow.isPaused) {
                     STATE.slideshow.slideInterval.start();
@@ -2197,2396 +2480,3041 @@ const SlideCreator = {
             });
           });
 
-        // 2. Check for local video trailers in MediaSources if yt is not available
-      } else if (!isYoutube && shouldCreateVideo) {
-        isVideo = true;
+          // 2. Check for local video trailers in MediaSources if yt is not available
+        } else if (!isYoutube && shouldCreateVideo) {
+          isVideo = true;
 
-        const videoSrc = (typeof trailerUrl === 'object' ? trailerUrl.url : trailerUrl);
-        const videoAttributes = {
-          className: "backdrop video-backdrop",
-          preload: "none",
-          disablePictureInPicture: true,
-          "data-src": videoSrc,
-          style: "object-fit: cover; object-position: center center; width: 100%; height: 100%; position: absolute; top: 0; left: 0; pointer-events: none; opacity: 0; transition: opacity 1.2s ease-in-out;"
-        };
+          const videoSrc = (typeof trailerUrl === 'object' ? trailerUrl.url : trailerUrl);
+          const videoAttributes = {
+            className: "backdrop video-backdrop",
+            preload: "none",
+            disablePictureInPicture: true,
+            "data-src": videoSrc,
+            style: "object-fit: cover; object-position: center center; width: 100%; height: 100%; position: absolute; top: 0; left: 0; pointer-events: none; opacity: 0; transition: opacity 1.2s ease-in-out;"
+          };
 
-        videoAttributes.muted = "";
-        videoAttributes.playsinline = "";
+          videoAttributes.muted = "";
+          videoAttributes.playsinline = "";
 
-        videoBackdrop = SlideUtils.createElement("video", videoAttributes);
-        videoBackdrop.volume = 0.4;
+          videoBackdrop = SlideUtils.createElement("video", videoAttributes);
+          videoBackdrop.volume = getEffectiveTrailerVolume() / 100;
 
-        STATE.slideshow.videoPlayers[itemId] = videoBackdrop;
+          STATE.slideshow.videoPlayers[itemId] = videoBackdrop;
 
-        videoBackdrop.addEventListener('play', (event) => {
-          const slide = document.querySelector(`.slide[data-item-id="${itemId}"]`);
-          if (!slide || !slide.classList.contains('active')) {
-            console.log("🎬 Media Bar:", `Local video ${itemId} started playing but slide is not active, pausing.`);
-            event.target.pause();
-            try {
-              if (event.target.currentTime > 0) {
-                event.target.currentTime = 0;
-              }
-            } catch(e){}
-            return;
-          }
-          
-          if (STATE.slideshow.playSignals[itemId] === false) {
-            event.target.pause();
-            return;
-          }
-          
-          // Fade in
-          event.target.style.opacity = "1";
-          
-          if (CONFIG.waitForTrailerToEnd && STATE.slideshow.slideInterval) {
-            STATE.slideshow.slideInterval.stop();
-          }
-        });
+          videoBackdrop.addEventListener('play', (event) => {
+            const slide = document.querySelector(`.slide[data-item-id="${itemId}"]`);
+            if (!slide || !slide.classList.contains('active')) {
+              console.log("🎬 Media Bar:", `Local video ${itemId} started playing but slide is not active, pausing.`);
+              event.target.pause();
+              try {
+                if (event.target.currentTime > 0) {
+                  event.target.currentTime = 0;
+                }
+              } catch (e) { }
+              return;
+            }
 
-        videoBackdrop.addEventListener('ended', (event) => {
+            if (STATE.slideshow.playSignals[itemId] === false) {
+              event.target.pause();
+              return;
+            }
+
+            // Fade in
+            event.target.style.opacity = "1";
+            STATE.slideshow.isVideoPlaying = true;
+
+            if (getEffectiveWaitForTrailer() && STATE.slideshow.slideInterval) {
+              STATE.slideshow.slideInterval.stop();
+            }
+          });
+
+          videoBackdrop.addEventListener('ended', (event) => {
+            STATE.slideshow.isVideoPlaying = false;
             const slide = event.target.closest('.slide');
             if (slide && slide.classList.contains('active')) {
               SlideshowManager.nextSlide();
             }
-        });
+          });
 
-        videoBackdrop.addEventListener('error', (event) => {
-          console.warn("🎬 Media Bar:", `Local video error for item ${itemId}`);
-          const slide = event.target.closest('.slide');
-          if (slide && slide.classList.contains('active')) {
-            // Re-enable normal slideshow timing if video fails
-            if (STATE.slideshow.slideInterval && !STATE.slideshow.isPaused) {
-              STATE.slideshow.slideInterval.start();
+          videoBackdrop.addEventListener('pause', (event) => {
+            const slide = event.target.closest('.slide');
+            if (slide && slide.classList.contains('active')) {
+              STATE.slideshow.isVideoPlaying = false;
             }
-          }
-        });
-      }
-    }
-
-    // Always create a static backdrop image (to show while video loads or if no video)
-    backdrop = SlideUtils.createElement("img", {
-      className: "backdrop high-quality",
-      src: this.buildImageUrl(item, "Backdrop", 0, serverAddress, 60),
-      alt: LocalizationUtils.getLocalizedString('Backdrop', 'Backdrop'),
-      loading: "eager",
-    });
-
-    // If video, static backdrop should be strictly a background (no animation)
-    if (isVideo) {
-        backdrop.style.animation = "none";
-        backdrop.style.transition = "none";
-    }
-
-    const backdropOverlay = SlideUtils.createElement("div", {
-      className: "backdrop-overlay",
-    });
-
-    const backdropContainer = SlideUtils.createElement("div", {
-      className: "backdrop-container" + (isVideo && CONFIG.fullWidthVideo ? " full-width-video" : ""),
-    });
-    
-    backdropContainer.append(backdrop, backdropOverlay);
-
-    // If video exists, append on top of static backdrop
-    if (isVideo && videoBackdrop) {
-        backdropContainer.appendChild(videoBackdrop);
-    }
-
-    const hasLogo = !!(item.ImageTags && item.ImageTags.Logo);
-    
-    const logoContainer = SlideUtils.createElement("div", {
-      className: "logo-container",
-    });
-
-    // Helper to create the title fallback only when needed (optimization)
-    const createTitleFallback = () => {
-      const titleText = item.Name || "";
-      // Break the title into a new line after a colon or hyphen/dash if followed by a space
-      let formattedTitle = titleText
-        .replace(/:\s+/g, ':<br>')
-        .replace(/\s+-\s+/g, ' -<br>')
-        .replace(/\s+–\s+/g, ' –<br>');
-
-      let fallbackFontSize = "3rem";
-      if (titleText.length <= 12) {
-        fallbackFontSize = "6rem";
-      } else if (titleText.length <= 25) {
-        fallbackFontSize = "4rem";
-      } else if (titleText.length >= 45) {
-        fallbackFontSize = "2.5rem";
-      }
-
-      return SlideUtils.createElement("div", {
-        className: "logo-title-fallback",
-        style: `font-size: ${fallbackFontSize};`,
-        innerHTML: formattedTitle
-      });
-    };
-    
-    if (hasLogo) {
-      const logo = SlideUtils.createElement("img", {
-        className: "logo high-quality",
-        src: this.buildImageUrl(item, "Logo", undefined, serverAddress, 40),
-        alt: item.Name,
-        loading: "eager",
-      });
-      logo.onerror = () => {
-        logo.remove();
-        logoContainer.appendChild(createTitleFallback());
-      };
-      logoContainer.appendChild(logo);
-    } else {
-      logoContainer.appendChild(createTitleFallback());
-    }
-
-    const featuredContent = SlideUtils.createElement(
-      "div",
-      {
-        className: "featured-content",
-      },
-      title
-    );
-
-    const plot = item.Overview || "No overview available";
-    const plotElement = SlideUtils.createElement(
-      "div",
-      {
-        className: "plot",
-      },
-      plot
-    );
-    SlideUtils.truncateText(plotElement, CONFIG.maxPlotLength);
-
-    const plotContainer = SlideUtils.createElement("div", {
-      className: "plot-container" + (CONFIG.constrainPlotWidth ? " constrained-plot" : ""),
-    });
-    plotContainer.appendChild(plotElement);
-
-    const gradientOverlay = SlideUtils.createElement("div", {
-      className: "gradient-overlay" + (isVideo && CONFIG.fullWidthVideo ? " full-width-video" : ""),
-    });
-
-    const infoContainer = SlideUtils.createElement("div", {
-      className: "info-container",
-    });
-
-    const ratingInfo = this.createRatingInfo(item);
-    infoContainer.appendChild(ratingInfo);
-
-    const genreElement = SlideUtils.createElement("div", {
-      className: "genre",
-      innerHTML: SlideUtils.parseGenres(item.Genres)
-    });
-
-    const buttonContainer = SlideUtils.createElement("div", {
-      className: "button-container",
-    });
-
-    const playButton = this.createPlayButton(itemId);
-    const detailButton = this.createDetailButton(itemId);
-    const favoriteButton = this.createFavoriteButton(item);
-
-    if (trailerUrl && !isVideo && CONFIG.showTrailerButton) {
-      const trailerButton = this.createTrailerButton(trailerUrl);
-      buttonContainer.append(detailButton, playButton, trailerButton, favoriteButton);
-    } else {
-      buttonContainer.append(detailButton, playButton, favoriteButton);
-    }
-
-    slide.append(
-      logoContainer,
-      backdropContainer,
-      gradientOverlay,
-      featuredContent,
-      plotContainer,
-      infoContainer,
-      genreElement,
-      buttonContainer
-    );
-
-    return slide;
-  },
-
-  /**
-   * Creates the rating information element
-   * @param {Object} item - Item data
-   * @returns {HTMLElement} Rating information element
-   */
-  createRatingInfo(item) {
-    const {
-      CommunityRating: communityRating,
-      CriticRating: criticRating,
-      OfficialRating: ageRating,
-      PremiereDate: premiereDate,
-      RunTimeTicks: runtime,
-      ChildCount: seasonCount,
-    } = item;
-
-    const miscInfo = SlideUtils.createElement("div", {
-      className: "misc-info",
-    });
-
-    // Community Rating Section (IMDb)
-    if (typeof communityRating === "number") {
-      const container = SlideUtils.createElement("div", {
-        className: "star-rating-container",
-        innerHTML: `<span class="material-icons community-rating-star star" aria-hidden="true"></span>${communityRating.toFixed(1)}`,
-      });
-      miscInfo.appendChild(container);
-      miscInfo.appendChild(SlideUtils.createSeparator());
-    }
-
-    // Critic Rating Section (Rotten Tomatoes)
-    if (typeof criticRating === "number") {
-      const svgIcon = criticRating < 60 ? CONFIG.IMAGE_SVG.rottenTomato : CONFIG.IMAGE_SVG.freshTomato;
-      const container = SlideUtils.createElement("div", {
-        className: "critic-rating",
-        innerHTML: `${svgIcon}${criticRating.toFixed(0)}%`,
-      })
-      miscInfo.appendChild(container);
-      miscInfo.appendChild(SlideUtils.createSeparator());
-    };
-
-    // Year Section
-    if (typeof premiereDate === "string" && !isNaN(new Date(premiereDate))) {
-      const container = SlideUtils.createElement("div", {
-        className: "date",
-        innerHTML: new Date(premiereDate).getFullYear(),
-      });
-      miscInfo.appendChild(container);
-      miscInfo.appendChild(SlideUtils.createSeparator());
-    };
-
-    // Age Rating Section
-    if (typeof ageRating === "string") {
-      const container = SlideUtils.createElement("div", {
-        className: "age-rating mediaInfoOfficialRating",
-        rating: ageRating,
-        ariaLabel: `Content rated ${ageRating}`,
-        title: `Rating: ${ageRating}`,
-        innerHTML: ageRating,
-      });
-      miscInfo.appendChild(container);
-      miscInfo.appendChild(SlideUtils.createSeparator());
-    };
-
-    // Runtime / Seasons Section
-    if (seasonCount !== undefined || runtime !== undefined) {
-      const container = SlideUtils.createElement("div", {
-        className: "runTime",
-      });
-      if (seasonCount) {
-        const seasonText = seasonCount <= 1 ? LocalizationUtils.getLocalizedString('Season', 'Season') : LocalizationUtils.getLocalizedString('TypeOptionPluralSeason', 'Seasons');
-        container.innerHTML = `${seasonCount} ${seasonText}`;
-      } else {
-        const milliseconds = runtime / 10000;
-        const currentTime = new Date();
-        const endTime = new Date(currentTime.getTime() + milliseconds);
-        const options = { hour: "2-digit", minute: "2-digit", hour12: false };
-        const formattedEndTime = endTime.toLocaleTimeString([], options);
-        const endsAtText = LocalizationUtils.getLocalizedString('EndsAtValue', 'Ends at {0}', formattedEndTime);
-        container.innerText = endsAtText;
-      }
-      miscInfo.appendChild(container);
-    }
-
-    return miscInfo;
-  },
-
-  /**
-   * Creates a play button for an item
-   * @param {string} itemId - Item ID
-   * @returns {HTMLElement} Play button element
-   */
-  createPlayButton(itemId) {
-    const playText = LocalizationUtils.getLocalizedString('Play', 'Play');
-    return SlideUtils.createElement("button", {
-      className: "detailButton btnPlay play-button",
-      innerHTML: `
-      <span class="play-text">${playText}</span>
-    `,
-      tabIndex: "0",
-      onclick: (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        console.log("🎬 Media Bar: Play button clicked for", itemId);
-        ApiUtils.playItem(itemId);
-      },
-    });
-  },
-
-  /**
-   * Creates a detail button for an item
-   * @param {string} itemId - Item ID
-   * @returns {HTMLElement} Detail button element
-   */
-  createDetailButton(itemId) {
-    return SlideUtils.createElement("button", {
-      className: "detailButton detail-button",
-      tabIndex: "0",
-      onclick: (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        if (window.Emby && window.Emby.Page) {
-          Emby.Page.show(
-            `/details?id=${itemId}&serverId=${STATE.jellyfinData.serverId}`
-          );
-        } else {
-          window.location.href = `#/details?id=${itemId}&serverId=${STATE.jellyfinData.serverId}`;
-        }
-      },
-    });
-  },
-
-  /**
-   * Creates a favorite button for an item
-   * @param {string} itemId - Item ID
-   * @returns {HTMLElement} Favorite button element
-   */
-
-  createFavoriteButton(item) {
-    const isFavorite = item.UserData && item.UserData.IsFavorite === true;
-
-    const button = SlideUtils.createElement("button", {
-      className: `favorite-button ${isFavorite ? "favorited" : ""}`,
-      tabIndex: "0",
-      onclick: async (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        await ApiUtils.toggleFavorite(item.Id, button);
-      },
-    });
-
-    return button;
-  },
-
-  /**
-   * Creates a trailer button
-   * @param {string|Object} trailerInfo - Trailer URL string or object {id, url}
-   * @returns {HTMLElement} Trailer button element
-   */
-  createTrailerButton(trailerInfo) {
-    const trailerText = LocalizationUtils.getLocalizedString('Trailer', 'Trailer');
-    
-    let url = trailerInfo;
-    let localTrailerId = null;
-
-    if (typeof trailerInfo === 'object' && trailerInfo !== null) {
-        url = trailerInfo.url;
-        localTrailerId = trailerInfo.id;
-    }
-
-    return SlideUtils.createElement("button", {
-      className: "detailButton trailer-button",
-      innerHTML: `<span class="material-icons">movie</span> <span class="trailer-text">${trailerText}</span>`,
-      tabIndex: "0",
-      onclick: (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        
-        if (localTrailerId) {
-            // Play local trailer using native player
-            ApiUtils.playItem(localTrailerId);
-        } else {
-            SlideUtils.openVideoModal(url);
-        }
-      },
-    });
-  },
-
-
-  /**
-   * Creates a placeholder slide for loading
-   * @param {string} itemId - Item ID to load
-   * @returns {HTMLElement} Placeholder slide element
-   */
-  createLoadingPlaceholder(itemId) {
-    const placeholder = SlideUtils.createElement("a", {
-      className: "slide placeholder",
-      "data-item-id": itemId,
-      style: {
-        display: "none",
-        opacity: "0",
-        transition: `opacity ${CONFIG.fadeTransitionDuration}ms ease-in-out`,
-      },
-    });
-
-    const loadingIndicator = SlideUtils.createLoadingIndicator();
-    placeholder.appendChild(loadingIndicator);
-
-    return placeholder;
-  },
-
-  /**
-   * Creates a slide for an item and adds it to the container
-   * @param {string} itemId - Item ID
-   * @param {boolean} forceRecreate - Force recreation of the slide
-   * @returns {Promise<HTMLElement>} Created slide element
-   */
-  async createSlideForItemId(itemId, forceRecreate = false) {
-    try {
-      if (!forceRecreate && STATE.slideshow.createdSlides[itemId]) {
-        return document.querySelector(`.slide[data-item-id="${itemId}"]`);
-      }
-
-      const container = SlideUtils.getOrCreateSlidesContainer();
-
-      const item = await ApiUtils.fetchItemDetails(itemId);
-
-      // Pre-fetch local trailer URL if needed
-      if (CONFIG.preferLocalTrailers && item.LocalTrailerCount > 0) {
-          item.localTrailerUrl = await ApiUtils.fetchLocalTrailer(itemId);
-      }
-
-      // Pre-fetch theme video URL if needed
-      if (CONFIG.preferLocalBackdrops) {
-          item.themeVideoUrl = await ApiUtils.fetchThemeVideos(itemId);
-      }
-
-      const slideElement = this.createSlideElement(
-        item,
-        item.Type === "Movie" ? "Movie" : "TV Show"
-      );
-
-      container.appendChild(slideElement);
-
-      STATE.slideshow.createdSlides[itemId] = true;
-
-      return slideElement;
-    } catch (error) {
-      console.error("🎬 Media Bar:", "Error creating slide for item:", error, itemId);
-      return null;
-    }
-  },
-};
-
-/**
- * Manages slideshow functionality
- */
-const SlideshowManager = {
-
-  createPaginationDots() {
-    if (!CONFIG.showPaginationDots) return;
-
-    let dotsContainer = document.querySelector(".dots-container");
-    if (!dotsContainer) {
-      dotsContainer = document.createElement("div");
-      dotsContainer.className = "dots-container";
-      document.getElementById("slides-container").appendChild(dotsContainer);
-    }
-
-    const totalItems = STATE.slideshow.totalItems || 0;
-
-    // dynamically lower the max dots threshold on small screens 
-    let effectiveMaxDots = CONFIG.maxPaginationDots;
-    if (window.matchMedia("(max-width: 767px) and (orientation: portrait)").matches) {
-      const availableWidth = window.innerWidth * 0.9;
-      const dotWidth = 18; // approximate width per dot
-      const fittingDots = Math.floor(availableWidth / dotWidth) - 1;
-      effectiveMaxDots = Math.min(effectiveMaxDots, fittingDots);
-    }
-
-    // Switch to counter style if too many items
-    if (totalItems > effectiveMaxDots) {
-      const counter = document.createElement("span");
-      counter.className = "slide-counter";
-      counter.id = "slide-counter";
-      dotsContainer.appendChild(counter);
-    } else {
-      // Create dots for all items
-      for (let i = 0; i < totalItems; i++) {
-        const dot = document.createElement("span");
-        dot.className = "dot";
-        dot.setAttribute("data-index", i);
-        dotsContainer.appendChild(dot);
-      }
-    }
-
-    this.updateDots();
-  },
-
-  /**
-   * Updates active dot based on current slide
-   * Maps current slide to one of the 5 dots
-   */
-  updateDots() {
-    const currentIndex = STATE.slideshow.currentSlideIndex;
-    const totalItems = STATE.slideshow.totalItems || 0;
-
-    // Handle Large List Counter
-    const counter = document.getElementById("slide-counter");
-    if (counter) {
-      counter.textContent = `${currentIndex + 1} / ${totalItems}`;
-      return;
-    }
-
-    // Handle Dots
-    const container = SlideUtils.getOrCreateSlidesContainer();
-    const dots = container.querySelectorAll(".dot");
-
-    // Fallback if dots exist but totalItems matched counter mode
-    if (dots.length === 0) return;
-
-    dots.forEach((dot, index) => {
-      if (index === currentIndex) {
-        dot.classList.add("active");
-      } else {
-        dot.classList.remove("active");
-      }
-    });
-  },
-
-  /**
-   * Updates current slide to the specified index
-   * @param {number} index - Slide index to display
-   */
-
-  async updateCurrentSlide(index) {
-    if (STATE.slideshow.isTransitioning) {
-      return;
-    }
-
-    STATE.slideshow.isTransitioning = true;
-
-    if (STATE.slideshow.backdropVideoTimeout) {
-      clearTimeout(STATE.slideshow.backdropVideoTimeout);
-      STATE.slideshow.backdropVideoTimeout = null;
-    }
-
-    let previousVisibleSlide;
-    try {
-      const container = SlideUtils.getOrCreateSlidesContainer();
-      const totalItems = STATE.slideshow.totalItems;
-
-      index = Math.max(0, Math.min(index, totalItems - 1));
-      const currentItemId = STATE.slideshow.itemIds[index];
-      
-      STATE.slideshow.currentSlideIndex = index;
-
-      let currentSlide = document.querySelector(
-        `.slide[data-item-id="${currentItemId}"]`
-      );
-
-      // pruning for iOS/LowPower
-      const isLowPower = isLowPowerDevice();
-      const isIOSApp = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-      const limitVideos = isLowPower || isIOSApp;
-      
-      // Destroy old video to free up the hardware decoder before allocating new one.
-      if (limitVideos) {
-        const currentActiveSlide = container.querySelectorAll(".slide.active");
-        currentActiveSlide.forEach(activeSlide => {
-            const oldVideoItemId = activeSlide.dataset.itemId;
-            if (oldVideoItemId && STATE.slideshow.hasTrailer && STATE.slideshow.hasTrailer[oldVideoItemId] === true && oldVideoItemId !== currentItemId) {
-               const oldVideo = activeSlide.querySelector('.video-backdrop');
-               if (oldVideo) {
-                   if (oldVideo.tagName === 'VIDEO') {
-                     oldVideo.pause();
-                     if (oldVideo.src) {
-                         oldVideo.removeAttribute('src');
-                         oldVideo.load(); // Force decoder release
-                     }
-                   }
-                   oldVideo.remove();
-                   console.log("🎬 Media Bar:", "Pruned hidden slide video strictly before new allocation to bypass Apple/Low Power Device limits");
-                   if (STATE.slideshow.videoPlayers && STATE.slideshow.videoPlayers[oldVideoItemId]) {
-                       delete STATE.slideshow.videoPlayers[oldVideoItemId];
-                   }
-               }
-            }
-        });
-      }
-      
-      // JIT recreating video to bypass OOM limitations on low-end devices
-      if (limitVideos && currentSlide && STATE.slideshow.hasTrailer && STATE.slideshow.hasTrailer[currentItemId] === true) {
-        const hasVideo = currentSlide.querySelector('.video-backdrop');
-        if (!hasVideo) {
-          console.log("🎬 Media Bar:", "JIT recreating slide to embed video on constrained device");
-          const newSlide = await SlideCreator.createSlideForItemId(currentItemId, true);
-          currentSlide.replaceWith(newSlide);
-          currentSlide = newSlide;
-          this.upgradeSlideImageQuality(currentSlide);
-        }
-      }
-      
-      if (!currentSlide) {
-        currentSlide = await SlideCreator.createSlideForItemId(currentItemId);
-        this.upgradeSlideImageQuality(currentSlide);
-
-        if (!currentSlide) {
-          console.error("🎬 Media Bar:", `Failed to create slide for item ${currentItemId}`);
-          STATE.slideshow.isTransitioning = false;
-          setTimeout(() => this.nextSlide(), 500);
-          return;
-        }
-      }
-
-      previousVisibleSlide = container.querySelector(".slide.active");
-      if (previousVisibleSlide) {
-        previousVisibleSlide.classList.remove("active");
-      }
-
-      void currentSlide.offsetWidth;
-      currentSlide.classList.add("active");
-      STATE.slideshow.playSignals[currentItemId] = false;
-
-      // Manage Video Playback: Stop others, Play current
-      // 1. Stop all other YouTube players and local video elements, release connections
-      setTimeout(() => {
-        if (STATE.slideshow.videoPlayers) {
-          Object.keys(STATE.slideshow.videoPlayers).forEach(id => {
-            if (id !== currentItemId) {
-              const p = STATE.slideshow.videoPlayers[id];
-              if (!p) return;
-              if (typeof p.stopVideo === 'function') {
-                if (p._wrapperDiv) {
-                  p._wrapperDiv.style.transition = "none";
-                  p._wrapperDiv.style.opacity = "0";
-                }
-                p.stopVideo();
-              } else if (typeof p.pauseVideo === 'function') {
-                p.pauseVideo();
+          });
+
+          videoBackdrop.addEventListener('timeupdate', (event) => {
+            if (!getEffectiveWaitForTrailer()) return;
+            const video = event.target;
+            const slide = video.closest('.slide');
+            if (!slide || !slide.classList.contains('active')) return;
+
+            if (video.duration) {
+              const progress = video.currentTime / video.duration;
+              const fill = document.querySelector('.media-bar-progress-fill');
+              if (fill) {
+                const bar = fill.closest('.media-bar-progress-bar');
+                if (bar) bar.classList.remove('animating');
+                fill.style.transform = `scaleX(${progress})`;
               }
-              // HTML5 <video> element (local trailers), release HTTP connection
-              if (p instanceof HTMLVideoElement) {
-                p.pause();
-                p.muted = true;
-                try {
-                  if (p.currentTime > 0) {
-                    p.currentTime = 0;
-                  }
-                } catch(e){}
-                // Save src to data-src and release the HTTP streaming connection
-                if (p.src && !p.getAttribute('data-src')) {
-                  p.setAttribute('data-src', p.src);
-                }
-                p.removeAttribute('src');
-                p.load();
+            }
+          });
+
+          videoBackdrop.addEventListener('error', (event) => {
+            console.warn("🎬 Media Bar:", `Local video error for item ${itemId}`);
+            STATE.slideshow.isVideoPlaying = false;
+            const slide = event.target.closest('.slide');
+            if (slide && slide.classList.contains('active')) {
+              // Re-enable normal slideshow timing if video fails
+              if (STATE.slideshow.slideInterval && !STATE.slideshow.isPaused) {
+                STATE.slideshow.slideInterval.start();
               }
             }
           });
         }
-      }, CONFIG.fadeTransitionDuration);
+      }
 
-      // 2. Pause all other HTML5 videos e.g. local trailers
-      container.querySelectorAll('video').forEach(video => {
-        if (!video.closest(`.slide[data-item-id="${currentItemId}"]`)) {
-          video.pause();
-        }
+      // Always create a static backdrop image (to show while video loads or if no video)
+      backdrop = SlideUtils.createElement("img", {
+        className: "backdrop high-quality",
+        src: this.buildImageUrl(item, "Backdrop", 0, serverAddress, 60),
+        alt: LocalizationUtils.getLocalizedString('Backdrop', 'Backdrop'),
+        loading: "eager",
       });
 
-      // 3. Play and Reset current video
-      const videoBackdrop = currentSlide.querySelector('.video-backdrop');
-      
-      // Hide video to prevent flash of paused iframe when revisiting slides
-      if (videoBackdrop) {
+      // If video, static backdrop should be strictly a background (no animation)
+      if (isVideo) {
+        backdrop.style.animation = "none";
+        backdrop.style.transition = "none";
+      }
+
+      const backdropOverlay = SlideUtils.createElement("div", {
+        className: "backdrop-overlay",
+      });
+
+      const backdropContainer = SlideUtils.createElement("div", {
+        className: "backdrop-container" + (isVideo && CONFIG.fullWidthVideo ? " full-width-video" : ""),
+      });
+
+      backdropContainer.append(backdrop, backdropOverlay);
+
+      // If video exists, append on top of static backdrop
+      if (isVideo && videoBackdrop) {
+        backdropContainer.appendChild(videoBackdrop);
+      }
+
+      const hasLogo = !!(item.ImageTags && item.ImageTags.Logo);
+
+      const logoContainer = SlideUtils.createElement("div", {
+        className: "logo-container",
+      });
+
+      // Helper to create the title fallback only when needed (optimization)
+      const createTitleFallback = () => {
+        const titleText = item.Name || "";
+        // Break the title into a new line after a colon or hyphen/dash if followed by a space
+        let formattedTitle = titleText
+          .replace(/:\s+/g, ':<br>')
+          .replace(/\s+-\s+/g, ' -<br>')
+          .replace(/\s+–\s+/g, ' –<br>');
+
+        let fallbackFontSize = "3rem";
+        if (titleText.length <= 12) {
+          fallbackFontSize = "6rem";
+        } else if (titleText.length <= 25) {
+          fallbackFontSize = "4rem";
+        } else if (titleText.length >= 45) {
+          fallbackFontSize = "2.5rem";
+        }
+
+        return SlideUtils.createElement("div", {
+          className: "logo-title-fallback",
+          style: `font-size: ${fallbackFontSize};`,
+          innerHTML: formattedTitle
+        });
+      };
+
+      if (hasLogo) {
+        const logo = SlideUtils.createElement("img", {
+          className: "logo high-quality",
+          src: this.buildImageUrl(item, "Logo", undefined, serverAddress, 40),
+          alt: item.Name,
+          loading: "eager",
+          draggable: "false",
+        });
+        logo.onerror = () => {
+          logo.remove();
+          logoContainer.appendChild(createTitleFallback());
+        };
+        logoContainer.appendChild(logo);
+      } else {
+        logoContainer.appendChild(createTitleFallback());
+      }
+
+      const featuredContent = SlideUtils.createElement(
+        "div",
+        {
+          className: "featured-content",
+        },
+        title
+      );
+
+      const plot = item.Overview || "No overview available";
+      const plotElement = SlideUtils.createElement(
+        "div",
+        {
+          className: "plot",
+        },
+        plot
+      );
+      SlideUtils.truncateText(plotElement, CONFIG.maxPlotLength);
+
+      const plotContainer = SlideUtils.createElement("div", {
+        className: "plot-container" + (CONFIG.constrainPlotWidth ? " constrained-plot" : ""),
+      });
+      plotContainer.appendChild(plotElement);
+
+      const gradientOverlay = SlideUtils.createElement("div", {
+        className: "gradient-overlay" + (isVideo && CONFIG.fullWidthVideo ? " full-width-video" : ""),
+      });
+
+      const infoContainer = SlideUtils.createElement("div", {
+        className: "info-container",
+      });
+
+      const ratingInfo = this.createRatingInfo(item);
+      infoContainer.appendChild(ratingInfo);
+
+      const genreElement = SlideUtils.createElement("div", {
+        className: "genre",
+        innerHTML: SlideUtils.parseGenres(item.Genres)
+      });
+
+      const buttonContainer = SlideUtils.createElement("div", {
+        className: "button-container",
+      });
+
+      const playButton = this.createPlayButton(itemId);
+      const detailButton = this.createDetailButton(itemId);
+      const favoriteButton = this.createFavoriteButton(item);
+
+      const showTrailerBtn = MediaBarEnhancedSettingsManager.getSetting('trailerButton', CONFIG.showTrailerButton);
+      if (trailerUrl && !isVideo && showTrailerBtn) {
+        const trailerButton = this.createTrailerButton(trailerUrl);
+        buttonContainer.append(detailButton, playButton, trailerButton, favoriteButton);
+      } else {
+        buttonContainer.append(detailButton, playButton, favoriteButton);
+      }
+
+      slide.append(
+        logoContainer,
+        backdropContainer,
+        gradientOverlay,
+        featuredContent,
+        plotContainer,
+        infoContainer,
+        genreElement,
+        buttonContainer
+      );
+
+      return slide;
+    },
+
+    /**
+     * Creates the rating information element
+     * @param {Object} item - Item data
+     * @returns {HTMLElement} Rating information element
+     */
+    createRatingInfo(item) {
+      const {
+        CommunityRating: communityRating,
+        CriticRating: criticRating,
+        OfficialRating: ageRating,
+        PremiereDate: premiereDate,
+        RunTimeTicks: runtime,
+        ChildCount: seasonCount,
+      } = item;
+
+      const miscInfo = SlideUtils.createElement("div", {
+        className: "misc-info",
+      });
+
+      // Community Rating Section (IMDb)
+      if (typeof communityRating === "number") {
+        const container = SlideUtils.createElement("div", {
+          className: "star-rating-container",
+          innerHTML: `<span class="material-icons community-rating-star star" aria-hidden="true"></span>${communityRating.toFixed(1)}`,
+        });
+        miscInfo.appendChild(container);
+        miscInfo.appendChild(SlideUtils.createSeparator());
+      }
+
+      // Critic Rating Section (Rotten Tomatoes)
+      if (typeof criticRating === "number") {
+        const svgIcon = criticRating < 60 ? CONFIG.IMAGE_SVG.rottenTomato : CONFIG.IMAGE_SVG.freshTomato;
+        const container = SlideUtils.createElement("div", {
+          className: "critic-rating",
+          innerHTML: `${svgIcon}${criticRating.toFixed(0)}%`,
+        })
+        miscInfo.appendChild(container);
+        miscInfo.appendChild(SlideUtils.createSeparator());
+      };
+
+      // Year Section
+      if (typeof premiereDate === "string" && !isNaN(new Date(premiereDate))) {
+        const container = SlideUtils.createElement("div", {
+          className: "date",
+          innerHTML: new Date(premiereDate).getFullYear(),
+        });
+        miscInfo.appendChild(container);
+        miscInfo.appendChild(SlideUtils.createSeparator());
+      };
+
+      // Age Rating Section
+      if (typeof ageRating === "string") {
+        const container = SlideUtils.createElement("div", {
+          className: "age-rating mediaInfoOfficialRating",
+          rating: ageRating,
+          ariaLabel: `Content rated ${ageRating}`,
+          title: `Rating: ${ageRating}`,
+          innerHTML: ageRating,
+        });
+        miscInfo.appendChild(container);
+        miscInfo.appendChild(SlideUtils.createSeparator());
+      };
+
+      // Runtime / Seasons Section
+      if (seasonCount !== undefined || runtime !== undefined) {
+        const container = SlideUtils.createElement("div", {
+          className: "runTime",
+        });
+        if (seasonCount) {
+          const seasonText = seasonCount <= 1 ? LocalizationUtils.getLocalizedString('Season', 'Season') : LocalizationUtils.getLocalizedString('TypeOptionPluralSeason', 'Seasons');
+          container.innerHTML = `${seasonCount} ${seasonText}`;
+        } else {
+          const milliseconds = runtime / 10000;
+          const currentTime = new Date();
+          const endTime = new Date(currentTime.getTime() + milliseconds);
+          const options = { hour: "2-digit", minute: "2-digit", hour12: false };
+          const formattedEndTime = endTime.toLocaleTimeString([], options);
+          const endsAtText = LocalizationUtils.getLocalizedString('EndsAtValue', 'Ends at {0}', formattedEndTime);
+          container.innerText = endsAtText;
+        }
+        miscInfo.appendChild(container);
+      }
+
+      return miscInfo;
+    },
+
+    /**
+     * Creates a play button for an item
+     * @param {string} itemId - Item ID
+     * @returns {HTMLElement} Play button element
+     */
+    createPlayButton(itemId) {
+      const playText = LocalizationUtils.getLocalizedString('Play', 'Play');
+      return SlideUtils.createElement("button", {
+        className: "detailButton btnPlay play-button",
+        innerHTML: `
+      <span class="play-text">${playText}</span>
+    `,
+        tabIndex: "0",
+        onclick: (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          console.log("🎬 Media Bar: Play button clicked for", itemId);
+          ApiUtils.playItem(itemId);
+        },
+      });
+    },
+
+    /**
+     * Creates a detail button for an item
+     * @param {string} itemId - Item ID
+     * @returns {HTMLElement} Detail button element
+     */
+    createDetailButton(itemId) {
+      return SlideUtils.createElement("button", {
+        className: "detailButton detail-button",
+        tabIndex: "0",
+        onclick: (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          if (window.Emby && window.Emby.Page) {
+            Emby.Page.show(
+              `/details?id=${itemId}&serverId=${STATE.jellyfinData.serverId}`
+            );
+          } else {
+            window.location.href = `#/details?id=${itemId}&serverId=${STATE.jellyfinData.serverId}`;
+          }
+        },
+      });
+    },
+
+    /**
+     * Creates a favorite button for an item
+     * @param {string} itemId - Item ID
+     * @returns {HTMLElement} Favorite button element
+     */
+
+    createFavoriteButton(item) {
+      const isFavorite = item.UserData && item.UserData.IsFavorite === true;
+
+      const button = SlideUtils.createElement("button", {
+        className: `favorite-button ${isFavorite ? "favorited" : ""}`,
+        tabIndex: "0",
+        onclick: async (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          await ApiUtils.toggleFavorite(item.Id, button);
+        },
+      });
+
+      return button;
+    },
+
+    /**
+     * Creates a trailer button
+     * @param {string|Object} trailerInfo - Trailer URL string or object {id, url}
+     * @returns {HTMLElement} Trailer button element
+     */
+    createTrailerButton(trailerInfo) {
+      const trailerText = LocalizationUtils.getLocalizedString('Trailer', 'Trailer');
+
+      let url = trailerInfo;
+      let localTrailerId = null;
+
+      if (typeof trailerInfo === 'object' && trailerInfo !== null) {
+        url = trailerInfo.url;
+        localTrailerId = trailerInfo.id;
+      }
+
+      return SlideUtils.createElement("button", {
+        className: "detailButton trailer-button",
+        innerHTML: `<span class="material-icons">movie</span> <span class="trailer-text">${trailerText}</span>`,
+        tabIndex: "0",
+        onclick: (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+
+          if (localTrailerId) {
+            // Play local trailer using native player
+            ApiUtils.playItem(localTrailerId);
+          } else {
+            SlideUtils.openVideoModal(url);
+          }
+        },
+      });
+    },
+
+
+    /**
+     * Creates a placeholder slide for loading
+     * @param {string} itemId - Item ID to load
+     * @returns {HTMLElement} Placeholder slide element
+     */
+    createLoadingPlaceholder(itemId) {
+      const placeholder = SlideUtils.createElement("a", {
+        className: "slide placeholder",
+        "data-item-id": itemId,
+        style: {
+          display: "none",
+          opacity: "0",
+          transition: `opacity ${CONFIG.fadeTransitionDuration}ms ease-in-out`,
+        },
+      });
+
+      const loadingIndicator = SlideUtils.createLoadingIndicator();
+      placeholder.appendChild(loadingIndicator);
+
+      return placeholder;
+    },
+
+    /**
+     * Creates a slide for an item and adds it to the container
+     * @param {string} itemId - Item ID
+     * @param {boolean} forceRecreate - Force recreation of the slide
+     * @returns {Promise<HTMLElement>} Created slide element
+     */
+    async createSlideForItemId(itemId, forceRecreate = false) {
+      try {
+        if (!forceRecreate && STATE.slideshow.createdSlides[itemId]) {
+          return document.querySelector(`.slide[data-item-id="${itemId}"]`);
+        }
+
+        const container = SlideUtils.getOrCreateSlidesContainer();
+
+        const item = await ApiUtils.fetchItemDetails(itemId);
+
+        // Pre-fetch local trailer URL if needed
+        if (CONFIG.preferLocalTrailers && item.LocalTrailerCount > 0) {
+          item.localTrailerUrl = await ApiUtils.fetchLocalTrailer(itemId);
+        }
+
+        // Pre-fetch theme video URL if needed
+        if (CONFIG.preferLocalBackdrops) {
+          item.themeVideoUrl = await ApiUtils.fetchThemeVideos(itemId);
+        }
+
+        const slideElement = this.createSlideElement(
+          item,
+          item.Type === "Movie" ? "Movie" : "TV Show"
+        );
+
+        container.appendChild(slideElement);
+
+        STATE.slideshow.createdSlides[itemId] = true;
+
+        return slideElement;
+      } catch (error) {
+        console.error("🎬 Media Bar:", "Error creating slide for item:", error, itemId);
+        return null;
+      }
+    },
+  };
+
+  /**
+   * Manages slideshow functionality
+   */
+  const SlideshowManager = {
+    youtubeProgressInterval: null,
+
+    startYouTubeProgressLoop(player) {
+      if (this.youtubeProgressInterval) {
+        clearInterval(this.youtubeProgressInterval);
+      }
+
+      if (!getEffectiveWaitForTrailer()) {
+        return;
+      }
+
+      const update = () => {
+        try {
+          if (typeof player.getCurrentTime !== 'function' || typeof player.getDuration !== 'function') return;
+
+          const currentTime = player.getCurrentTime();
+          const duration = player.getDuration();
+
+          if (!duration) return;
+
+          // Apply SponsorBlock start/end boundaries if present
+          const startTime = player._startTime || 0;
+          const endTime = player._endTime || duration;
+          const totalDuration = endTime - startTime;
+
+          if (totalDuration <= 0) return;
+
+          const currentProgress = currentTime - startTime;
+          const progressFraction = Math.max(0, Math.min(1, currentProgress / totalDuration));
+
+          const fill = document.querySelector('.media-bar-progress-fill');
+          if (fill) {
+            const bar = fill.closest('.media-bar-progress-bar');
+            if (bar) bar.classList.remove('animating');
+            fill.style.transform = `scaleX(${progressFraction})`;
+          }
+        } catch (e) {
+          console.error("🎬 Media Bar:", "Error in YouTube progress loop:", e);
+        }
+      };
+
+      update();
+      this.youtubeProgressInterval = setInterval(update, 100);
+    },
+
+    stopYouTubeProgressLoop() {
+      if (this.youtubeProgressInterval) {
+        clearInterval(this.youtubeProgressInterval);
+        this.youtubeProgressInterval = null;
+      }
+    },
+
+    createPaginationDots() {
+      if (!CONFIG.showPaginationDots) return;
+
+      let dotsContainer = document.querySelector(".dots-container");
+      if (!dotsContainer) {
+        dotsContainer = document.createElement("div");
+        dotsContainer.className = "dots-container";
+        document.getElementById("slides-container").appendChild(dotsContainer);
+      } else {
+        dotsContainer.innerHTML = "";
+      }
+
+      const totalItems = STATE.slideshow.totalItems || 0;
+
+      // dynamically lower the max dots threshold on small screens 
+      let effectiveMaxDots = CONFIG.maxPaginationDots;
+      if (window.matchMedia("(max-width: 767px) and (orientation: portrait)").matches) {
+        const availableWidth = window.innerWidth * 0.9;
+        const dotWidth = 18; // approximate width per dot
+        const fittingDots = Math.floor(availableWidth / dotWidth) - 1;
+        effectiveMaxDots = Math.min(effectiveMaxDots, fittingDots);
+      }
+
+      const forceCounter = MediaBarEnhancedSettingsManager.getSetting('forceSlideCounter', CONFIG.forceSlideCounter);
+
+      // Switch to counter style if too many items or if forced
+      if (totalItems > effectiveMaxDots || forceCounter) {
+        document.body.classList.add("media-bar-has-counter");
+        const slidesContainer = document.getElementById("slides-container");
+        if (slidesContainer) slidesContainer.classList.add("has-counter");
+
+        const counter = document.createElement("span");
+        counter.className = "slide-counter";
+        counter.id = "slide-counter";
+        dotsContainer.appendChild(counter);
+      } else {
+        document.body.classList.remove("media-bar-has-counter");
+        const slidesContainer = document.getElementById("slides-container");
+        if (slidesContainer) slidesContainer.classList.remove("has-counter");
+
+        // Create dots for all items
+        for (let i = 0; i < totalItems; i++) {
+          const dot = document.createElement("span");
+          dot.className = "dot";
+          dot.setAttribute("data-index", i);
+          dotsContainer.appendChild(dot);
+        }
+      }
+
+      this.updateDots();
+    },
+
+    /**
+     * Updates active dot based on current slide
+     * Maps current slide to one of the 5 dots
+     */
+    updateDots() {
+      const currentIndex = STATE.slideshow.currentSlideIndex;
+      const totalItems = STATE.slideshow.totalItems || 0;
+
+      // Handle Large List Counter
+      const counter = document.getElementById("slide-counter");
+      if (counter) {
+        counter.textContent = `${currentIndex + 1} / ${totalItems}`;
+        return;
+      }
+
+      // Handle Dots
+      const container = SlideUtils.getOrCreateSlidesContainer();
+      const dots = container.querySelectorAll(".dot");
+
+      // Fallback if dots exist but totalItems matched counter mode
+      if (dots.length === 0) return;
+
+      dots.forEach((dot, index) => {
+        if (index === currentIndex) {
+          dot.classList.add("active");
+        } else {
+          dot.classList.remove("active");
+        }
+      });
+    },
+
+    /**
+     * Updates current slide to the specified index
+     * @param {number} index - Slide index to display
+     */
+
+    async updateCurrentSlide(index) {
+      if (STATE.slideshow.isTransitioning) {
+        return;
+      }
+
+      STATE.slideshow.isTransitioning = true;
+
+      if (STATE.slideshow.failsafeTimeout) {
+        clearTimeout(STATE.slideshow.failsafeTimeout);
+        STATE.slideshow.failsafeTimeout = null;
+      }
+      STATE.slideshow.isVideoPlaying = false;
+
+      // Stop current YouTube progress tracking
+      if (typeof this.stopYouTubeProgressLoop === 'function') {
+        this.stopYouTubeProgressLoop();
+      }
+
+      if (STATE.slideshow.backdropVideoTimeout) {
+        clearTimeout(STATE.slideshow.backdropVideoTimeout);
+        STATE.slideshow.backdropVideoTimeout = null;
+      }
+
+      let previousVisibleSlide;
+      try {
+        const container = SlideUtils.getOrCreateSlidesContainer();
+        const totalItems = STATE.slideshow.totalItems;
+
+        index = Math.max(0, Math.min(index, totalItems - 1));
+        const currentItemId = STATE.slideshow.itemIds[index];
+
+        STATE.slideshow.currentSlideIndex = index;
+
+        let currentSlide = document.querySelector(
+          `.slide[data-item-id="${currentItemId}"]`
+        );
+
+        // pruning for iOS/LowPower
+        const isLowPower = isLowPowerDevice();
+        const isIOSApp = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+        const limitVideos = isLowPower || isIOSApp;
+
+        // Destroy old video to free up the hardware decoder before allocating new one.
+        if (limitVideos) {
+          const currentActiveSlide = container.querySelectorAll(".slide.active");
+          currentActiveSlide.forEach(activeSlide => {
+            const oldVideoItemId = activeSlide.dataset.itemId;
+            if (oldVideoItemId && STATE.slideshow.hasTrailer && STATE.slideshow.hasTrailer[oldVideoItemId] === true && oldVideoItemId !== currentItemId) {
+              const oldVideo = activeSlide.querySelector('.video-backdrop');
+              if (oldVideo) {
+                if (oldVideo.tagName === 'VIDEO') {
+                  oldVideo.pause();
+                  if (oldVideo.src) {
+                    oldVideo.removeAttribute('src');
+                    oldVideo.load(); // Force decoder release
+                  }
+                }
+                oldVideo.remove();
+                console.log("🎬 Media Bar:", "Pruned hidden slide video strictly before new allocation to bypass Apple/Low Power Device limits");
+                if (STATE.slideshow.videoPlayers && STATE.slideshow.videoPlayers[oldVideoItemId]) {
+                  delete STATE.slideshow.videoPlayers[oldVideoItemId];
+                }
+              }
+            }
+          });
+        }
+
+        // JIT recreating video to bypass OOM limitations on low-end devices
+        if (limitVideos && currentSlide && STATE.slideshow.hasTrailer && STATE.slideshow.hasTrailer[currentItemId] === true) {
+          const hasVideo = currentSlide.querySelector('.video-backdrop');
+          if (!hasVideo) {
+            console.log("🎬 Media Bar:", "JIT recreating slide to embed video on constrained device");
+            const newSlide = await SlideCreator.createSlideForItemId(currentItemId, true);
+            currentSlide.replaceWith(newSlide);
+            currentSlide = newSlide;
+            this.upgradeSlideImageQuality(currentSlide);
+          }
+        }
+
+        if (!currentSlide) {
+          currentSlide = await SlideCreator.createSlideForItemId(currentItemId);
+          this.upgradeSlideImageQuality(currentSlide);
+
+          if (!currentSlide) {
+            console.error("🎬 Media Bar:", `Failed to create slide for item ${currentItemId}`);
+            STATE.slideshow.isTransitioning = false;
+            setTimeout(() => this.nextSlide(), 500);
+            return;
+          }
+        }
+
+        previousVisibleSlide = container.querySelector(".slide.active");
+        if (previousVisibleSlide) {
+          previousVisibleSlide.classList.remove("active");
+        }
+
+        void currentSlide.offsetWidth;
+        currentSlide.classList.add("active");
+        STATE.slideshow.playSignals[currentItemId] = false;
+
+        // Manage Video Playback: Stop others, Play current
+        // 1. Stop all other YouTube players and local video elements, release connections
+        setTimeout(() => {
+          if (STATE.slideshow.videoPlayers) {
+            Object.keys(STATE.slideshow.videoPlayers).forEach(id => {
+              if (id !== currentItemId) {
+                const p = STATE.slideshow.videoPlayers[id];
+                if (!p) return;
+                if (typeof p.stopVideo === 'function') {
+                  if (p._wrapperDiv) {
+                    p._wrapperDiv.style.transition = "none";
+                    p._wrapperDiv.style.opacity = "0";
+                  }
+                  p.stopVideo();
+                } else if (typeof p.pauseVideo === 'function') {
+                  p.pauseVideo();
+                }
+                // HTML5 <video> element (local trailers), release HTTP connection
+                if (p instanceof HTMLVideoElement) {
+                  p.pause();
+                  p.muted = true;
+                  try {
+                    if (p.currentTime > 0) {
+                      p.currentTime = 0;
+                    }
+                  } catch (e) { }
+                  // Save src to data-src and release the HTTP streaming connection
+                  if (p.src && !p.getAttribute('data-src')) {
+                    p.setAttribute('data-src', p.src);
+                  }
+                  p.removeAttribute('src');
+                  p.load();
+                }
+              }
+            });
+          }
+        }, CONFIG.fadeTransitionDuration);
+
+        // 2. Pause all other HTML5 videos e.g. local trailers
+        container.querySelectorAll('video').forEach(video => {
+          if (!video.closest(`.slide[data-item-id="${currentItemId}"]`)) {
+            video.pause();
+          }
+        });
+
+        // 3. Play and Reset current video
+        const videoBackdrop = currentSlide.querySelector('.video-backdrop');
+
+        // Hide video to prevent flash of paused iframe when revisiting slides
+        if (videoBackdrop) {
           videoBackdrop.style.transition = "none";
           videoBackdrop.style.opacity = "0";
           // Force layout reflow to apply the instant opacity jump
           void videoBackdrop.offsetWidth;
           videoBackdrop.style.transition = "opacity 1.2s ease-in-out";
-      }
+        }
 
-      // Auto-unpause when a video slide becomes active
-      if (videoBackdrop && STATE.slideshow.isPaused) {
+        // Auto-unpause when a video slide becomes active
+        if (videoBackdrop && STATE.slideshow.isPaused) {
           STATE.slideshow.isPaused = false;
           const pauseButton = document.querySelector('.pause-button');
           if (pauseButton) {
-              pauseButton.innerHTML = '<i class="material-icons">pause</i>';
-              const pauseLabel = LocalizationUtils.getLocalizedString('ButtonPause', 'Pause');
-              pauseButton.setAttribute("aria-label", pauseLabel);
-              pauseButton.setAttribute("title", pauseLabel);
-          }
-      }
-
-      // Update mute button visibility
-      const muteButton = document.querySelector('.mute-button');
-      if (muteButton) {
-        const hasVideo = !!videoBackdrop;
-        muteButton.style.display = hasVideo ? 'block' : 'none';
-      }
-
-      if (videoBackdrop) {
-        // preload logic
-        if (videoBackdrop.tagName === 'VIDEO') {
-          // Restore src from data-src if it was deactivated to release connections
-          const lazySrc = videoBackdrop.getAttribute('data-src');
-          if (lazySrc && !videoBackdrop.src) {
-            videoBackdrop.src = lazySrc;
-            videoBackdrop.load(); // Force pre-buffering
-          } else {
-            try {
-              if (videoBackdrop.currentTime > 0) {
-                videoBackdrop.currentTime = 0;
-              }
-            } catch (e) {}
-          }
-
-          videoBackdrop.muted = STATE.slideshow.isMuted;
-          if (!STATE.slideshow.isMuted) {
-            videoBackdrop.volume = 0.4;
-          }
-        } else if (STATE.slideshow.videoPlayers && STATE.slideshow.videoPlayers[currentItemId]) {
-          const player = STATE.slideshow.videoPlayers[currentItemId];
-          // If delay > 0, buffer the video silently using cueVideoById. If 0, skip and load directly later.
-          if (CONFIG.backdropVideoDelay > 0) {
-            if (player && typeof player.cueVideoById === 'function' && player._videoId) {
-              // Use cueVideoById to buffer video without auto-playing it
-              player.cueVideoById({
-                videoId: player._videoId,
-                startSeconds: player._startTime || 0,
-                endSeconds: player._endTime
-              });
-
-              if (STATE.slideshow.isMuted) {
-                player.mute();
-              } else {
-                player.unMute();
-                player.setVolume(40);
-              }
-            } else if (player && typeof player.seekTo === 'function') {
-              const startTime = player._startTime || 0;
-              player.seekTo(startTime);
-            }
+            pauseButton.innerHTML = '<i class="material-icons">pause</i>';
+            const pauseLabel = LocalizationUtils.getLocalizedString('ButtonPause', 'Pause');
+            pauseButton.setAttribute("aria-label", pauseLabel);
+            pauseButton.setAttribute("title", pauseLabel);
           }
         }
 
-        // play logic
-        const playVideoLogic = () => {
-          if (!currentSlide.classList.contains('active')) return;
-          
-          STATE.slideshow.playSignals[currentItemId] = true;
+        // Update mute button visibility
+        const muteButton = document.querySelector('.mute-button');
+        if (muteButton) {
+          const hasVideo = !!videoBackdrop;
+          muteButton.style.display = hasVideo ? 'block' : 'none';
+        }
 
-          if (document.hidden) {
-            console.log("🎬 Media Bar:", "Tab is hidden, deferring video playback until visible.");
-            return;
-          }
-
+        if (videoBackdrop) {
+          // preload logic
           if (videoBackdrop.tagName === 'VIDEO') {
-            videoBackdrop.play().catch(e => {
-              // Ignore intentional aborts when sliding away quickly
-              if (e.name === 'AbortError') return;
-              if (!STATE.slideshow.isMuted) {
-                 console.warn("🎬 Media Bar:", `Autoplay blocked for ${currentItemId}, attempting immediate muted fallback`);
-                 videoBackdrop.muted = true;
-                 videoBackdrop.play().catch(err => {
-                    if (err.name !== 'AbortError') {
-                       console.error("🎬 Media Bar:", "Muted fallback failed", err);
-                       if (STATE.slideshow.slideInterval && !STATE.slideshow.isPaused) {
-                           STATE.slideshow.slideInterval.start();
-                       }
-                    }
-                 });
-              } else {
-                console.error("🎬 Media Bar:", "Playback failed despite being muted", e);
-                if (STATE.slideshow.slideInterval && !STATE.slideshow.isPaused) {
-                    STATE.slideshow.slideInterval.start();
+            // Restore src from data-src if it was deactivated to release connections
+            const lazySrc = videoBackdrop.getAttribute('data-src');
+            if (lazySrc && !videoBackdrop.src) {
+              videoBackdrop.src = lazySrc;
+              videoBackdrop.load(); // Force pre-buffering
+            } else {
+              try {
+                if (videoBackdrop.currentTime > 0) {
+                  videoBackdrop.currentTime = 0;
                 }
-              }
-            });
+              } catch (e) { }
+            }
+
+            videoBackdrop.muted = STATE.slideshow.isMuted;
+            if (!STATE.slideshow.isMuted) {
+              videoBackdrop.volume = getEffectiveTrailerVolume() / 100;
+            }
           } else if (STATE.slideshow.videoPlayers && STATE.slideshow.videoPlayers[currentItemId]) {
             const player = STATE.slideshow.videoPlayers[currentItemId];
-            
-            if (CONFIG.backdropVideoDelay === 0 && player && typeof player.loadVideoById === 'function' && player._videoId) {
-              // Zero delay: Natively load and play immediately to preserve Autoplay tokens
-              player.loadVideoById({
-                videoId: player._videoId,
-                startSeconds: player._startTime || 0,
-                endSeconds: player._endTime
-              });
-              
-              if (STATE.slideshow.isMuted) {
-                player.mute();
-              } else {
-                player.unMute();
-                player.setVolume(40);
-              }
-            } else if (player && typeof player.playVideo === 'function') {
-              // Delayed: Use playVideo on the buffered cue
-              player.playVideo();
-            }
+            // If delay > 0, buffer the video silently using cueVideoById. If 0, skip and load directly later.
+            if (CONFIG.backdropVideoDelay > 0) {
+              if (player && typeof player.cueVideoById === 'function' && player._videoId) {
+                // Use cueVideoById to buffer video without auto-playing it
+                player.cueVideoById({
+                  videoId: player._videoId,
+                  startSeconds: player._startTime || 0,
+                  endSeconds: player._endTime
+                });
 
-            if (!STATE.slideshow.isMuted) {
-              // Check if playback successfully started, otherwise fallback to muted
-              setTimeout(() => {
-                if (!currentSlide.classList.contains('active')) return;
-                if (player.getPlayerState &&
-                  player.getPlayerState() !== YT.PlayerState.PLAYING &&
-                  player.getPlayerState() !== YT.PlayerState.BUFFERING) {
-                  console.log("🎬 Media Bar:", "YouTube didn't start playback, retrying muted...");
+                if (STATE.slideshow.isMuted) {
                   player.mute();
-                  player.playVideo();
+                } else {
+                  player.unMute();
+                  player.setVolume(getEffectiveTrailerVolume());
                 }
-              }, 1000);
+              } else if (player && typeof player.seekTo === 'function') {
+                const startTime = player._startTime || 0;
+                player.seekTo(startTime);
+              }
             }
           }
-        };
 
-        if (CONFIG.backdropVideoDelay > 0) {
-          STATE.slideshow.currentPlayVideoLogic = playVideoLogic;
-          STATE.slideshow.backdropVideoTimeout = setTimeout(playVideoLogic, CONFIG.backdropVideoDelay);
-        } else {
-          playVideoLogic();
+          // play logic
+          const playVideoLogic = () => {
+            if (!currentSlide.classList.contains('active')) return;
+
+            STATE.slideshow.playSignals[currentItemId] = true;
+
+            if (document.hidden) {
+              console.log("🎬 Media Bar:", "Tab is hidden, deferring video playback until visible.");
+              return;
+            }
+
+            if (videoBackdrop.tagName === 'VIDEO') {
+              videoBackdrop.play().catch(e => {
+                // Ignore intentional aborts when sliding away quickly
+                if (e.name === 'AbortError') return;
+                if (!STATE.slideshow.isMuted) {
+                  console.warn("🎬 Media Bar:", `Autoplay blocked for ${currentItemId}, attempting immediate muted fallback`);
+                  videoBackdrop.muted = true;
+                  videoBackdrop.play().catch(err => {
+                    if (err.name !== 'AbortError') {
+                      console.error("🎬 Media Bar:", "Muted fallback failed", err);
+                      if (STATE.slideshow.slideInterval && !STATE.slideshow.isPaused) {
+                        STATE.slideshow.slideInterval.start();
+                      }
+                    }
+                  });
+                } else {
+                  console.error("🎬 Media Bar:", "Playback failed despite being muted", e);
+                  if (STATE.slideshow.slideInterval && !STATE.slideshow.isPaused) {
+                    STATE.slideshow.slideInterval.start();
+                  }
+                }
+              });
+            } else if (STATE.slideshow.videoPlayers && STATE.slideshow.videoPlayers[currentItemId]) {
+              const player = STATE.slideshow.videoPlayers[currentItemId];
+
+              if (CONFIG.backdropVideoDelay === 0 && player && typeof player.loadVideoById === 'function' && player._videoId) {
+                // Zero delay: Natively load and play immediately to preserve Autoplay tokens
+                player.loadVideoById({
+                  videoId: player._videoId,
+                  startSeconds: player._startTime || 0,
+                  endSeconds: player._endTime
+                });
+
+                if (STATE.slideshow.isMuted) {
+                  player.mute();
+                } else {
+                  player.unMute();
+                  player.setVolume(getEffectiveTrailerVolume());
+                }
+              } else if (player && typeof player.playVideo === 'function') {
+                // Delayed: Use playVideo on the buffered cue
+                player.playVideo();
+              }
+
+              if (!STATE.slideshow.isMuted) {
+                // Check if playback successfully started, otherwise fallback to muted
+                setTimeout(() => {
+                  if (!currentSlide.classList.contains('active')) return;
+                  if (player.getPlayerState &&
+                    player.getPlayerState() !== YT.PlayerState.PLAYING &&
+                    player.getPlayerState() !== YT.PlayerState.BUFFERING) {
+                    console.log("🎬 Media Bar:", "YouTube didn't start playback, retrying muted...");
+                    player.mute();
+                    player.playVideo();
+                  }
+                }, 1000);
+              }
+            }
+          };
+
+          if (CONFIG.backdropVideoDelay > 0) {
+            STATE.slideshow.currentPlayVideoLogic = playVideoLogic;
+            STATE.slideshow.backdropVideoTimeout = setTimeout(playVideoLogic, CONFIG.backdropVideoDelay);
+          } else {
+            playVideoLogic();
+          }
         }
+
+        const enableAnimations = MediaBarEnhancedSettingsManager.getSetting('slideAnimations', CONFIG.slideAnimationEnabled);
+
+        if (enableAnimations) {
+          const backdrop = currentSlide.querySelector(".backdrop");
+          if (backdrop && !backdrop.classList.contains("video-backdrop")) {
+            backdrop.classList.add("animate");
+          }
+          const logo = currentSlide.querySelector(".logo");
+          if (logo) logo.classList.add("animate");
+        }
+
+        if (index === 0 || !previousVisibleSlide) {
+          const dotsContainer = container.querySelector(".dots-container");
+          if (dotsContainer) {
+            dotsContainer.style.opacity = "1";
+          }
+        }
+
+        setTimeout(() => {
+          const allSlides = container.querySelectorAll(".slide");
+          allSlides.forEach((slide) => {
+            if (slide !== currentSlide) {
+              slide.classList.remove("active");
+            }
+          });
+        }, CONFIG.fadeTransitionDuration);
+
+        // Only restart interval if we are NOT waiting for a video to end
+        const hasVideo = currentSlide.querySelector('.video-backdrop') ||
+          (STATE.slideshow.videoPlayers && STATE.slideshow.videoPlayers[currentItemId]);
+
+        this.preloadAdjacentSlides(index);
+        this.updateDots();
+        this.updateProgressBar(hasVideo);
+
+        if (STATE.slideshow.slideInterval && !STATE.slideshow.isPaused) {
+          if (getEffectiveWaitForTrailer() && hasVideo) {
+            STATE.slideshow.slideInterval.stop();
+            // Start 5-second autoplay failsafe
+            STATE.slideshow.failsafeTimeout = setTimeout(() => {
+              if (!STATE.slideshow.isVideoPlaying && !STATE.slideshow.isPaused && currentSlide.classList.contains('active')) {
+                console.warn("🎬 Media Bar:", `Failsafe triggered for item ${currentItemId}: Video did not start playing. Resuming standard slideshow.`);
+                if (STATE.slideshow.slideInterval) {
+                  STATE.slideshow.slideInterval.start();
+                }
+                // Also trigger CSS-based progress bar animation as fallback
+                const fill = document.querySelector('.media-bar-progress-fill');
+                if (fill) {
+                  const bar = fill.closest('.media-bar-progress-bar');
+                  if (bar) {
+                    bar.classList.add('animating');
+                    fill.style.transform = 'scaleX(0)';
+                    fill.style.animationDuration = `${CONFIG.shuffleInterval}ms`;
+                  }
+                }
+              }
+            }, 5000);
+          } else {
+            STATE.slideshow.slideInterval.restart();
+          }
+        }
+
+        this.pruneSlideCache();
+      } catch (error) {
+        console.error("🎬 Media Bar:", "Error updating current slide:", error);
+      } finally {
+        setTimeout(() => {
+          STATE.slideshow.isTransitioning = false;
+
+          if (previousVisibleSlide) {
+            const enableAnimations = MediaBarEnhancedSettingsManager.getSetting('slideAnimations', CONFIG.slideAnimationEnabled) && !isLowPowerDevice();
+            if (enableAnimations) {
+              const prevBackdrop = previousVisibleSlide.querySelector(".backdrop");
+              const prevLogo = previousVisibleSlide.querySelector(".logo");
+              if (prevBackdrop) prevBackdrop.classList.remove("animate");
+              if (prevLogo) prevLogo.classList.remove("animate");
+            }
+          }
+        }, CONFIG.fadeTransitionDuration);
+      }
+    },
+
+    updateProgressBar(hasVideo) {
+      const showProgress = MediaBarEnhancedSettingsManager.getSetting('showProgressBar', CONFIG.showProgressBar);
+      let progressBar = document.querySelector('.media-bar-progress-bar');
+
+      if (!showProgress) {
+        if (progressBar) progressBar.remove();
+        return;
       }
 
-      const enableAnimations = MediaBarEnhancedSettingsManager.getSetting('slideAnimations', CONFIG.slideAnimationEnabled);
+      const locationSetting = MediaBarEnhancedSettingsManager.getSetting('progressBarLocation', CONFIG.progressBarLocation) || 'Dots';
+      const dotsContainer = document.querySelector('.dots-container');
 
-      if (enableAnimations) {
-        const backdrop = currentSlide.querySelector(".backdrop");
-        if (backdrop && !backdrop.classList.contains("video-backdrop")) {
-          backdrop.classList.add("animate");
-        }
-        const logo = currentSlide.querySelector(".logo");
-        if (logo) logo.classList.add("animate");
-      }
+      let parentContainer;
+      let positionClass;
 
-      if (index === 0 || !previousVisibleSlide) {
-        const dotsContainer = container.querySelector(".dots-container");
+      if (locationSetting === 'Navbar') {
+        parentContainer = document.getElementById('slides-container');
+        positionClass = 'progress-bar-navbar';
+      } else { // 'Dots'
         if (dotsContainer) {
-          dotsContainer.style.opacity = "1";
-        }
-      }
-
-      setTimeout(() => {
-        const allSlides = container.querySelectorAll(".slide");
-        allSlides.forEach((slide) => {
-          if (slide !== currentSlide) {
-            slide.classList.remove("active");
-          }
-        });
-      }, CONFIG.fadeTransitionDuration);
-
-      this.preloadAdjacentSlides(index);
-      this.updateDots();
-
-      // Only restart interval if we are NOT waiting for a video to end
-      const hasVideo = currentSlide.querySelector('.video-backdrop') || 
-        (STATE.slideshow.videoPlayers && STATE.slideshow.videoPlayers[currentItemId]);
-      if (STATE.slideshow.slideInterval && !STATE.slideshow.isPaused) {
-        if (CONFIG.waitForTrailerToEnd && hasVideo) {
-          STATE.slideshow.slideInterval.stop();
+          parentContainer = dotsContainer;
+          positionClass = 'progress-bar-dots';
         } else {
-          STATE.slideshow.slideInterval.restart();
+          parentContainer = document.getElementById('slides-container');
+          positionClass = 'progress-bar-bottom';
         }
       }
 
-      this.pruneSlideCache();
-    } catch (error) {
-      console.error("🎬 Media Bar:", "Error updating current slide:", error);
-    } finally {
-      setTimeout(() => {
-        STATE.slideshow.isTransitioning = false;
+      if (!parentContainer) return;
 
-        if (previousVisibleSlide) {
-          const enableAnimations = MediaBarEnhancedSettingsManager.getSetting('slideAnimations', CONFIG.slideAnimationEnabled) && !isLowPowerDevice();
-          if (enableAnimations) {
-            const prevBackdrop = previousVisibleSlide.querySelector(".backdrop");
-            const prevLogo = previousVisibleSlide.querySelector(".logo");
-            if (prevBackdrop) prevBackdrop.classList.remove("animate");
-            if (prevLogo) prevLogo.classList.remove("animate");
-          }
-        }
-      }, CONFIG.fadeTransitionDuration);
-    }
-  },
-
-  /**
-   * Upgrades the image quality for all images in a slide
-   * @param {HTMLElement} slide - The slide element containing images to upgrade
-   */
-
-  upgradeSlideImageQuality(slide) {
-    if (!slide) return;
-
-    const images = slide.querySelectorAll("img.low-quality");
-    images.forEach((img) => {
-      const highQualityUrl = img.getAttribute("data-high-quality");
-
-      // Prevent duplicate requests if already using high quality
-      if (highQualityUrl && img.src !== highQualityUrl) {
-        addThrottledRequest(highQualityUrl, () => {
-          img.src = highQualityUrl;
-          img.classList.remove("low-quality");
-          img.classList.add("high-quality");
-        });
+      const needsCreation = !progressBar || progressBar.parentNode !== parentContainer || !progressBar.classList.contains(positionClass);
+      if (needsCreation) {
+        if (progressBar) progressBar.remove();
+        progressBar = document.createElement('div');
+        progressBar.className = `media-bar-progress-bar ${positionClass}`;
+        const fill = document.createElement('div');
+        fill.className = 'media-bar-progress-fill';
+        progressBar.appendChild(fill);
+        parentContainer.appendChild(progressBar);
       }
-    });
-  },
 
-  /**
-   * Preloads adjacent slides for smoother transitions
-   * @param {number} currentIndex - Current slide index
-   */
-  async preloadAdjacentSlides(currentIndex) {
-    const totalItems = STATE.slideshow.totalItems;
-    let preloadCount = Math.min(Math.max(CONFIG.preloadCount || 1, 1), 5);
-    if (isLowPowerDevice()) preloadCount = 1; // Strict limit for TVs
-    
-    const preloadedIds = new Set();
+      // Reset animation state
+      progressBar.classList.remove('animating', 'paused');
+      const fill = progressBar.querySelector('.media-bar-progress-fill');
+      if (fill) {
+        fill.style.transform = 'scaleX(0)';
+        fill.style.animationDuration = '0s';
+      }
+      void progressBar.offsetWidth; // force reflow
 
-    // Preload next slides
-    for (let i = 1; i <= preloadCount; i++) {
+      // If we have a video and are waiting for it to end, the timer is stopped.
+      // So we do not animate the progress bar via CSS keyframes (we will update it manually).
+      const waitForTrailer = getEffectiveWaitForTrailer();
+      if (hasVideo && waitForTrailer) {
+        return;
+      }
+
+      // Start keyframe animation
+      if (fill) {
+        fill.style.animationDuration = `${CONFIG.shuffleInterval}ms`;
+      }
+      progressBar.classList.add('animating');
+
+      const slidesContainer = document.getElementById("slides-container");
+      if (slidesContainer) {
+        if (STATE.slideshow.isPaused) {
+          slidesContainer.classList.add("slideshow-paused");
+        } else {
+          slidesContainer.classList.remove("slideshow-paused");
+        }
+      }
+
+      if (STATE.slideshow.isPaused) {
+        progressBar.classList.add('paused');
+      }
+    },
+
+    /**
+     * Upgrades the image quality for all images in a slide
+     * @param {HTMLElement} slide - The slide element containing images to upgrade
+     */
+
+    upgradeSlideImageQuality(slide) {
+      if (!slide) return;
+
+      const images = slide.querySelectorAll("img.low-quality");
+      images.forEach((img) => {
+        const highQualityUrl = img.getAttribute("data-high-quality");
+
+        // Prevent duplicate requests if already using high quality
+        if (highQualityUrl && img.src !== highQualityUrl) {
+          addThrottledRequest(highQualityUrl, () => {
+            img.src = highQualityUrl;
+            img.classList.remove("low-quality");
+            img.classList.add("high-quality");
+          });
+        }
+      });
+    },
+
+    /**
+     * Preloads adjacent slides for smoother transitions
+     * @param {number} currentIndex - Current slide index
+     */
+    async preloadAdjacentSlides(currentIndex) {
+      const totalItems = STATE.slideshow.totalItems;
+      let preloadCount = Math.min(Math.max(CONFIG.preloadCount || 1, 1), 5);
+      if (isLowPowerDevice()) preloadCount = 1; // Strict limit for TVs
+
+      const preloadedIds = new Set();
+
+      // Preload next slides
+      for (let i = 1; i <= preloadCount; i++) {
         const nextIndex = (currentIndex + i) % totalItems;
         if (nextIndex === currentIndex) break;
 
         const itemId = STATE.slideshow.itemIds[nextIndex];
         if (!preloadedIds.has(itemId)) {
-             preloadedIds.add(itemId);
-             SlideCreator.createSlideForItemId(itemId);
+          preloadedIds.add(itemId);
+          SlideCreator.createSlideForItemId(itemId);
         }
-    }
+      }
 
-    // Preload previous slides
-    for (let i = 1; i <= preloadCount; i++) {
+      // Preload previous slides
+      for (let i = 1; i <= preloadCount; i++) {
         const prevIndex = (currentIndex - i + totalItems) % totalItems;
         if (prevIndex === currentIndex) break;
 
         const prevItemId = STATE.slideshow.itemIds[prevIndex];
         if (!preloadedIds.has(prevItemId)) {
-             preloadedIds.add(prevItemId);
-             SlideCreator.createSlideForItemId(prevItemId);
+          preloadedIds.add(prevItemId);
+          SlideCreator.createSlideForItemId(prevItemId);
         }
-    }
-  },
+      }
+    },
 
-  nextSlide() {
-    const currentIndex = STATE.slideshow.currentSlideIndex;
-    const totalItems = STATE.slideshow.totalItems;
+    nextSlide() {
+      const currentIndex = STATE.slideshow.currentSlideIndex;
+      const totalItems = STATE.slideshow.totalItems;
 
-    const nextIndex = (currentIndex + 1) % totalItems;
+      const nextIndex = (currentIndex + 1) % totalItems;
 
-    this.updateCurrentSlide(nextIndex);
-  },
+      this.updateCurrentSlide(nextIndex);
+    },
 
-  prevSlide() {
-    const currentIndex = STATE.slideshow.currentSlideIndex;
-    const totalItems = STATE.slideshow.totalItems;
+    prevSlide() {
+      const currentIndex = STATE.slideshow.currentSlideIndex;
+      const totalItems = STATE.slideshow.totalItems;
 
-    const prevIndex = (currentIndex - 1 + totalItems) % totalItems;
+      const prevIndex = (currentIndex - 1 + totalItems) % totalItems;
 
-    this.updateCurrentSlide(prevIndex);
-  },
+      this.updateCurrentSlide(prevIndex);
+    },
 
-  /**
-   * Prunes the slide cache to prevent memory bloat
-   * Removes slides that are outside the viewing range
-   */
-  pruneSlideCache() {
-    const currentIndex = STATE.slideshow.currentSlideIndex;
-    const keepRange = CONFIG.preloadCount + 1;
-    let prunedAny = false;
+    /**
+     * Prunes the slide cache to prevent memory bloat
+     * Removes slides that are outside the viewing range
+     */
+    pruneSlideCache() {
+      const currentIndex = STATE.slideshow.currentSlideIndex;
+      const keepRange = CONFIG.preloadCount + 1;
+      let prunedAny = false;
 
-    Object.keys(STATE.slideshow.createdSlides).forEach((itemId) => {
-      const index = STATE.slideshow.itemIds.indexOf(itemId);
-      if (index === -1) return;
+      Object.keys(STATE.slideshow.createdSlides).forEach((itemId) => {
+        const index = STATE.slideshow.itemIds.indexOf(itemId);
+        if (index === -1) return;
 
-      const totalItems = STATE.slideshow.itemIds.length;
-      let distance = Math.abs(index - currentIndex);
-      
-      // Always calculate circular distance for slideshow
-      distance = Math.min(distance, totalItems - distance);
+        const totalItems = STATE.slideshow.itemIds.length;
+        let distance = Math.abs(index - currentIndex);
 
-      if (distance > keepRange) {
-        // Destroy video player if exists
-        if (STATE.slideshow.videoPlayers[itemId]) {
-          const player = STATE.slideshow.videoPlayers[itemId];
-          if (typeof player.destroy === 'function') {
-            // YouTube player
-            player.destroy();
-          } else if (player instanceof HTMLVideoElement) {
-            // HTML5 video, release HTTP streaming connection
-            player.pause();
-            // Save src to data-src and release the HTTP streaming connection
-            if (player.src && !player.getAttribute('data-src')) {
-              player.setAttribute('data-src', player.src);
+        // Always calculate circular distance for slideshow
+        distance = Math.min(distance, totalItems - distance);
+
+        if (distance > keepRange) {
+          // Destroy video player if exists
+          if (STATE.slideshow.videoPlayers[itemId]) {
+            const player = STATE.slideshow.videoPlayers[itemId];
+            if (typeof player.destroy === 'function') {
+              // YouTube player
+              player.destroy();
+            } else if (player instanceof HTMLVideoElement) {
+              // HTML5 video, release HTTP streaming connection
+              player.pause();
+              // Save src to data-src and release the HTTP streaming connection
+              if (player.src && !player.getAttribute('data-src')) {
+                player.setAttribute('data-src', player.src);
+              }
+              player.removeAttribute('src');
+              player.load();
             }
-            player.removeAttribute('src');
-            player.load();
+            delete STATE.slideshow.videoPlayers[itemId];
           }
-          delete STATE.slideshow.videoPlayers[itemId];
+
+          delete STATE.slideshow.loadedItems[itemId];
+
+          const slide = document.querySelector(
+            `.slide[data-item-id="${itemId}"]`
+          );
+          if (slide) slide.remove();
+
+          delete STATE.slideshow.createdSlides[itemId];
+          prunedAny = true;
+
+          console.log("🎬 Media Bar:", `Pruned slide ${itemId} at distance ${distance} from view`);
+        }
+      });
+
+      if (prunedAny) {
+        const isTvMode = (window.layoutManager && window.layoutManager.tv) ||
+          document.documentElement.classList.contains('layout-tv') ||
+          document.body.classList.contains('layout-tv');
+        if (isTvMode) {
+          setTimeout(() => {
+            const container = document.getElementById("slides-container");
+            if (container && container.style.display !== 'none') {
+              container.focus({ preventScroll: true });
+            }
+          }, 0);
+        }
+      }
+    },
+
+    toggleMute() {
+      STATE.slideshow.isMuted = !STATE.slideshow.isMuted;
+      const isUnmuting = !STATE.slideshow.isMuted;
+      const muteButton = document.querySelector('.mute-button');
+
+      const updateIcon = () => {
+        if (!muteButton) return;
+        const isMuted = STATE.slideshow.isMuted;
+        muteButton.innerHTML = `<i class="material-icons">${isMuted ? 'volume_off' : 'volume_up'}</i>`;
+        const label = isMuted ? 'Unmute' : 'Mute';
+        muteButton.setAttribute("aria-label", LocalizationUtils.getLocalizedString(label, label));
+        muteButton.setAttribute("title", LocalizationUtils.getLocalizedString(label, label));
+      };
+
+      const currentItemId = STATE.slideshow.itemIds[STATE.slideshow.currentSlideIndex];
+      const player = STATE.slideshow.videoPlayers ? STATE.slideshow.videoPlayers[currentItemId] : null;
+
+      if (currentItemId) {
+        const currentSlide = document.querySelector(`.slide[data-item-id="${currentItemId}"]`);
+        const video = currentSlide ? currentSlide.querySelector('video') : null;
+
+        if (video) {
+          video.muted = STATE.slideshow.isMuted;
+          if (!STATE.slideshow.isMuted) {
+            video.volume = getEffectiveTrailerVolume() / 100;
+          }
+
+          video.play().catch(error => {
+            if (error.name === 'AbortError') return;
+            console.warn("🎬 Media Bar:", "Unmuted play blocked, reverting to muted...");
+            STATE.slideshow.isMuted = true;
+            video.muted = true;
+            video.play().catch(err => { if (err.name !== 'AbortError') console.warn(err); });
+            updateIcon();
+          });
         }
 
-        delete STATE.slideshow.loadedItems[itemId];
-
-        const slide = document.querySelector(
-          `.slide[data-item-id="${itemId}"]`
-        );
-        if (slide) slide.remove();
-
-        delete STATE.slideshow.createdSlides[itemId];
-        prunedAny = true;
-
-        console.log("🎬 Media Bar:", `Pruned slide ${itemId} at distance ${distance} from view`);
-      }
-    });
-
-    if (prunedAny) {
-      const isTvMode = (window.layoutManager && window.layoutManager.tv) ||
-        document.documentElement.classList.contains('layout-tv') ||
-        document.body.classList.contains('layout-tv');
-      if (isTvMode) {
-        setTimeout(() => {
-          const container = document.getElementById("slides-container");
-          if (container && container.style.display !== 'none') {
-            container.focus({ preventScroll: true });
+        if (player && typeof player.playVideo === 'function') {
+          if (STATE.slideshow.isMuted) {
+            player.mute();
+          } else {
+            player.unMute();
+            player.setVolume(getEffectiveTrailerVolume());
           }
-        }, 0);
+
+          player.playVideo();
+          if (isUnmuting) {
+            setTimeout(() => {
+              const state = player.getPlayerState();
+              if (state === 2) {
+                console.log("🎬 Media Bar:", "Video was paused after unmute...");
+                STATE.slideshow.isMuted = true;
+                player.mute();
+                player.playVideo();
+                updateIcon();
+              }
+            }, 300);
+          }
+        }
       }
-    }
-  },
 
-  toggleMute() {
-    STATE.slideshow.isMuted = !STATE.slideshow.isMuted;
-    const isUnmuting = !STATE.slideshow.isMuted;
-    const muteButton = document.querySelector('.mute-button');
+      updateIcon();
+    },
 
-    const updateIcon = () => {
-      if (!muteButton) return;
-      const isMuted = STATE.slideshow.isMuted;
-      muteButton.innerHTML = `<i class="material-icons">${isMuted ? 'volume_off' : 'volume_up'}</i>`;
-      const label = isMuted ? 'Unmute' : 'Mute';
-      muteButton.setAttribute("aria-label", LocalizationUtils.getLocalizedString(label, label));
-      muteButton.setAttribute("title", LocalizationUtils.getLocalizedString(label, label));
-    };
+    togglePause() {
+      STATE.slideshow.isPaused = !STATE.slideshow.isPaused;
+      const pauseButton = document.querySelector('.pause-button');
 
-    const currentItemId = STATE.slideshow.itemIds[STATE.slideshow.currentSlideIndex];
-    const player = STATE.slideshow.videoPlayers ? STATE.slideshow.videoPlayers[currentItemId] : null;
-
-    if (currentItemId) {
+      // Handle current video playback
+      const currentItemId = STATE.slideshow.itemIds[STATE.slideshow.currentSlideIndex];
       const currentSlide = document.querySelector(`.slide[data-item-id="${currentItemId}"]`);
-      const video = currentSlide ? currentSlide.querySelector('video') : null;
 
-      if (video) {
-        video.muted = STATE.slideshow.isMuted;
-        if (!STATE.slideshow.isMuted) {
-          video.volume = 0.4;
+      if (currentSlide) {
+        // Try YouTube player
+        const ytPlayer = STATE.slideshow.videoPlayers[currentItemId];
+        if (ytPlayer && typeof ytPlayer.getPlayerState === 'function') {
+          if (STATE.slideshow.isPaused) {
+            if (typeof ytPlayer.pauseVideo === 'function') ytPlayer.pauseVideo();
+            if (ytPlayer._wrapperDiv) {
+              ytPlayer._wrapperDiv.style.transition = "opacity 0.5s ease-in-out";
+              ytPlayer._wrapperDiv.style.opacity = "0";
+            }
+          } else {
+            if (typeof ytPlayer.playVideo === 'function') ytPlayer.playVideo();
+            if (ytPlayer._wrapperDiv) {
+              ytPlayer._wrapperDiv.style.transition = "opacity 0.5s ease-in-out";
+              ytPlayer._wrapperDiv.style.opacity = "1";
+            }
+          }
         }
 
-        video.play().catch(error => {
-          if (error.name === 'AbortError') return;
-          console.warn("🎬 Media Bar:", "Unmuted play blocked, reverting to muted...");
-          STATE.slideshow.isMuted = true;
-          video.muted = true;
-          video.play().catch(err => { if (err.name !== 'AbortError') console.warn(err); });
-          updateIcon();
+        // Try HTML5 video
+        const html5Video = currentSlide.querySelector('video');
+        if (html5Video) {
+          if (STATE.slideshow.isPaused) {
+            html5Video.pause();
+            html5Video.style.transition = "opacity 0.5s ease-in-out";
+            html5Video.style.opacity = "0";
+          } else {
+            html5Video.play();
+            html5Video.style.transition = "opacity 0.5s ease-in-out";
+            html5Video.style.opacity = "1";
+          }
+        }
+      }
+
+      // Pause/Resume Progress Bar
+      const progressBar = document.querySelector('.media-bar-progress-bar');
+      if (progressBar) {
+        if (STATE.slideshow.isPaused) {
+          progressBar.classList.add('paused');
+        } else {
+          progressBar.classList.remove('paused');
+        }
+      }
+
+      // Pause/Resume static backdrop Ken Burns zoom animations
+      const slidesContainer = document.getElementById("slides-container");
+      if (slidesContainer) {
+        if (STATE.slideshow.isPaused) {
+          slidesContainer.classList.add("slideshow-paused");
+        } else {
+          slidesContainer.classList.remove("slideshow-paused");
+        }
+      }
+
+      if (STATE.slideshow.isPaused) {
+        STATE.slideshow.slideInterval.stop();
+        pauseButton.innerHTML = '<i class="material-icons">play_arrow</i>';
+        const playLabel = LocalizationUtils.getLocalizedString('Play', 'Play');
+        pauseButton.setAttribute("aria-label", playLabel);
+        pauseButton.setAttribute("title", playLabel);
+      } else {
+        // Only restart interval if we are NOT waiting for a video to end
+        const currentItemId = STATE.slideshow.itemIds[STATE.slideshow.currentSlideIndex];
+        const currentSlide = document.querySelector(`.slide[data-item-id="${currentItemId}"]`);
+        const hasVideo = currentSlide && currentSlide.querySelector('.video-backdrop');
+
+        if (!getEffectiveWaitForTrailer() || !hasVideo) {
+          STATE.slideshow.slideInterval.start();
+        }
+
+        pauseButton.innerHTML = '<i class="material-icons">pause</i>';
+        const pauseLabel = LocalizationUtils.getLocalizedString('ButtonPause', 'Pause');
+        pauseButton.setAttribute("aria-label", pauseLabel);
+        pauseButton.setAttribute("title", pauseLabel);
+      }
+    },
+
+    /**
+     * Stops all video playback (YouTube and HTML5)
+     * Used when navigating away from the home screen
+     */
+    stopAllPlayback() {
+      // Stop YouTube progress loop
+      if (typeof this.stopYouTubeProgressLoop === 'function') {
+        this.stopYouTubeProgressLoop();
+      }
+
+      // Clear any pending autoplay timeouts
+      if (STATE.slideshow.autoplayTimeouts) {
+        STATE.slideshow.autoplayTimeouts.forEach(id => clearTimeout(id));
+        STATE.slideshow.autoplayTimeouts = [];
+      }
+
+      // 1. Stop all YouTube players
+      if (STATE.slideshow.videoPlayers) {
+        Object.values(STATE.slideshow.videoPlayers).forEach(player => {
+          try {
+            if (player) {
+              if (typeof player.stopVideo === 'function') {
+                player.stopVideo();
+              } else if (typeof player.pauseVideo === 'function') {
+                player.pauseVideo();
+              }
+              if (player._wrapperDiv) {
+                player._wrapperDiv.style.transition = "opacity 0.3s ease-in-out";
+                player._wrapperDiv.style.opacity = "0";
+              }
+            }
+            if (typeof player.clearVideo === 'function') {
+              player.clearVideo();
+            }
+          } catch (e) {
+            console.warn("🎬 Media Bar:", "Error pausing/stopping YouTube player:", e);
+          }
         });
       }
 
-      if (player && typeof player.playVideo === 'function') {
-        if (STATE.slideshow.isMuted) {
-          player.mute();
-        } else {
-          player.unMute();
-          player.setVolume(40);
-        }
-
-        player.playVideo();
-        if (isUnmuting) {
-          setTimeout(() => {
-            const state = player.getPlayerState();
-            if (state === 2) {
-              console.log("🎬 Media Bar:", "Video was paused after unmute...");
-              STATE.slideshow.isMuted = true;
-              player.mute();
-              player.playVideo();
-              updateIcon();
-            }
-          }, 300);
-        }
-      }
-    }
-
-    updateIcon();
-  },
-
-  togglePause() {
-    STATE.slideshow.isPaused = !STATE.slideshow.isPaused;
-    const pauseButton = document.querySelector('.pause-button');
-
-    // Handle current video playback
-    const currentItemId = STATE.slideshow.itemIds[STATE.slideshow.currentSlideIndex];
-    const currentSlide = document.querySelector(`.slide[data-item-id="${currentItemId}"]`);
-
-    if (currentSlide) {
-      // Try YouTube player
-      const ytPlayer = STATE.slideshow.videoPlayers[currentItemId];
-      if (ytPlayer && typeof ytPlayer.getPlayerState === 'function') {
-        if (STATE.slideshow.isPaused) {
-          if (typeof ytPlayer.pauseVideo === 'function') ytPlayer.pauseVideo();
-          if (ytPlayer._wrapperDiv) {
-            ytPlayer._wrapperDiv.style.transition = "opacity 0.5s ease-in-out";
-            ytPlayer._wrapperDiv.style.opacity = "0";
-          }
-        } else {
-          if (typeof ytPlayer.playVideo === 'function') ytPlayer.playVideo();
-          if (ytPlayer._wrapperDiv) {
-            ytPlayer._wrapperDiv.style.transition = "opacity 0.5s ease-in-out";
-            ytPlayer._wrapperDiv.style.opacity = "1";
-          }
-        }
-      }
-
-      // Try HTML5 video
-      const html5Video = currentSlide.querySelector('video');
-      if (html5Video) {
-        if (STATE.slideshow.isPaused) {
-          html5Video.pause();
-          html5Video.style.transition = "opacity 0.5s ease-in-out";
-          html5Video.style.opacity = "0";
-        } else {
-          html5Video.play();
-          html5Video.style.transition = "opacity 0.5s ease-in-out";
-          html5Video.style.opacity = "1";
-        }
-      }
-    }
-
-    if (STATE.slideshow.isPaused) {
-      STATE.slideshow.slideInterval.stop();
-      pauseButton.innerHTML = '<i class="material-icons">play_arrow</i>';
-      const playLabel = LocalizationUtils.getLocalizedString('Play', 'Play');
-      pauseButton.setAttribute("aria-label", playLabel);
-      pauseButton.setAttribute("title", playLabel);
-    } else {
-      // Only restart interval if we are NOT waiting for a video to end
-      const currentItemId = STATE.slideshow.itemIds[STATE.slideshow.currentSlideIndex];
-      const currentSlide = document.querySelector(`.slide[data-item-id="${currentItemId}"]`);
-      const hasVideo = currentSlide && currentSlide.querySelector('.video-backdrop');
-
-      if (!CONFIG.waitForTrailerToEnd || !hasVideo) {
-        STATE.slideshow.slideInterval.start();
-      }
-
-      pauseButton.innerHTML = '<i class="material-icons">pause</i>';
-      const pauseLabel = LocalizationUtils.getLocalizedString('ButtonPause', 'Pause');
-      pauseButton.setAttribute("aria-label", pauseLabel);
-      pauseButton.setAttribute("title", pauseLabel);
-    }
-  },
-
-  /**
-   * Stops all video playback (YouTube and HTML5)
-   * Used when navigating away from the home screen
-   */
-  stopAllPlayback() {
-    // Clear any pending autoplay timeouts
-    if (STATE.slideshow.autoplayTimeouts) {
-        STATE.slideshow.autoplayTimeouts.forEach(id => clearTimeout(id));
-        STATE.slideshow.autoplayTimeouts = [];
-    }
-
-    // 1. Stop all YouTube players
-    if (STATE.slideshow.videoPlayers) {
-      Object.values(STATE.slideshow.videoPlayers).forEach(player => {
-        try {
-          if (player) {
-            if (typeof player.stopVideo === 'function') {
-                player.stopVideo();
-            } else if (typeof player.pauseVideo === 'function') {
-                player.pauseVideo();
-            }
-            if (player._wrapperDiv) {
-              player._wrapperDiv.style.transition = "opacity 0.3s ease-in-out";
-              player._wrapperDiv.style.opacity = "0";
-            }
-          }
-          if (typeof player.clearVideo === 'function') {
-            player.clearVideo();
-          }
-        } catch (e) {
-          console.warn("🎬 Media Bar:", "Error pausing/stopping YouTube player:", e);
-        }
-      });
-    }
-
-    // 2. Stop and mute all HTML5 videos, release connections
-    const container = document.getElementById("slides-container");
-    if (container) {
-      container.querySelectorAll('video').forEach(video => {
-        try {
-          video.pause();
-          video.muted = true;
-          try {
-            if (video.currentTime > 0) {
-              video.currentTime = 0;
-            }
-          } catch(e){}
-          // Save src and release HTTP streaming connection
-          if (video.src && !video.getAttribute('data-src')) {
-            video.setAttribute('data-src', video.src);
-          }
-          video.removeAttribute('src');
-          video.load();
-        } catch (e) {
-          console.warn("🎬 Media Bar:", "Error stopping HTML5 video:", e);
-        }
-      });
-    }
-  },
-
-  /**
-   * Resumes playback for the active slide if not globally paused
-   */
-  resumeActivePlayback() {
-    if (STATE.slideshow.isPaused) return;
-
-    const currentItemId = STATE.slideshow.itemIds[STATE.slideshow.currentSlideIndex];
-    if (!currentItemId) return;
-
-    const currentSlide = document.querySelector(`.slide[data-item-id="${currentItemId}"]`);
-    if (!currentSlide) return;
-
-    // YouTube player: just resume, don't reload
-    const ytPlayer = (STATE.slideshow.videoPlayers && STATE.slideshow.videoPlayers[currentItemId]) ? STATE.slideshow.videoPlayers[currentItemId] : undefined;
-    if (ytPlayer && typeof ytPlayer.playVideo === 'function') {
-      if (STATE.slideshow.isMuted) {
-        if (typeof ytPlayer.mute === 'function') ytPlayer.mute();
-      } else {
-        if (typeof ytPlayer.unMute === 'function') ytPlayer.unMute();
-        if (typeof ytPlayer.setVolume === 'function') ytPlayer.setVolume(40);
-      }
-      ytPlayer.playVideo();
-      return;
-    }
-
-    // HTML5 video: restore src if needed, then resume
-    const html5Video = currentSlide.querySelector('video.video-backdrop');
-    if (html5Video) {
-      // Restore src from data-src if it was cleared to release connections
-      const lazySrc = html5Video.getAttribute('data-src');
-      if (lazySrc && !html5Video.src) {
-        html5Video.src = lazySrc;
-      }
-      html5Video.muted = STATE.slideshow.isMuted;
-      if (!STATE.slideshow.isMuted) html5Video.volume = 0.4;
-      html5Video.play().catch(e => {
-        if (e.name !== 'AbortError') console.warn("🎬 Media Bar:", "Error resuming HTML5 video:", e);
-      });
-    }
-  },
-
-  /**
-   * Initializes touch events for swiping
-   */
-  initTouchEvents() {
-    const container = SlideUtils.getOrCreateSlidesContainer();
-    let touchStartX = 0;
-    let touchEndX = 0;
-
-    container.addEventListener(
-      "touchstart",
-      (e) => {
-        touchStartX = e.changedTouches[0].screenX;
-      },
-      { passive: true }
-    );
-
-    container.addEventListener(
-      "touchend",
-      (e) => {
-        touchEndX = e.changedTouches[0].screenX;
-        this.handleSwipe(touchStartX, touchEndX);
-      },
-      { passive: true }
-    );
-  },
-
-  /**
-   * Handles swipe gestures
-   * @param {number} startX - Starting X position
-   * @param {number} endX - Ending X position
-   */
-  handleSwipe(startX, endX) {
-    const diff = endX - startX;
-
-    if (Math.abs(diff) < CONFIG.minSwipeDistance) {
-      return;
-    }
-
-    if (diff > 0) {
-      this.prevSlide();
-    } else {
-      this.nextSlide();
-    }
-  },
-
-  /**
-   * Initializes keyboard event listeners
-   */
-  initKeyboardEvents() {
-    if (!CONFIG.enableKeyboardControls) return;
-
-    document.addEventListener("keydown", (e) => {
+      // 2. Stop and mute all HTML5 videos, release connections
       const container = document.getElementById("slides-container");
-      if (!container || container.style.display === "none") {
+      if (container) {
+        container.querySelectorAll('video').forEach(video => {
+          try {
+            video.pause();
+            video.muted = true;
+            try {
+              if (video.currentTime > 0) {
+                video.currentTime = 0;
+              }
+            } catch (e) { }
+            // Save src and release HTTP streaming connection
+            if (video.src && !video.getAttribute('data-src')) {
+              video.setAttribute('data-src', video.src);
+            }
+            video.removeAttribute('src');
+            video.load();
+          } catch (e) {
+            console.warn("🎬 Media Bar:", "Error stopping HTML5 video:", e);
+          }
+        });
+      }
+    },
+
+    /**
+     * Resumes playback for the active slide if not globally paused
+     */
+    resumeActivePlayback() {
+      if (STATE.slideshow.isPaused) return;
+
+      const currentItemId = STATE.slideshow.itemIds[STATE.slideshow.currentSlideIndex];
+      if (!currentItemId) return;
+
+      const currentSlide = document.querySelector(`.slide[data-item-id="${currentItemId}"]`);
+      if (!currentSlide) return;
+
+      // YouTube player: just resume, don't reload
+      const ytPlayer = (STATE.slideshow.videoPlayers && STATE.slideshow.videoPlayers[currentItemId]) ? STATE.slideshow.videoPlayers[currentItemId] : undefined;
+      if (ytPlayer && typeof ytPlayer.playVideo === 'function') {
+        if (STATE.slideshow.isMuted) {
+          if (typeof ytPlayer.mute === 'function') ytPlayer.mute();
+        } else {
+          if (typeof ytPlayer.unMute === 'function') ytPlayer.unMute();
+          if (typeof ytPlayer.setVolume === 'function') ytPlayer.setVolume(getEffectiveTrailerVolume());
+        }
+        ytPlayer.playVideo();
         return;
       }
 
-      const activeElement = document.activeElement;
-      const isTvDevice = window.browser && window.browser.tv;
-      const isTvLayout = window.layoutManager && window.layoutManager.tv;
-      const hasTvClass = document.documentElement.classList.contains('layout-tv') || document.body.classList.contains('layout-tv');
-      const isTvMode = isTvDevice || isTvLayout || hasTvClass;
+      // HTML5 video: restore src if needed, then resume
+      const html5Video = currentSlide.querySelector('video.video-backdrop');
+      if (html5Video) {
+        // Restore src from data-src if it was cleared to release connections
+        const lazySrc = html5Video.getAttribute('data-src');
+        if (lazySrc && !html5Video.src) {
+          html5Video.src = lazySrc;
+        }
+        html5Video.muted = STATE.slideshow.isMuted;
+        if (!STATE.slideshow.isMuted) html5Video.volume = getEffectiveTrailerVolume() / 100;
+        html5Video.play().catch(e => {
+          if (e.name !== 'AbortError') console.warn("🎬 Media Bar:", "Error resuming HTML5 video:", e);
+        });
+      }
+    },
 
-      // Check Focus State
-      const isBodyFocused = activeElement === document.body;
-      const hasDirectFocus = container.contains(activeElement) || activeElement === container;
-      
-      // Determine if we should handle navigation keys (Arrows, Space, M)
-      // TV Mode: Strict focus required (must be on slideshow)
-      // Desktop Mode: Loose focus allowed (slideshow OR body/nothing focused)
-      const canControlSlideshow = isTvMode ? hasDirectFocus : (hasDirectFocus || isBodyFocused);
+    /**
+     * Initializes touch events for swiping
+     */
+    initTouchEvents() {
+      const container = SlideUtils.getOrCreateSlidesContainer();
+      let touchStartX = 0;
+      let touchEndX = 0;
 
-      // Check for Input Fields (always ignore typing)
-      const isInputElement = activeElement && (activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA' || activeElement.isContentEditable);
-      if (isInputElement) return;
+      container.addEventListener(
+        "touchstart",
+        (e) => {
+          touchStartX = e.changedTouches[0].screenX;
+        },
+        { passive: true }
+      );
 
-      // Check active video players (ignore if video is playing/overlay is open)
-      const videoPlayer = document.querySelector('.videoPlayerContainer');
-      const trailerPlayer = document.querySelector('.youtubePlayerContainer');
-      const isVideoOpen = (videoPlayer && !videoPlayer.classList.contains('hide')) || (trailerPlayer && !trailerPlayer.classList.contains('hide'));
-      if (isVideoOpen) return;
+      container.addEventListener(
+        "touchend",
+        (e) => {
+          touchEndX = e.changedTouches[0].screenX;
+          this.handleSwipe(touchStartX, touchEndX);
+        },
+        { passive: true }
+      );
+    },
 
-      switch (e.key) {
-        case "ArrowRight":
-          if (canControlSlideshow) {
-            SlideshowManager.nextSlide();
-            e.preventDefault();
-          }
-          break;
+    /**
+     * Handles swipe gestures
+     * @param {number} startX - Starting X position
+     * @param {number} endX - Ending X position
+     */
+    handleSwipe(startX, endX) {
+      const diff = endX - startX;
 
-        case "ArrowLeft":
-          if (canControlSlideshow) {
-            SlideshowManager.prevSlide();
-            e.preventDefault();
-          }
-          break;
+      if (Math.abs(diff) < CONFIG.minSwipeDistance) {
+        return;
+      }
 
-        case " ": // Space bar
-          if (canControlSlideshow) {
-            this.togglePause();
-            e.preventDefault();
-          }
-          break;
+      if (diff > 0) {
+        this.prevSlide();
+      } else {
+        this.nextSlide();
+      }
+    },
 
-        case "m": // Mute toggle
-        case "M":
-          if (canControlSlideshow) {
-            this.toggleMute();
-            e.preventDefault();
-          }
-          break;
+    /**
+     * Initializes keyboard event listeners
+     */
+    initKeyboardEvents() {
+      if (!CONFIG.enableKeyboardControls) return;
 
-        case "Enter":
-          // Enter always requires direct focus on the slideshow to avoid conflicts
-          if (hasDirectFocus) {
-            const currentItemId = STATE.slideshow.itemIds[STATE.slideshow.currentSlideIndex];
-            if (currentItemId) {
-               if (window.Emby && window.Emby.Page) {
-                 Emby.Page.show(
-                   `/details?id=${currentItemId}&serverId=${STATE.jellyfinData.serverId}`
-                 );
-               } else {
-                 window.location.href = `#/details?id=${currentItemId}&serverId=${STATE.jellyfinData.serverId}`;
-               }
+      document.addEventListener("keydown", (e) => {
+        const container = document.getElementById("slides-container");
+        if (!container || container.style.display === "none") {
+          return;
+        }
+
+        const activeElement = document.activeElement;
+        const isTvDevice = window.browser && window.browser.tv;
+        const isTvLayout = window.layoutManager && window.layoutManager.tv;
+        const hasTvClass = document.documentElement.classList.contains('layout-tv') || document.body.classList.contains('layout-tv');
+        const isTvMode = isTvDevice || isTvLayout || hasTvClass;
+
+        // Check Focus State
+        const isBodyFocused = activeElement === document.body;
+        const hasDirectFocus = container.contains(activeElement) || activeElement === container;
+
+        // Determine if we should handle navigation keys (Arrows, Space, M)
+        // TV Mode: Strict focus required (must be on slideshow)
+        // Desktop Mode: Loose focus allowed (slideshow OR body/nothing focused)
+        const canControlSlideshow = isTvMode ? hasDirectFocus : (hasDirectFocus || isBodyFocused);
+
+        // Check for Input Fields (always ignore typing)
+        const isInputElement = activeElement && (activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA' || activeElement.isContentEditable);
+        if (isInputElement) return;
+
+        // Check active video players (ignore if video is playing/overlay is open)
+        const videoPlayer = document.querySelector('.videoPlayerContainer');
+        const trailerPlayer = document.querySelector('.youtubePlayerContainer');
+        const isVideoOpen = (videoPlayer && !videoPlayer.classList.contains('hide')) || (trailerPlayer && !trailerPlayer.classList.contains('hide'));
+        if (isVideoOpen) return;
+
+        switch (e.key) {
+          case "ArrowRight":
+            if (canControlSlideshow) {
+              SlideshowManager.nextSlide();
+              e.preventDefault();
             }
-            e.preventDefault();
+            break;
+
+          case "ArrowLeft":
+            if (canControlSlideshow) {
+              SlideshowManager.prevSlide();
+              e.preventDefault();
+            }
+            break;
+
+          case " ": // Space bar
+            if (canControlSlideshow) {
+              this.togglePause();
+              e.preventDefault();
+            }
+            break;
+
+          case "m": // Mute toggle
+          case "M":
+            if (canControlSlideshow) {
+              this.toggleMute();
+              e.preventDefault();
+            }
+            break;
+
+          case "Enter":
+            // Enter always requires direct focus on the slideshow to avoid conflicts
+            if (hasDirectFocus) {
+              const currentItemId = STATE.slideshow.itemIds[STATE.slideshow.currentSlideIndex];
+              if (currentItemId) {
+                if (window.Emby && window.Emby.Page) {
+                  Emby.Page.show(
+                    `/details?id=${currentItemId}&serverId=${STATE.jellyfinData.serverId}`
+                  );
+                } else {
+                  window.location.href = `#/details?id=${currentItemId}&serverId=${STATE.jellyfinData.serverId}`;
+                }
+              }
+              e.preventDefault();
+            }
+            break;
+        }
+      });
+
+      const container = SlideUtils.getOrCreateSlidesContainer();
+
+      container.addEventListener("focus", () => {
+        STATE.slideshow.containerFocused = true;
+      });
+
+      container.addEventListener("blur", () => {
+        STATE.slideshow.containerFocused = false;
+      });
+    },
+
+    /**
+     * Parses custom media IDs, handling seasonal content if enabled.
+     * If Seasonal Content is enabled:
+     *  - Check if any defined season matches the current date.
+     *  - If match: Return IDs from that season.
+     *  - If NO match: Fall back to Default Custom IDs.
+     * If Custom Media IDs are enabled (and no seasonal match):
+     *  - Return Default Custom IDs.
+     * If no Custom Media IDs are enabled:
+     *  - Return empty result (triggering random fallback).
+     * 
+     * Supports special prefixes in the ID field:
+     *  - genre:Action  --> filter by genre
+     *  - tag:2000s     --> filter by tag
+     * 
+     * @returns {{ ids: string[], genres: string[], tags: string[] }} Parsed result
+     */
+    parseIdsString(idsString) {
+      if (!idsString) return { ids: [], genres: [], tags: [] };
+
+      const ids = [];
+      const genres = [];
+      const tags = [];
+
+      idsString
+        .split(/[\n,]/)
+        .map((line) => line.trim())
+        .filter((line) => line)
+        .forEach((line) => {
+          // Check for genre prefix
+          const genreMatch = line.match(/^genre:\s*(.+)$/i);
+          if (genreMatch) {
+            genres.push(genreMatch[1].trim());
+            return;
           }
-          break;
-      }
-    });
 
-    const container = SlideUtils.getOrCreateSlidesContainer();
+          // Check for tag prefix
+          const tagMatch = line.match(/^tag:\s*(.+)$/i);
+          if (tagMatch) {
+            tags.push(tagMatch[1].trim());
+            return;
+          }
 
-    container.addEventListener("focus", () => {
-      STATE.slideshow.containerFocused = true;
-    });
-
-    container.addEventListener("blur", () => {
-      STATE.slideshow.containerFocused = false;
-    });
-  },
-
-  /**
-   * Parses custom media IDs, handling seasonal content if enabled.
-   * If Seasonal Content is enabled:
-   *  - Check if any defined season matches the current date.
-   *  - If match: Return IDs from that season.
-   *  - If NO match: Fall back to Default Custom IDs.
-   * If Custom Media IDs are enabled (and no seasonal match):
-   *  - Return Default Custom IDs.
-   * If no Custom Media IDs are enabled:
-   *  - Return empty result (triggering random fallback).
-   * 
-   * Supports special prefixes in the ID field:
-   *  - genre:Action  --> filter by genre
-   *  - tag:2000s     --> filter by tag
-   * 
-   * @returns {{ ids: string[], genres: string[], tags: string[] }} Parsed result
-   */
-  parseCustomIds() {
-    let idsString = CONFIG.customMediaIds;
-    let usingSeasonal = false;
-
-    if (CONFIG.enableSeasonalContent) {
-      try {
-        const sections = JSON.parse(CONFIG.seasonalSections || "[]");
-        const currentDate = new Date();
-        const currentMonth = currentDate.getMonth() + 1; // 1-12
-        const currentDay = currentDate.getDate(); // 1-31
-
-        for (const section of sections) {
-           const startDay = parseInt(section.StartDay);
-           const startMonth = parseInt(section.StartMonth);
-           const endDay = parseInt(section.EndDay);
-           const endMonth = parseInt(section.EndMonth);
-           
-           let isInRange = false;
-
-           if (startMonth === endMonth) {
-             if (currentMonth === startMonth && currentDay >= startDay && currentDay <= endDay) {
-               isInRange = true;
-             }
-           } else if (startMonth < endMonth) {
-             // Normal range
-             if (
-               (currentMonth > startMonth && currentMonth < endMonth) ||
-               (currentMonth === startMonth && currentDay >= startDay) ||
-               (currentMonth === endMonth && currentDay <= endDay)
-             ) {
-               isInRange = true;
-             }
-           } else {
-             // Wrap around year
-             if (
-               (currentMonth > startMonth || currentMonth < endMonth) ||
-               (currentMonth === startMonth && currentDay >= startDay) ||
-               (currentMonth === endMonth && currentDay <= endDay)
-             ) {
-               isInRange = true;
-             }
-           }
-
-           if (isInRange) {
-             console.log("🎬 Media Bar:", `Seasonal match found: ${section.Name}`);
-             idsString = section.MediaIds;
-             usingSeasonal = true;
-             break; // Use first matching season
-           }
-        }
-      } catch (e) {
-        console.error("🎬 Media Bar:", "Error parsing seasonal sections in JS:", e);
-      }
-    }
-
-    // If NOT using seasonal content (disabled or no match), 
-    // Custom IDs are disabled, return empty to skip to random
-    if (!usingSeasonal && !CONFIG.enableCustomMediaIds) {
-        return { ids: [], genres: [], tags: [] };
-    }
-    
-    // Parse the resulting string (either seasonal or default)
-    if (!idsString) return { ids: [], genres: [], tags: [] };
-
-    const ids = [];
-    const genres = [];
-    const tags = [];
-
-    idsString
-      .split(/[\n,]/)
-      .map((line) => line.trim())
-      .filter((line) => line)
-      .forEach((line) => {
-        // Check for genre prefix
-        const genreMatch = line.match(/^genre:\s*(.+)$/i);
-        if (genreMatch) {
-          genres.push(genreMatch[1].trim());
-          return;
-        }
-
-        // Check for tag prefix
-        const tagMatch = line.match(/^tag:\s*(.+)$/i);
-        if (tagMatch) {
-          tags.push(tagMatch[1].trim());
-          return;
-        }
-
-        // Regular ID/name processing
-        const urlMatch = line.match(/\[(.*?)\]/);
-        let id = line;
-        if (urlMatch) {
+          // Regular ID/name processing
+          const urlMatch = line.match(/\[(.*?)\]/);
+          let id = line;
+          if (urlMatch) {
             const url = urlMatch[1];
             // Remove the [url] part from the ID string for parsing
             id = line.replace(/\[.*?\]/, '').trim();
             // Attempt to extract GUID if present
             const guidMatch = id.match(/([0-9a-f]{32})/i);
             if (guidMatch) {
-                id = guidMatch[1];
+              id = guidMatch[1];
             } else {
-                // Fallback: split by pipe if used
-                id = id.split('|')[0].trim();
+              // Fallback: split by pipe if used
+              id = id.split('|')[0].trim();
             }
             STATE.slideshow.customTrailerUrls[id] = url;
-        }
-        if (id.trim()) {
-          ids.push(id.trim());
-        }
-      });
-
-    if (genres.length > 0) {
-      console.log("🎬 Media Bar:", `Parsed ${genres.length} genre filter(s): ${genres.join(', ')}`);
-    }
-    if (tags.length > 0) {
-      console.log("🎬 Media Bar:", `Parsed ${tags.length} tag filter(s): ${tags.join(', ')}`);
-    }
-
-    return { ids, genres, tags };
-  },
-
-  /**
-   * Resolves a list of IDs, expanding collections (BoxSets) into their children
-   * @param {string[]} rawIds - List of input IDs
-   * @returns {Promise<string[]>} Flattened list of item IDs
-   */
-  async resolveCollectionsAndItems(rawIds) {
-    const finalIds = [];
-    const guidRegex = /^([0-9a-f]{32})$/i;
-
-    for (const rawId of rawIds) {
-      try {
-        let id = rawId;
-
-        // If not a valid GUID, check if it starts with one (comments) or treat as a name
-        if (!guidRegex.test(rawId)) {
-          const guidMatch = rawId.match(/^([0-9a-f]{32})(?:[^0-9a-f]|$)/i);
-
-          if (guidMatch) {
-            id = guidMatch[1];
-          } else {
-            console.log("🎬 Media Bar:", `Input '${rawId}' is not a GUID, searching for Collection/Playlist by name...`);
-            const resolvedId = await ApiUtils.findCollectionOrPlaylistByName(rawId);
-
-            if (resolvedId) {
-              console.log("🎬 Media Bar:", `Resolved name '${rawId}' to ID: ${resolvedId}`);
-              id = resolvedId;
-            } else {
-              console.warn("🎬 Media Bar:", `Could not find Collection or Playlist with name: '${rawId}'`);
-              continue; // Skip if resolution failed
-            }
           }
-        }
+          if (id.trim()) {
+            ids.push(id.trim());
+          }
+        });
 
-        const item = await ApiUtils.fetchItemDetails(id);
-        if (item && (item.Type === 'BoxSet' || item.Type === 'Playlist')) {
-          console.log("🎬 Media Bar:", `Found Collection/Playlist: ${id} (${item.Type}), fetching children...`);
-          const children = await ApiUtils.fetchCollectionItems(id);
-          finalIds.push(...children);
-        } else if (item) {
-          finalIds.push({ Id: item.Id, Type: item.Type });
+      return { ids, genres, tags };
+    },
+
+    parseCustomIds() {
+      const activePlaylist = MediaBarEnhancedSettingsManager.getSetting('activePlaylist', 'Default');
+
+      if (activePlaylist === 'Library') {
+        return { ids: [], genres: [], tags: [] };
+      } else if (activePlaylist && activePlaylist.startsWith('Playlist:')) {
+        const playlistName = activePlaylist.replace('Playlist:', '');
+        try {
+          const playlists = JSON.parse(CONFIG.customPlaylists || "[]");
+          const found = playlists.find(p => p.Name === playlistName);
+          if (found) {
+            return this.parseIdsString(found.MediaIds);
+          }
+          console.warn("🎬 Media Bar:", `Custom playlist "${playlistName}" not found in config, falling back to default.`);
+        } catch (e) {
+          console.error("🎬 Media Bar:", "Error parsing custom playlists for override:", e);
         }
-      } catch (e) {
-        console.warn("🎬 Media Bar:", `Error resolving item ${rawId}:`, e);
       }
-    }
-    return finalIds;
-  },
 
-  /**
-   * Loads slideshow data and initializes the slideshow
-   */
-  async loadSlideshowData() {
-    try {
-      STATE.slideshow.isLoading = true;
-      let itemIds = [];
+      let idsString = CONFIG.customMediaIds;
+      let usingSeasonal = false;
 
-      // 1. Try Custom Media/Collection IDs from Config & seasonal content
-      if (CONFIG.enableCustomMediaIds || CONFIG.enableSeasonalContent) {
-        console.log("🎬 Media Bar:", "Using Custom Media IDs from configuration");
-        const parsed = this.parseCustomIds();
-        const hasGenresOrTags = parsed.genres.length > 0 || parsed.tags.length > 0;
-        const hasIds = parsed.ids.length > 0;
+      if (CONFIG.enableSeasonalContent) {
+        try {
+          const sections = JSON.parse(CONFIG.seasonalSections || "[]");
+          const currentDate = new Date();
+          const currentMonth = currentDate.getMonth() + 1; // 1-12
+          const currentDay = currentDate.getDate(); // 1-31
 
-        let resolvedItems = [];
+          for (const section of sections) {
+            const startDay = parseInt(section.StartDay);
+            const startMonth = parseInt(section.StartMonth);
+            const endDay = parseInt(section.EndDay);
+            const endMonth = parseInt(section.EndMonth);
 
-        // Resolve explicit IDs (GUIDs, collection names, etc.)
-        if (hasIds) {
-          resolvedItems = await this.resolveCollectionsAndItems(parsed.ids);
-        }
+            let isInRange = false;
 
-        // Fetch items matching genre/tag filters from the API
-        if (hasGenresOrTags) {
-          const genreTagItems = await ApiUtils.fetchItemsByGenresAndTags(parsed.genres, parsed.tags);
-          
-          if (genreTagItems.length > 0) {
-            // Merge with explicit IDs, deduplicating by Id
-            const existingIds = new Set(resolvedItems.map(i => i.Id));
-            for (const item of genreTagItems) {
-              if (!existingIds.has(item.Id)) {
-                resolvedItems.push(item);
-                existingIds.add(item.Id);
+            if (startMonth === endMonth) {
+              if (currentMonth === startMonth && currentDay >= startDay && currentDay <= endDay) {
+                isInRange = true;
+              }
+            } else if (startMonth < endMonth) {
+              // Normal range
+              if (
+                (currentMonth > startMonth && currentMonth < endMonth) ||
+                (currentMonth === startMonth && currentDay >= startDay) ||
+                (currentMonth === endMonth && currentDay <= endDay)
+              ) {
+                isInRange = true;
+              }
+            } else {
+              // Wrap around year
+              if (
+                (currentMonth > startMonth || currentMonth < endMonth) ||
+                (currentMonth === startMonth && currentDay >= startDay) ||
+                (currentMonth === endMonth && currentDay <= endDay)
+              ) {
+                isInRange = true;
               }
             }
-            console.log("🎬 Media Bar:", `Merged ${genreTagItems.length} genre/tag items with ${hasIds ? parsed.ids.length : 0} explicit IDs → ${resolvedItems.length} total unique items`);
-          }
-        }
 
-        // Apply max items limit to custom IDs if enabled
-        if (CONFIG.applyLimitsToCustomIds) {
+            if (isInRange) {
+              console.log("🎬 Media Bar:", `Seasonal match found: ${section.Name}`);
+              idsString = section.MediaIds;
+              usingSeasonal = true;
+              break; // Use first matching season
+            }
+          }
+        } catch (e) {
+          console.error("🎬 Media Bar:", "Error parsing seasonal sections in JS:", e);
+        }
+      }
+
+      // If NOT using seasonal content (disabled or no match), 
+      // Custom IDs are disabled, return empty to skip to random
+      if (!usingSeasonal && !CONFIG.enableCustomMediaIds) {
+        return { ids: [], genres: [], tags: [] };
+      }
+
+      // Parse the resulting string (either seasonal or default)
+      const result = this.parseIdsString(idsString);
+
+      if (result.genres.length > 0) {
+        console.log("🎬 Media Bar:", `Parsed ${result.genres.length} genre filter(s): ${result.genres.join(', ')}`);
+      }
+      if (result.tags.length > 0) {
+        console.log("🎬 Media Bar:", `Parsed ${result.tags.length} tag filter(s): ${result.tags.join(', ')}`);
+      }
+
+      return result;
+    },
+
+    /**
+     * Resolves a list of IDs, expanding collections (BoxSets) into their children
+     * @param {string[]} rawIds - List of input IDs
+     * @returns {Promise<string[]>} Flattened list of item IDs
+     */
+    async resolveCollectionsAndItems(rawIds) {
+      const finalIds = [];
+      const guidRegex = /^([0-9a-f]{32})$/i;
+
+      for (const rawId of rawIds) {
+        try {
+          let id = rawId;
+
+          // If not a valid GUID, check if it starts with one (comments) or treat as a name
+          if (!guidRegex.test(rawId)) {
+            const guidMatch = rawId.match(/^([0-9a-f]{32})(?:[^0-9a-f]|$)/i);
+
+            if (guidMatch) {
+              id = guidMatch[1];
+            } else {
+              console.log("🎬 Media Bar:", `Input '${rawId}' is not a GUID, searching for Collection/Playlist by name...`);
+              const resolvedId = await ApiUtils.findCollectionOrPlaylistByName(rawId);
+
+              if (resolvedId) {
+                console.log("🎬 Media Bar:", `Resolved name '${rawId}' to ID: ${resolvedId}`);
+                id = resolvedId;
+              } else {
+                console.warn("🎬 Media Bar:", `Could not find Collection or Playlist with name: '${rawId}'`);
+                continue; // Skip if resolution failed
+              }
+            }
+          }
+
+          const item = await ApiUtils.fetchItemDetails(id);
+          if (item && (item.Type === 'BoxSet' || item.Type === 'Playlist' || item.Type === 'CollectionFolder' || item.Type === 'Folder' || item.Type === 'UserView')) {
+            console.log("🎬 Media Bar:", `Found Collection/Playlist/Folder: ${id} (${item.Type}), fetching children...`);
+            const children = await ApiUtils.fetchCollectionItems(id);
+            finalIds.push(...children);
+          } else if (item) {
+            finalIds.push({ Id: item.Id, Type: item.Type });
+          }
+        } catch (e) {
+          console.warn("🎬 Media Bar:", `Error resolving item ${rawId}:`, e);
+        }
+      }
+      return finalIds;
+    },
+
+    /**
+     * Loads slideshow data and initializes the slideshow
+     */
+    async loadSlideshowData() {
+      try {
+        STATE.slideshow.isLoading = true;
+        let itemIds = [];
+
+        // 1. Try Custom Media/Collection IDs from Config & seasonal content
+        const activePlaylist = MediaBarEnhancedSettingsManager.getSetting('activePlaylist', 'Default');
+        if (CONFIG.enableCustomMediaIds || CONFIG.enableSeasonalContent || (activePlaylist && activePlaylist.startsWith('Playlist:'))) {
+          console.log("🎬 Media Bar:", "Using Custom Media IDs from configuration");
+          const parsed = this.parseCustomIds();
+          const hasGenresOrTags = parsed.genres.length > 0 || parsed.tags.length > 0;
+          const hasIds = parsed.ids.length > 0;
+
+          let resolvedItems = [];
+
+          // Resolve explicit IDs (GUIDs, collection names, etc.)
+          if (hasIds) {
+            resolvedItems = await this.resolveCollectionsAndItems(parsed.ids);
+          }
+
+          // Fetch items matching genre/tag filters from the API
+          if (hasGenresOrTags) {
+            const genreTagItems = await ApiUtils.fetchItemsByGenresAndTags(parsed.genres, parsed.tags);
+
+            if (genreTagItems.length > 0) {
+              // Merge with explicit IDs, deduplicating by Id
+              const existingIds = new Set(resolvedItems.map(i => i.Id));
+              for (const item of genreTagItems) {
+                if (!existingIds.has(item.Id)) {
+                  resolvedItems.push(item);
+                  existingIds.add(item.Id);
+                }
+              }
+              console.log("🎬 Media Bar:", `Merged ${genreTagItems.length} genre/tag items with ${hasIds ? parsed.ids.length : 0} explicit IDs → ${resolvedItems.length} total unique items`);
+            }
+          }
+
+          // Apply max items limit to custom IDs if enabled
+          if (CONFIG.applyLimitsToCustomIds) {
             let movieCount = 0;
             let showCount = 0;
             let keptItems = [];
-            
+
             for (const item of resolvedItems) {
-                 if (keptItems.length >= CONFIG.maxItems) break;
-                 
-                 if (item.Type === 'Movie') {
-                     if (movieCount < CONFIG.maxMovies) {
-                         movieCount++;
-                         keptItems.push(item);
-                     }
-                 } else if (item.Type === 'Series' || item.Type === 'Season' || item.Type === 'Episode') { 
-                     // Count Seasons/Episodes as TV Shows
-                     if (showCount < CONFIG.maxTvShows) {
-                         showCount++;
-                         keptItems.push(item);
-                     }
-                 } else {
-                     // Other types: count towards total only
-                     keptItems.push(item);
-                 }
+              if (keptItems.length >= CONFIG.maxItems) break;
+
+              if (item.Type === 'Movie') {
+                if (movieCount < CONFIG.maxMovies) {
+                  movieCount++;
+                  keptItems.push(item);
+                }
+              } else if (item.Type === 'Series' || item.Type === 'Season' || item.Type === 'Episode') {
+                // Count Seasons/Episodes as TV Shows
+                if (showCount < CONFIG.maxTvShows) {
+                  showCount++;
+                  keptItems.push(item);
+                }
+              } else {
+                // Other types: count towards total only
+                keptItems.push(item);
+              }
             }
             itemIds = keptItems.map(i => i.Id);
             console.log("🎬 Media Bar:", `Applied limits to custom IDs: ${itemIds.length} items (Movies: ${movieCount}, Shows: ${showCount})`);
-        } else {
+          } else {
+            // Even if applyLimitsToCustomIds is false, filter out items whose max count is 0
+            resolvedItems = resolvedItems.filter(item => {
+              if (item.Type === 'Movie' && CONFIG.maxMovies === 0) return false;
+              if ((item.Type === 'Series' || item.Type === 'Season' || item.Type === 'Episode') && CONFIG.maxTvShows === 0) return false;
+              return true;
+            });
             itemIds = resolvedItems.map(i => i.Id);
+          }
         }
-      }
 
-      // 2. Fallback to server query (Random)
-      if (itemIds.length === 0) {
-        console.log("🎬 Media Bar:", "No custom list found, fetching random items from server...");
-        itemIds = await ApiUtils.fetchItemIdsFromServer();
-        
-        if (CONFIG.sortBy === 'Random') {
+        // 2. Fallback to server query (Random)
+        if (itemIds.length === 0) {
+          console.log("🎬 Media Bar:", "No custom list found, fetching random items from server...");
+          itemIds = await ApiUtils.fetchItemIdsFromServer();
+
+          if (CONFIG.sortBy === 'Random') {
             itemIds = SlideUtils.shuffleArray(itemIds);
-        }
-      } else {
-        // Custom IDs
-        if (CONFIG.sortBy === 'Random') {
-             itemIds = SlideUtils.shuffleArray(itemIds);
-        } else if (CONFIG.sortBy !== 'Original') {
+          }
+        } else {
+          // Custom IDs
+          if (CONFIG.sortBy === 'Random') {
+            itemIds = SlideUtils.shuffleArray(itemIds);
+          } else if (CONFIG.sortBy !== 'Original') {
             // Client-side sort required...
-             console.log("🎬 Media Bar:", `Sorting ${itemIds.length} custom items by ${CONFIG.sortBy} ${CONFIG.sortOrder}`);
-             const itemsWithDetails = [];
-             for (const id of itemIds) {
-                 const item = await ApiUtils.fetchItemDetails(id);
-                 if (item) itemsWithDetails.push(item);
-             }
-             
-             const sortedItems = SlideUtils.sortItems(itemsWithDetails, CONFIG.sortBy, CONFIG.sortOrder);
-             itemIds = sortedItems.map(i => i.Id);
+            console.log("🎬 Media Bar:", `Sorting ${itemIds.length} custom items by ${CONFIG.sortBy} ${CONFIG.sortOrder}`);
+            const itemsWithDetails = [];
+            for (const id of itemIds) {
+              const item = await ApiUtils.fetchItemDetails(id);
+              if (item) itemsWithDetails.push(item);
+            }
+
+            const sortedItems = SlideUtils.sortItems(itemsWithDetails, CONFIG.sortBy, CONFIG.sortOrder);
+            itemIds = sortedItems.map(i => i.Id);
+          }
         }
-      }
 
-      STATE.slideshow.itemIds = itemIds;
-      STATE.slideshow.totalItems = itemIds.length;
+        STATE.slideshow.itemIds = itemIds;
+        STATE.slideshow.totalItems = itemIds.length;
 
-      this.createPaginationDots();
+        this.createPaginationDots();
 
-      await this.updateCurrentSlide(0);
+        // Apply transition effect and duration class to container
+        const transitionEffect = MediaBarEnhancedSettingsManager.getSetting('transitionEffect', CONFIG.transitionEffect) || 'Fade';
+        const containerEl = document.getElementById("slides-container");
+        if (containerEl) {
+          containerEl.className = containerEl.className.split(' ').filter(c => !c.startsWith('transition-effect-')).join(' ');
+          containerEl.classList.add(`transition-effect-${transitionEffect.toLowerCase()}`);
+          containerEl.style.setProperty('--transition-duration', `${CONFIG.fadeTransitionDuration || 500}ms`);
+        }
 
-      STATE.slideshow.slideInterval = new SlideTimer(() => {
-        if (STATE.slideshow.isPaused) return;
+        await this.updateCurrentSlide(0);
 
-        if (CONFIG.waitForTrailerToEnd) {
+        STATE.slideshow.slideInterval = new SlideTimer(() => {
+          if (STATE.slideshow.isPaused) return;
+
+          if (getEffectiveWaitForTrailer()) {
+            const activeSlide = document.querySelector('.slide.active');
+            const video = activeSlide ? activeSlide.querySelector('.video-backdrop') : null;
+            if (video && !video.paused) return;
+          }
+
+          this.nextSlide();
+        }, CONFIG.shuffleInterval);
+
+        // Check if we should wait for trailer
+        const waitForTrailer = getEffectiveWaitForTrailer();
+
+        if (waitForTrailer && STATE.slideshow.slideInterval) {
           const activeSlide = document.querySelector('.slide.active');
           const video = activeSlide ? activeSlide.querySelector('.video-backdrop') : null;
-          if (video && !video.paused) return;
+          if (video && !video.paused) {
+            STATE.slideshow.slideInterval.stop();
+          }
         }
-
-        this.nextSlide();
-      }, CONFIG.shuffleInterval);
-
-      // Check if we should wait for trailer
-      const waitForTrailer = MediaBarEnhancedSettingsManager.getSetting('waitForTrailer', CONFIG.waitForTrailerToEnd);
-
-      if (waitForTrailer && STATE.slideshow.slideInterval) {
-        const activeSlide = document.querySelector('.slide.active');
-        const video = activeSlide ? activeSlide.querySelector('.video-backdrop') : null;
-        if (video && !video.paused) {
-          STATE.slideshow.slideInterval.stop();
-        }
+      } catch (error) {
+        console.error("🎬 Media Bar:", "Error loading slideshow data:", error);
+      } finally {
+        STATE.slideshow.isLoading = false;
       }
-    } catch (error) {
-      console.error("🎬 Media Bar:", "Error loading slideshow data:", error);
-    } finally {
-      STATE.slideshow.isLoading = false;
-    }
-  },
-};
-
-/**
- * Initializes arrow navigation elements
- */
-const initArrowNavigation = () => {
-  const container = SlideUtils.getOrCreateSlidesContainer();
-
-  const leftArrow = SlideUtils.createElement("div", {
-    className: "arrow left-arrow",
-    innerHTML: '<i class="material-icons">chevron_left</i>',
-    tabIndex: "0",
-    onclick: (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      SlideshowManager.prevSlide();
     },
-    style: {
-      opacity: "0",
-      transition: "opacity 0.3s ease",
-      display: "none",
-    },
-  });
-
-  const rightArrow = SlideUtils.createElement("div", {
-    className: "arrow right-arrow",
-    innerHTML: '<i class="material-icons">chevron_right</i>',
-    tabIndex: "0",
-    onclick: (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      SlideshowManager.nextSlide();
-    },
-    style: {
-      opacity: "0",
-      transition: "opacity 0.3s ease",
-      display: "none",
-    },
-  });
-
-  const pauseButton = SlideUtils.createElement("div", {
-    className: "pause-button",
-    innerHTML: '<i class="material-icons">pause</i>',
-    tabIndex: "0",
-    "aria-label": LocalizationUtils.getLocalizedString('ButtonPause', 'Pause'),
-    title: LocalizationUtils.getLocalizedString('ButtonPause', 'Pause'),
-    onclick: (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      SlideshowManager.togglePause();
-    }
-  });
-
-  // Prevent touch events from bubbling to container
-  pauseButton.addEventListener("touchstart", (e) => e.stopPropagation(), { passive: true });
-  pauseButton.addEventListener("touchend", (e) => e.stopPropagation(), { passive: true });
-  pauseButton.addEventListener("mousedown", (e) => e.stopPropagation());
-
-  const muteButton = SlideUtils.createElement("div", {
-    className: "mute-button",
-    innerHTML: STATE.slideshow.isMuted ? '<i class="material-icons">volume_off</i>' : '<i class="material-icons">volume_up</i>',
-    tabIndex: "0",
-    "aria-label": STATE.slideshow.isMuted ? LocalizationUtils.getLocalizedString('Unmute', 'Unmute') : LocalizationUtils.getLocalizedString('Mute', 'Mute'),
-    title: STATE.slideshow.isMuted ? LocalizationUtils.getLocalizedString('Unmute', 'Unmute') : LocalizationUtils.getLocalizedString('Mute', 'Mute'),
-    style: { display: "none" },
-    onclick: (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      SlideshowManager.toggleMute();
-    }
-  });
-
-  // Prevent touch events from bubbling to container
-  muteButton.addEventListener("touchstart", (e) => e.stopPropagation(), { passive: true });
-  muteButton.addEventListener("touchend", (e) => e.stopPropagation(), { passive: true });
-  muteButton.addEventListener("mousedown", (e) => e.stopPropagation());
-
-  container.appendChild(leftArrow);
-  container.appendChild(rightArrow);
-  container.appendChild(pauseButton);
-  container.appendChild(muteButton);
-
-  const showArrows = () => {
-    if (CONFIG.hideArrowsOnMobile && window.matchMedia("only screen and (max-width: 768px)").matches) {
-        return; // disable arrow display on mobile
-    }
-
-    leftArrow.style.display = "block";
-    rightArrow.style.display = "block";
-
-    void leftArrow.offsetWidth;
-    void rightArrow.offsetWidth;
-
-    leftArrow.style.opacity = "1";
-    rightArrow.style.opacity = "1";
   };
 
-  const hideArrows = () => {
-    leftArrow.style.opacity = "0";
-    rightArrow.style.opacity = "0";
+  /**
+   * Initializes arrow navigation elements
+   */
+  const initArrowNavigation = () => {
+    const container = SlideUtils.getOrCreateSlidesContainer();
 
-    setTimeout(() => {
-      if (leftArrow.style.opacity === "0") {
-        leftArrow.style.display = "none";
-        rightArrow.style.display = "none";
-      }
-    }, 300);
-  };
-
-  container.addEventListener("mouseenter", showArrows);
-
-  container.addEventListener("mouseleave", hideArrows);
-
-  if (CONFIG.alwaysShowArrows) {
-    showArrows();
-    // Remove listeners to keep them shown
-    container.removeEventListener("mouseenter", showArrows);
-    container.removeEventListener("mouseleave", hideArrows);
-  }
-
-  let arrowTimeout;
-  container.addEventListener(
-    "touchstart",
-    () => {
-      if (arrowTimeout) {
-        clearTimeout(arrowTimeout);
-      }
-
-      showArrows();
-
-      arrowTimeout = setTimeout(hideArrows, 2000);
-    },
-    { passive: true }
-  );
-};
-
-const MediaBarEnhancedSettingsManager = {
-  initialized: false,
-  
-  init() {
-    if (this.initialized) return;
-    if (!CONFIG.enableClientSideSettings) return;
-
-    this.initialized = true;
-    this.injectSettingsIcon();
-    console.log("🎬 Media Bar:", "Client-Side Settings Manager initialized.");
-  },
-
-  getSetting(key, defaultValue) {
-    if (!CONFIG.enableClientSideSettings) return defaultValue;
-    const value = localStorage.getItem(`mediaBarEnhanced-${key}`);
-    return value !== null ? value === 'true' : defaultValue;
-  },
-
-  setSetting(key, value) {
-    localStorage.setItem(`mediaBarEnhanced-${key}`, value);
-  },
-
-  createIcon() {
-    const button = document.createElement('button');
-    button.type = 'button';
-    button.className = 'paper-icon-button-light headerButton media-bar-settings-button';
-    button.title = 'Media Bar Settings';
-    // button.innerHTML = '<span class="material-icons">tune</span>';
-
-    // button.innerHTML = `<img src="${STATE.jellyfinData.serverAddress}/MediaBarEnhanced/Resources/assets/logo_SW.svg" style="width: 24px; height: 24px; vertical-align: middle;">`;
-    // currently not optimal, as it's egg-shaped due to the svg format... but if it's square, it's very small...
-    // button.innerHTML = `<img src="${STATE.jellyfinData.serverAddress}/MediaBarEnhanced/Resources/assets/logo_SW.svg" draggable="false" style="width: 52px; height: 24px; vertical-align: middle; pointer-events: none;">`;
-    // button.innerHTML = `<img src="${STATE.jellyfinData.serverAddress}/MediaBarEnhanced/Resources/assets/logo_SW_SHORT.svg" draggable="false" style="width: 41px; height: 24px; vertical-align: middle; pointer-events: none;">`;
-    button.innerHTML = `<img src="${STATE.jellyfinData.serverAddress}/MediaBarEnhanced/Resources/assets/logo_SW_MINIMAL.svg" draggable="false" style="width: 24px; height: 24px; vertical-align: middle; pointer-events: none;">`;
-    
-    button.style.verticalAlign = 'middle';
-
-    button.addEventListener('click', (e) => {
+    const leftArrow = SlideUtils.createElement("div", {
+      className: "arrow left-arrow",
+      innerHTML: '<i class="material-icons">chevron_left</i>',
+      tabIndex: "0",
+      onclick: (e) => {
+        e.preventDefault();
         e.stopPropagation();
-        this.toggleSettingsPopup(button);
+        SlideshowManager.prevSlide();
+      },
+      style: {
+        opacity: "0",
+        transition: "opacity 0.3s ease",
+        display: "none",
+      },
     });
 
-    return button;
-  },
+    const rightArrow = SlideUtils.createElement("div", {
+      className: "arrow right-arrow",
+      innerHTML: '<i class="material-icons">chevron_right</i>',
+      tabIndex: "0",
+      onclick: (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        SlideshowManager.nextSlide();
+      },
+      style: {
+        opacity: "0",
+        transition: "opacity 0.3s ease",
+        display: "none",
+      },
+    });
 
-  injectSettingsIcon() {
-      const observer = new MutationObserver((mutations, obs) => {
+    const pauseButton = SlideUtils.createElement("div", {
+      className: "pause-button",
+      innerHTML: '<i class="material-icons">pause</i>',
+      tabIndex: "0",
+      "aria-label": LocalizationUtils.getLocalizedString('ButtonPause', 'Pause'),
+      title: LocalizationUtils.getLocalizedString('ButtonPause', 'Pause'),
+      onclick: (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        SlideshowManager.togglePause();
+      }
+    });
+
+    // Prevent touch events from bubbling to container
+    pauseButton.addEventListener("touchstart", (e) => e.stopPropagation(), { passive: true });
+    pauseButton.addEventListener("touchend", (e) => e.stopPropagation(), { passive: true });
+    pauseButton.addEventListener("mousedown", (e) => e.stopPropagation());
+
+    const muteButton = SlideUtils.createElement("div", {
+      className: "mute-button",
+      innerHTML: STATE.slideshow.isMuted ? '<i class="material-icons">volume_off</i>' : '<i class="material-icons">volume_up</i>',
+      tabIndex: "0",
+      "aria-label": STATE.slideshow.isMuted ? LocalizationUtils.getLocalizedString('Unmute', 'Unmute') : LocalizationUtils.getLocalizedString('Mute', 'Mute'),
+      title: STATE.slideshow.isMuted ? LocalizationUtils.getLocalizedString('Unmute', 'Unmute') : LocalizationUtils.getLocalizedString('Mute', 'Mute'),
+      style: { display: "none" },
+      onclick: (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        SlideshowManager.toggleMute();
+      }
+    });
+
+    // Prevent touch events from bubbling to container
+    muteButton.addEventListener("touchstart", (e) => e.stopPropagation(), { passive: true });
+    muteButton.addEventListener("touchend", (e) => e.stopPropagation(), { passive: true });
+    muteButton.addEventListener("mousedown", (e) => e.stopPropagation());
+
+    container.appendChild(leftArrow);
+    container.appendChild(rightArrow);
+    container.appendChild(pauseButton);
+    container.appendChild(muteButton);
+
+    const showArrows = () => {
+      if (CONFIG.hideArrowsOnMobile && window.matchMedia("only screen and (max-width: 768px)").matches) {
+        return; // disable arrow display on mobile
+      }
+
+      leftArrow.style.display = "block";
+      rightArrow.style.display = "block";
+
+      void leftArrow.offsetWidth;
+      void rightArrow.offsetWidth;
+
+      leftArrow.style.opacity = "1";
+      rightArrow.style.opacity = "1";
+    };
+
+    const hideArrows = () => {
+      leftArrow.style.opacity = "0";
+      rightArrow.style.opacity = "0";
+
+      setTimeout(() => {
+        if (leftArrow.style.opacity === "0") {
+          leftArrow.style.display = "none";
+          rightArrow.style.display = "none";
+        }
+      }, 300);
+    };
+
+    container.addEventListener("mouseenter", showArrows);
+
+    container.addEventListener("mouseleave", hideArrows);
+
+    if (CONFIG.alwaysShowArrows) {
+      showArrows();
+      // Remove listeners to keep them shown
+      container.removeEventListener("mouseenter", showArrows);
+      container.removeEventListener("mouseleave", hideArrows);
+    }
+
+    let arrowTimeout;
+    container.addEventListener(
+      "touchstart",
+      () => {
+        if (arrowTimeout) {
+          clearTimeout(arrowTimeout);
+        }
+
+        showArrows();
+
+        arrowTimeout = setTimeout(hideArrows, 2000);
+      },
+      { passive: true }
+    );
+  };
+
+  const MediaBarEnhancedSettingsManager = {
+    initialized: false,
+
+    init() {
+      if (this.initialized) return;
+      if (!CONFIG.enableClientSideSettings) return;
+
+      this.initialized = true;
+      this.injectSettingsIcon();
+      console.log("🎬 Media Bar:", "Client-Side Settings Manager initialized.");
+    },
+
+    getSetting(key, defaultValue) {
+      if (!CONFIG.enableClientSideSettings) return defaultValue;
+      const value = localStorage.getItem(`mediaBarEnhanced-${key}`);
+      if (value === null) return defaultValue;
+      if (value === 'true') return true;
+      if (value === 'false') return false;
+      return value;
+    },
+
+    setSetting(key, value) {
+      localStorage.setItem(`mediaBarEnhanced-${key}`, value);
+    },
+
+    createIcon() {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'paper-icon-button-light headerButton media-bar-settings-button';
+      button.title = 'Media Bar Settings';
+      // button.innerHTML = '<span class="material-icons">tune</span>';
+
+      // button.innerHTML = `<img src="${STATE.jellyfinData.serverAddress}/MediaBarEnhanced/Resources/assets/logo_SW.svg" style="width: 24px; height: 24px; vertical-align: middle;">`;
+      // currently not optimal, as it's egg-shaped due to the svg format... but if it's square, it's very small...
+      // button.innerHTML = `<img src="${STATE.jellyfinData.serverAddress}/MediaBarEnhanced/Resources/assets/logo_SW.svg" draggable="false" style="width: 52px; height: 24px; vertical-align: middle; pointer-events: none;">`;
+      // button.innerHTML = `<img src="${STATE.jellyfinData.serverAddress}/MediaBarEnhanced/Resources/assets/logo_SW_SHORT.svg" draggable="false" style="width: 41px; height: 24px; vertical-align: middle; pointer-events: none;">`;
+      button.innerHTML = `<img src="${STATE.jellyfinData.serverAddress}/MediaBarEnhanced/Resources/assets/logo_SW_MINIMAL.svg" draggable="false" style="width: 24px; height: 24px; vertical-align: middle; pointer-events: none;">`;
+
+      button.style.verticalAlign = 'middle';
+
+      button.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.toggleSettingsPopup(button);
+      });
+
+      return button;
+    },
+
+    injectSettingsIcon() {
+      const menuLocation = this.getSetting('menuLocation', CONFIG.clientMenuLocation);
+      let navbarInjected = false;
+      let debounceTimer = null;
+
+      const tryInject = () => {
+        // 1. Inject to Navbar if "Navbar" or "Both" (skip once injected)
+        if (!navbarInjected && (menuLocation === 'Navbar' || menuLocation === 'Both')) {
           const headerRight = document.querySelector('.headerRight');
-          if (headerRight && !document.querySelector('.media-bar-settings-button')) {
-              const icon = this.createIcon();
-              headerRight.prepend(icon);
+          if (headerRight && !headerRight.querySelector('.media-bar-settings-button')) {
+            const icon = this.createIcon();
+            headerRight.prepend(icon);
+            navbarInjected = true;
           }
+        }
+
+        // 2. Inject to Sidebar if "Sidebar" or "Both"
+        if (menuLocation === 'Sidebar' || menuLocation === 'Both') {
+          const containers = document.querySelectorAll('.sidebarLinks, .mainDrawer-scrollContainer');
+          containers.forEach(container => {
+            // Prevent injecting directly into the scroll container if a nested sidebarLinks div exists
+            if (container.classList.contains('mainDrawer-scrollContainer') && container.querySelector('.sidebarLinks')) {
+              return;
+            }
+
+            if (!container.querySelector('.media-bar-sidebar-settings-link')) {
+              // Add sidebar section header if not present
+              if (!container.querySelector('.media-bar-sidebar-header')) {
+                const header = document.createElement('h3');
+                header.className = 'sidebarHeader media-bar-sidebar-header';
+                header.textContent = 'Media Bar';
+                container.appendChild(header);
+              }
+
+              const link = document.createElement('a');
+              link.className = 'sidebarLink navMenuOption media-bar-sidebar-settings-link';
+              link.href = '#';
+
+              // Add logo icon
+              const logoImg = document.createElement('img');
+              logoImg.className = 'sidebarLinkIcon navMenuOptionIcon';
+              logoImg.src = `${STATE.jellyfinData.serverAddress}/MediaBarEnhanced/Resources/assets/logo_SW_MINIMAL.svg`;
+              logoImg.draggable = false;
+              Object.assign(logoImg.style, {
+                width: '24px',
+                height: '24px',
+                verticalAlign: 'middle',
+                marginRight: '1.2em',
+                pointerEvents: 'none'
+              });
+
+              // Add text
+              const textSpan = document.createElement('span');
+              textSpan.className = 'sidebarLinkText navMenuOptionText';
+
+              let locale = LocalizationUtils.cachedLocale || 'en';
+              locale = locale.split('-')[0].toLowerCase();
+              const t = CLIENT_MENU_TRANSLATIONS[locale] ? CLIENT_MENU_TRANSLATIONS[locale] : CLIENT_MENU_TRANSLATIONS['en'];
+
+              // Clean up name to "Settings" or local equivalent since it sits under the header
+              let linkText = t.title;
+              if (linkText.includes('Media Bar ')) {
+                linkText = linkText.replace('Media Bar ', '');
+              } else if (linkText.includes(' de Media Bar')) {
+                linkText = linkText.replace(' de Media Bar', '');
+              } else if (linkText.includes(' Media Bar')) {
+                linkText = linkText.replace(' Media Bar', '');
+              }
+              textSpan.textContent = linkText;
+
+              link.appendChild(logoImg);
+              link.appendChild(textSpan);
+
+              link.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.toggleSettingsPopup(link);
+              });
+
+              container.appendChild(link);
+            }
+          });
+        }
+      };
+
+      const observer = new MutationObserver(() => {
+        if (debounceTimer) clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(tryInject, 150);
       });
 
       observer.observe(document.body, {
-          childList: true,
-          subtree: true
+        childList: true,
+        subtree: true
       });
-  },
 
-  createPopup(anchorElement) {
-    const existing = document.querySelector('.media-bar-settings-popup');
-    if (existing) existing.remove();
+      // Initial injection attempt without waiting for mutations
+      tryInject();
+    },
 
-    const popup = document.createElement('div');
-    popup.className = 'media-bar-settings-popup dialog';
+    createPopup(anchorElement) {
+      const existing = document.querySelector('.media-bar-settings-popup');
+      if (existing) existing.remove();
 
-    Object.assign(popup.style, {
-        position: 'fixed',
-        zIndex: '10000',
-        backgroundColor: '#202020',
-        padding: '1em',
-        borderRadius: '0.3em',
-        boxShadow: '0 0 20px rgba(0,0,0,0.5)',
-        minWidth: '250px',
-        color: '#fff',
-    });
+      const existingOverlay = document.querySelector('.media-bar-modal-overlay');
+      if (existingOverlay) existingOverlay.remove();
 
-    const rect = anchorElement.getBoundingClientRect();
-    
-    let rightPos = window.innerWidth - rect.right;
-    if (window.innerWidth < 450 || (window.innerWidth - rightPos) < 260) {
-        popup.style.right = '1rem';
-        popup.style.left = 'auto';
-    } else {
-        popup.style.right = `${rightPos}px`;
-        popup.style.left = 'auto';
-    }
+      const isSidebarLink = anchorElement && anchorElement.classList.contains('media-bar-sidebar-settings-link');
 
-    popup.style.top = `${rect.bottom + 10}px`;
-    
-    let locale = LocalizationUtils.cachedLocale || 'en';
-    locale = locale.split('-')[0].toLowerCase();
-    const t = CLIENT_MENU_TRANSLATIONS[locale] ? CLIENT_MENU_TRANSLATIONS[locale] : CLIENT_MENU_TRANSLATIONS['en'];
+      let overlay = null;
+      if (isSidebarLink) {
+        overlay = document.createElement('div');
+        overlay.className = 'media-bar-modal-overlay';
+        document.body.appendChild(overlay);
+      }
 
-    const settings = [
+      const popup = document.createElement('div');
+      popup.className = `media-bar-settings-popup dialog ${isSidebarLink ? 'media-bar-modal' : 'media-bar-dropdown'}`;
+
+      if (!isSidebarLink) {
+        const rect = anchorElement.getBoundingClientRect();
+        let rightPos = window.innerWidth - rect.right;
+        if (window.innerWidth < 450 || (window.innerWidth - rightPos) < 260) {
+          popup.style.right = '1rem';
+          popup.style.left = 'auto';
+        } else {
+          popup.style.right = `${rightPos}px`;
+          popup.style.left = 'auto';
+        }
+        popup.style.top = `${rect.bottom + 10}px`;
+      }
+
+      let locale = LocalizationUtils.cachedLocale || 'en';
+      locale = locale.split('-')[0].toLowerCase();
+      const t = CLIENT_MENU_TRANSLATIONS[locale] ? CLIENT_MENU_TRANSLATIONS[locale] : CLIENT_MENU_TRANSLATIONS['en'];
+
+      const generalSettings = [
         { key: 'enabled', label: t.enabledLabel, description: t.enabledDesc, default: true },
+        { key: 'slideAnimations', label: t.slideAnimationsLabel, description: t.slideAnimationsDesc, default: CONFIG.slideAnimationEnabled },
+        { key: 'showProgressBar', label: t.showProgressBarLabel || 'Show Progress Bar', description: t.showProgressBarDesc || 'Display timing progress line.', default: CONFIG.showProgressBar },
+        { key: 'forceSlideCounter', label: t.forceSlideCounterLabel || 'Always Use Slide Counter', description: t.forceSlideCounterDesc || 'Force numeric slide counter instead of pagination dots.', default: CONFIG.forceSlideCounter },
+      ];
+      const trailerSettings = [
         { key: 'videoBackdrops', label: t.videoBackdropsLabel, description: t.videoBackdropsDesc, default: CONFIG.enableVideoBackdrop },
         { key: 'trailerButton', label: t.trailerButtonLabel, description: t.trailerButtonDesc, default: CONFIG.showTrailerButton },
         { key: 'mobileVideo', label: t.mobileVideoLabel, description: t.mobileVideoDesc, default: CONFIG.enableMobileVideo },
         { key: 'waitForTrailer', label: t.waitForTrailerLabel, description: t.waitForTrailerDesc, default: CONFIG.waitForTrailerToEnd },
-        { key: 'slideAnimations', label: t.slideAnimationsLabel, description: t.slideAnimationsDesc, default: CONFIG.slideAnimationEnabled },
-    ];
+      ];
 
-    let html = `<h3 style="margin-top:0; margin-bottom:1em; border-bottom:1px solid #444; padding-bottom:0.5em;">${t.title}</h3>`;
+      let html = `
+    <div class="media-bar-settings-header">
+        <img src="${STATE.jellyfinData.serverAddress}/MediaBarEnhanced/Resources/assets/logo_SW.svg" draggable="false" class="media-bar-settings-logo" />
+        <h3 class="media-bar-settings-title">${t.title}</h3>
+    </div>
+    
+    <div class="media-bar-client-tabs">
+        <button type="button" class="media-bar-client-tab active" data-tab="mb-client-tab-general">
+            <svg style="width: 18px; height: 18px; fill: currentColor; flex-shrink: 0;" viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+            <span>${t.groupGeneral}</span>
+        </button>
+        <button type="button" class="media-bar-client-tab" data-tab="mb-client-tab-trailers">
+            <svg style="width: 18px; height: 18px; fill: currentColor; flex-shrink: 0;" viewBox="0 0 24 24"><path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/></svg>
+            <span>${t.groupTrailers.replace(' & ', ' &amp;<br>').replace(' y ', ' y<br>').replace(' et ', ' et<br>')}</span>
+        </button>
+        <button type="button" class="media-bar-client-tab" data-tab="mb-client-tab-layout">
+            <svg style="width: 18px; height: 18px; fill: currentColor; flex-shrink: 0;" viewBox="0 0 24 24"><path d="M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H3V5h18v14zM8 6h8v2H8zm-4 4h16v2H4zm3 4h10v2H7z"/></svg>
+            <span>${t.groupLayout.replace(' & ', ' &amp;<br>').replace(' y ', ' y<br>').replace(' et ', ' et<br>')}</span>
+        </button>
+    </div>
 
-    settings.forEach(setting => {
+    <div class="media-bar-settings-body">
+        <!-- GENERAL TAB -->
+        <div id="mb-client-tab-general" class="media-bar-client-tab-content">
+    `;
+
+      generalSettings.forEach(setting => {
         const isChecked = this.getSetting(setting.key, setting.default);
         html += `
-        <div class="checkboxContainer checkboxContainer-withDescription" style="margin-bottom: 0.5em;">
-            <label class="emby-checkbox-label">
-                <input id="mb-setting-${setting.key}" type="checkbox" is="emby-checkbox" class="emby-checkbox" ${isChecked ? 'checked' : ''} />
-                <span class="checkboxLabel">${setting.label}</span>
-            </label>
-            <div class="fieldDescription">${setting.description}</div>
-        </div>
-        `;
-    });
+      <div class="media-bar-toggle-container">
+          <div class="media-bar-toggle-info">
+              <span class="media-bar-toggle-label">${setting.label}</span>
+              <span class="media-bar-toggle-desc">${setting.description}</span>
+          </div>
+          <label class="media-bar-switch">
+              <input id="mb-setting-${setting.key}" type="checkbox" ${isChecked ? 'checked' : ''} />
+              <span class="media-bar-slider"></span>
+          </label>
+      </div>
+      `;
+      });
 
-    // Buttons Container
-    html += `
-    <div style="margin-top:1em; display:flex; justify-content:flex-end; align-items:center; gap:1.5em;">
-        <button is="emby-button" type="button" class="raised button-cancel emby-button" id="mb-settings-reset" title="${t.resetTitle}">
-            <span>${t.resetBtn}</span>
-        </button>
-        <button is="emby-button" type="button" class="raised button-submit emby-button" id="mb-settings-save">
-            <span>${t.saveBtn}</span>
-        </button>
+      const activePlaylistVal = this.getSetting('activePlaylist', 'Default');
+      let playlistsOptions = `<option value="Default" ${activePlaylistVal === 'Default' ? 'selected' : ''}>Default (Server Config / Seasonal)</option>`;
+      playlistsOptions += `<option value="Library" ${activePlaylistVal === 'Library' ? 'selected' : ''}>None (Random Library Content)</option>`;
+
+      try {
+        const playlists = JSON.parse(CONFIG.customPlaylists || "[]");
+        playlists.forEach(pl => {
+          if (pl.Name) {
+            const plVal = `Playlist:${pl.Name}`;
+            playlistsOptions += `<option value="${plVal}" ${activePlaylistVal === plVal ? 'selected' : ''}>Playlist: ${pl.Name}</option>`;
+          }
+        });
+      } catch (e) {
+        console.error("Error parsing playlists for client settings menu dropdown:", e);
+      }
+
+      html += `
+    <div class="media-bar-select-container" style="margin-top: 0.5em;">
+        <div class="media-bar-select-info">
+            <span class="media-bar-select-label">${t.activePlaylistLabel || 'Active Playlist'}</span>
+            <span class="media-bar-select-desc">${t.activePlaylistDesc || 'Select which custom playlist to display.'}</span>
+        </div>
+        <select id="mb-setting-activePlaylist" class="media-bar-select">
+            ${playlistsOptions}
+        </select>
+    </div>
+        </div>
+        
+        <!-- TRAILERS TAB -->
+        <div id="mb-client-tab-trailers" class="media-bar-client-tab-content" style="display: none;">
+    `;
+
+      trailerSettings.forEach(setting => {
+        const isChecked = this.getSetting(setting.key, setting.default);
+        html += `
+      <div class="media-bar-toggle-container">
+          <div class="media-bar-toggle-info">
+              <span class="media-bar-toggle-label">${setting.label}</span>
+              <span class="media-bar-toggle-desc">${setting.description}</span>
+          </div>
+          <label class="media-bar-switch">
+              <input id="mb-setting-${setting.key}" type="checkbox" ${isChecked ? 'checked' : ''} />
+              <span class="media-bar-slider"></span>
+          </label>
+      </div>
+      `;
+      });
+
+      const defaultVolumeVal = parseInt(this.getSetting('defaultTrailerVolume', CONFIG.defaultTrailerVolume), 10);
+      html += `
+    <div class="media-bar-select-container">
+        <div class="media-bar-select-info">
+            <span class="media-bar-select-label">${t.defaultTrailerVolumeLabel}</span>
+            <span class="media-bar-select-desc">${t.defaultTrailerVolumeDesc}</span>
+        </div>
+        <select id="mb-setting-defaultTrailerVolume" class="media-bar-select">
+    `;
+      for (let vol = 10; vol <= 100; vol += 10) {
+        html += `<option value="${vol}" ${defaultVolumeVal === vol ? 'selected' : ''}>${vol}%</option>`;
+      }
+      html += `
+        </select>
+    </div>
+        </div>
+        
+        <!-- LAYOUT TAB -->
+        <div id="mb-client-tab-layout" class="media-bar-client-tab-content" style="display: none;">
+    `;
+
+      const mobileModeVal = this.getSetting('mobileMode', CONFIG.mobileCompactMode);
+      html += `
+    <div class="media-bar-select-container">
+        <div class="media-bar-select-info">
+            <span class="media-bar-select-label">${t.mobileModeLabel}</span>
+            <span class="media-bar-select-desc">${t.mobileModeDesc}</span>
+        </div>
+        <select id="mb-setting-mobileMode" class="media-bar-select">
+            <option value="Original" ${mobileModeVal === 'Original' ? 'selected' : ''}>${t.optionMobileModeOriginal || 'Original (65vh)'}</option>
+            <option value="16:9" ${mobileModeVal === '16:9' ? 'selected' : ''}>${t.optionMobileMode16_9 || '16:9 (Compact)'}</option>
+            <option value="4:3" ${mobileModeVal === '4:3' ? 'selected' : ''}>${t.optionMobileMode4_3 || '4:3 (Classic)'}</option>
+        </select>
     </div>
     `;
 
-    popup.innerHTML = html;
+      const menuLocationVal = this.getSetting('menuLocation', CONFIG.clientMenuLocation);
+      html += `
+    <div class="media-bar-select-container">
+        <div class="media-bar-select-info">
+            <span class="media-bar-select-label">${t.clientMenuLocationLabel}</span>
+            <span class="media-bar-select-desc">${t.clientMenuLocationDesc}</span>
+        </div>
+        <select id="mb-setting-menuLocation" class="media-bar-select">
+            <option value="Navbar" ${menuLocationVal === 'Navbar' ? 'selected' : ''}>${t.optionMenuLocationNavbar || 'Navbar'}</option>
+            <option value="Sidebar" ${menuLocationVal === 'Sidebar' ? 'selected' : ''}>${t.optionMenuLocationSidebar || 'Sidebar'}</option>
+            <option value="Both" ${menuLocationVal === 'Both' ? 'selected' : ''}>${t.optionMenuLocationBoth || 'Both'}</option>
+        </select>
+    </div>
+    `;
 
-    // Add Listeners
-    settings.forEach(setting => {
-        const checkbox = popup.querySelector(`#mb-setting-${setting.key}`);
-        checkbox.addEventListener('change', (e) => {
-            this.setSetting(setting.key, e.target.checked);
+      const transitionEffectVal = this.getSetting('transitionEffect', CONFIG.transitionEffect);
+      html += `
+    <div class="media-bar-select-container" style="margin-top: 0.5em;">
+        <div class="media-bar-select-info">
+            <span class="media-bar-select-label">${t.transitionEffectLabel || 'Transition Effect'}</span>
+            <span class="media-bar-select-desc">${t.transitionEffectDesc || 'Select the transition style between slides.'}</span>
+        </div>
+        <select id="mb-setting-transitionEffect" class="media-bar-select">
+            <option value="Fade" ${transitionEffectVal === 'Fade' ? 'selected' : ''}>${t.optionTransitionFade || 'Crossfade'}</option>
+            <option value="SlideLeft" ${transitionEffectVal === 'SlideLeft' ? 'selected' : ''}>${t.optionTransitionSlideLeft || 'Slide Left'}</option>
+            <option value="SlideRight" ${transitionEffectVal === 'SlideRight' ? 'selected' : ''}>${t.optionTransitionSlideRight || 'Slide Right'}</option>
+            <option value="SlideUp" ${transitionEffectVal === 'SlideUp' ? 'selected' : ''}>${t.optionTransitionSlideUp || 'Slide Up'}</option>
+            <option value="SlideDown" ${transitionEffectVal === 'SlideDown' ? 'selected' : ''}>${t.optionTransitionSlideDown || 'Slide Down'}</option>
+            <option value="ZoomIn" ${transitionEffectVal === 'ZoomIn' ? 'selected' : ''}>${t.optionTransitionZoomIn || 'Zoom In'}</option>
+            <option value="ZoomOut" ${transitionEffectVal === 'ZoomOut' ? 'selected' : ''}>${t.optionTransitionZoomOut || 'Zoom Out'}</option>
+        </select>
+    </div>
+
+    <div class="media-bar-select-container" id="mb-progressBarLocationContainer" style="margin-top: 0.5em; transition: opacity 0.2s ease;">
+        <div class="media-bar-select-info">
+            <span class="media-bar-select-label">${t.progressBarLocationLabel || 'Progress Bar Location'}</span>
+            <span class="media-bar-select-desc">${t.progressBarLocationDesc || 'Select where to render the slide progress bar.'}</span>
+        </div>
+        <select id="mb-setting-progressBarLocation" class="media-bar-select">
+            <option value="Dots" ${this.getSetting('progressBarLocation', CONFIG.progressBarLocation) === 'Dots' ? 'selected' : ''}>${t.progressBarLocationDots || 'Under Dots/Counter'}</option>
+            <option value="Navbar" ${this.getSetting('progressBarLocation', CONFIG.progressBarLocation) === 'Navbar' ? 'selected' : ''}>${t.progressBarLocationNavbar || 'Top (Under Header)'}</option>
+        </select>
+    </div>
+        </div>
+    </div> <!-- .media-bar-settings-body -->
+
+    <div class="media-bar-settings-buttons">
+        <button type="button" class="media-bar-btn media-bar-btn-cancel" id="mb-settings-reset" title="${t.resetTitle}">
+            <span>${t.resetBtn}</span>
+        </button>
+        <button type="button" class="media-bar-btn media-bar-btn-submit" id="mb-settings-save">
+            <span>${t.saveBtn}</span>
+        </button>
+    </div>
+    <div class="media-bar-settings-footer">
+        <span id="mb-settings-version">Version ${STATE.jellyfinData.pluginVersion || 'N/A'}</span>
+        <a href="https://github.com/CodeDevMLH/jellyfin-plugin-media-bar-enhanced" target="_blank" rel="noopener noreferrer" class="media-bar-github-link">
+            <svg style="width:14px; height:14px; fill:currentColor;" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.9-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.9 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33.85 0 1.71.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0 0 12 2z"/></svg>
+            <span>GitHub</span>
+        </a>
+    </div>
+    `;
+
+      popup.innerHTML = html;
+
+      // Close button for mobile accessibility
+      const closeBtn = document.createElement('button');
+      closeBtn.type = 'button';
+      closeBtn.className = 'media-bar-settings-close-button';
+      closeBtn.setAttribute('aria-label', 'Close');
+      closeBtn.innerHTML = '<svg style="width: 16px; height: 16px; fill: currentColor;" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>';
+      closeBtn.addEventListener('click', () => {
+        popup.remove();
+        if (overlay) overlay.remove();
+        document.removeEventListener('click', closeHandler);
+      });
+      popup.appendChild(closeBtn);
+
+      // Client tab switcher
+      const tabButtons = popup.querySelectorAll('.media-bar-client-tab');
+      tabButtons.forEach(tBtn => {
+        tBtn.addEventListener('click', () => {
+          tabButtons.forEach(b => b.classList.remove('active'));
+          tBtn.classList.add('active');
+
+          popup.querySelectorAll('.media-bar-client-tab-content').forEach(c => c.style.display = 'none');
+          const targetId = tBtn.getAttribute('data-tab');
+          const targetContent = popup.querySelector(`#${targetId}`);
+          if (targetContent) {
+            targetContent.style.display = 'flex';
+          }
         });
-    });
+      });
 
-    // Reload Handler
-    popup.querySelector('#mb-settings-save').addEventListener('click', () => {
-        location.reload();
-    });
-
-    // Reset Handler
-    popup.querySelector('#mb-settings-reset').addEventListener('click', () => {
-        if (confirm(t.confirmReset)) {
-            Object.keys(localStorage).forEach(key => {
-                if (key.startsWith('mediaBarEnhanced-')) {
-                    localStorage.removeItem(key);
-                }
-            });
-            location.reload();
+      // Add Listeners
+      const allSwitches = [...generalSettings, ...trailerSettings];
+      allSwitches.forEach(setting => {
+        const checkbox = popup.querySelector(`#mb-setting-${setting.key}`);
+        if (checkbox) {
+          checkbox.addEventListener('change', (e) => {
+            this.setSetting(setting.key, e.target.checked);
+          });
         }
-    });
+      });
 
-    const closeHandler = (e) => {
-        if (!popup.contains(e.target) && e.target !== anchorElement && !anchorElement.contains(e.target)) {
-            popup.remove();
-            document.removeEventListener('click', closeHandler);
-        }
-    };
-    setTimeout(() => document.addEventListener('click', closeHandler), 0);
+      const mobileModeSelect = popup.querySelector('#mb-setting-mobileMode');
+      mobileModeSelect.addEventListener('change', (e) => {
+        this.setSetting('mobileMode', e.target.value);
+      });
 
-    document.body.appendChild(popup);
-  },
+      const menuLocationSelect = popup.querySelector('#mb-setting-menuLocation');
+      menuLocationSelect.addEventListener('change', (e) => {
+        this.setSetting('menuLocation', e.target.value);
+      });
 
-  toggleSettingsPopup(anchorElement) {
-    const existing = document.querySelector('.media-bar-settings-popup');
-    if (existing) {
-        existing.remove();
-    } else {
-        this.createPopup(anchorElement);
-    }
-  }
-};
-
-/**
- * Initialize page visibility handling to pause when tab is inactive
- */
-const initPageVisibilityHandler = () => {
-  let wasVideoPlayingBeforeHide = false;
-
-  document.addEventListener("visibilitychange", () => {
-    if (document.hidden) {
-      console.log("🎬 Media Bar:", "Tab inactive - pausing slideshow and videos");
-      wasVideoPlayingBeforeHide = STATE.slideshow.isVideoPlaying;
-      
-      if (STATE.slideshow.slideInterval) {
-        STATE.slideshow.slideInterval.stop();
+      const activePlaylistSelect = popup.querySelector('#mb-setting-activePlaylist');
+      if (activePlaylistSelect) {
+        activePlaylistSelect.addEventListener('change', (e) => {
+          this.setSetting('activePlaylist', e.target.value);
+        });
       }
-      
-      // Pause active video if playing
-      const currentItemId = STATE.slideshow.itemIds[STATE.slideshow.currentSlideIndex];
-      if (currentItemId) {
-        // YouTube
-        if (STATE.slideshow.videoPlayers && STATE.slideshow.videoPlayers[currentItemId]) {
-          const player = STATE.slideshow.videoPlayers[currentItemId];
-          if (typeof player.pauseVideo === "function") {
-            try {
-              player.pauseVideo();
-              STATE.slideshow.isVideoPlaying = false;
-            } catch (e) {
-              console.warn("🎬 Media Bar:", "Error pausing video on tab hide:", e);
-            }
-          } else if (player.tagName === 'VIDEO') { // HTML5 Video
-             player.pause();
-             STATE.slideshow.isVideoPlaying = false;
+
+      const transitionEffectSelect = popup.querySelector('#mb-setting-transitionEffect');
+      if (transitionEffectSelect) {
+        transitionEffectSelect.addEventListener('change', (e) => {
+          this.setSetting('transitionEffect', e.target.value);
+        });
+      }
+
+      const defaultVolumeSelect = popup.querySelector('#mb-setting-defaultTrailerVolume');
+      defaultVolumeSelect.addEventListener('change', (e) => {
+        this.setSetting('defaultTrailerVolume', parseInt(e.target.value, 10));
+      });
+
+      const progressBarLocationSelect = popup.querySelector('#mb-setting-progressBarLocation');
+      if (progressBarLocationSelect) {
+        progressBarLocationSelect.addEventListener('change', (e) => {
+          this.setSetting('progressBarLocation', e.target.value);
+        });
+      }
+
+      const updateClientDependencies = () => {
+        const showProgressBarCb = popup.querySelector('#mb-setting-showProgressBar');
+        const container = popup.querySelector('#mb-progressBarLocationContainer');
+        if (showProgressBarCb && container) {
+          if (showProgressBarCb.checked) {
+            container.style.opacity = '1';
+            container.style.pointerEvents = 'auto';
+          } else {
+            container.style.opacity = '0.4';
+            container.style.pointerEvents = 'none';
           }
         }
+      };
+
+      updateClientDependencies();
+
+      const showProgressBarCb = popup.querySelector('#mb-setting-showProgressBar');
+      if (showProgressBarCb) {
+        showProgressBarCb.addEventListener('change', updateClientDependencies);
       }
-    } else {
-      console.log("🎬 Media Bar:", "Tab active - resuming slideshow");
-      
-      const currentItemId = STATE.slideshow.itemIds[STATE.slideshow.currentSlideIndex];
-      
-      // Resume video if the play signal was given (either before hiding, or timer expired while hidden)
-      if (!STATE.slideshow.isPaused) {
-        if (currentItemId && STATE.slideshow.currentPlayVideoLogic) {
-            if (STATE.slideshow.playSignals && STATE.slideshow.playSignals[currentItemId] === true) {
-               STATE.slideshow.currentPlayVideoLogic();
+
+      // Reload Handler
+      popup.querySelector('#mb-settings-save').addEventListener('click', () => {
+        location.reload();
+      });
+
+      // Reset Handler
+      popup.querySelector('#mb-settings-reset').addEventListener('click', () => {
+        if (confirm(t.confirmReset)) {
+          Object.keys(localStorage).forEach(key => {
+            if (key.startsWith('mediaBarEnhanced-')) {
+              localStorage.removeItem(key);
             }
+          });
+          location.reload();
+        }
+      });
+
+      const closeHandler = (e) => {
+        if (!popup.contains(e.target) && e.target !== anchorElement && !anchorElement.contains(e.target)) {
+          popup.remove();
+          if (overlay) overlay.remove();
+          document.removeEventListener('click', closeHandler);
+        }
+      };
+      setTimeout(() => document.addEventListener('click', closeHandler), 150);
+
+      if (overlay) {
+        overlay.addEventListener('click', () => {
+          popup.remove();
+          overlay.remove();
+          document.removeEventListener('click', closeHandler);
+        });
+      }
+
+      document.body.appendChild(popup);
+    },
+
+    toggleSettingsPopup(anchorElement) {
+      const existing = document.querySelector('.media-bar-settings-popup');
+      if (existing) {
+        existing.remove();
+        const overlay = document.querySelector('.media-bar-modal-overlay');
+        if (overlay) overlay.remove();
+      } else {
+        this.createPopup(anchorElement);
+      }
+    }
+  };
+
+  /**
+   * Returns the effective trailer volume (0-100), respecting client-side overrides.
+   * @returns {number} Volume level 0-100
+   */
+  function getEffectiveTrailerVolume() {
+    return parseInt(MediaBarEnhancedSettingsManager.getSetting('defaultTrailerVolume', CONFIG.defaultTrailerVolume), 10);
+  }
+
+  /**
+   * Returns the effective value for waiting for trailer to end, respecting client-side overrides.
+   * @returns {boolean} Whether to wait for the trailer to end
+   */
+  function getEffectiveWaitForTrailer() {
+    return MediaBarEnhancedSettingsManager.getSetting('waitForTrailer', CONFIG.waitForTrailerToEnd);
+  }
+
+  /**
+   * Initialize page visibility handling to pause when tab is inactive
+   */
+  const initPageVisibilityHandler = () => {
+    let wasVideoPlayingBeforeHide = false;
+
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) {
+        console.log("🎬 Media Bar:", "Tab inactive - pausing slideshow and videos");
+        wasVideoPlayingBeforeHide = STATE.slideshow.isVideoPlaying;
+
+        if (STATE.slideshow.slideInterval) {
+          STATE.slideshow.slideInterval.stop();
         }
 
-        if (wasVideoPlayingBeforeHide && currentItemId && STATE.slideshow.videoPlayers && STATE.slideshow.videoPlayers[currentItemId]) {
-          const player = STATE.slideshow.videoPlayers[currentItemId];
-          
+        // Pause active video if playing
+        const currentItemId = STATE.slideshow.itemIds[STATE.slideshow.currentSlideIndex];
+        if (currentItemId) {
           // YouTube
-          if (typeof player.playVideo === "function") {
-            try {
-              player.playVideo();
-              STATE.slideshow.isVideoPlaying = true;
-            } catch (e) {
-              console.warn("🎬 Media Bar:", "Error resuming video on tab show:", e);
-              if (STATE.slideshow.slideInterval) {
-                STATE.slideshow.slideInterval.start();
+          if (STATE.slideshow.videoPlayers && STATE.slideshow.videoPlayers[currentItemId]) {
+            const player = STATE.slideshow.videoPlayers[currentItemId];
+            if (typeof player.pauseVideo === "function") {
+              try {
+                player.pauseVideo();
+                STATE.slideshow.isVideoPlaying = false;
+              } catch (e) {
+                console.warn("🎬 Media Bar:", "Error pausing video on tab hide:", e);
               }
+            } else if (player.tagName === 'VIDEO') { // HTML5 Video
+              player.pause();
+              STATE.slideshow.isVideoPlaying = false;
             }
-          } else if (player.tagName === 'VIDEO') { // HTML5 Video
-             try {
+          }
+        }
+      } else {
+        console.log("🎬 Media Bar:", "Tab active - resuming slideshow");
+
+        const currentItemId = STATE.slideshow.itemIds[STATE.slideshow.currentSlideIndex];
+
+        // Resume video if the play signal was given (either before hiding, or timer expired while hidden)
+        if (!STATE.slideshow.isPaused) {
+          if (currentItemId && STATE.slideshow.currentPlayVideoLogic) {
+            if (STATE.slideshow.playSignals && STATE.slideshow.playSignals[currentItemId] === true) {
+              STATE.slideshow.currentPlayVideoLogic();
+            }
+          }
+
+          if (wasVideoPlayingBeforeHide && currentItemId && STATE.slideshow.videoPlayers && STATE.slideshow.videoPlayers[currentItemId]) {
+            const player = STATE.slideshow.videoPlayers[currentItemId];
+
+            // YouTube
+            if (typeof player.playVideo === "function") {
+              try {
+                player.playVideo();
+                STATE.slideshow.isVideoPlaying = true;
+              } catch (e) {
+                console.warn("🎬 Media Bar:", "Error resuming video on tab show:", e);
+                if (STATE.slideshow.slideInterval) {
+                  STATE.slideshow.slideInterval.start();
+                }
+              }
+            } else if (player.tagName === 'VIDEO') { // HTML5 Video
+              try {
                 player.play().catch(e => {
                   if (e.name !== 'AbortError') console.warn("🎬 Media Bar:", "Error resuming HTML5 video:", e);
                 });
                 STATE.slideshow.isVideoPlaying = true;
-             } catch(e) { console.warn("🎬 Media Bar:", e); }
-          }
-        } else {
-          // No video was playing, just restart interval
-          const activeSlide = document.querySelector('.slide.active');
-          const video = activeSlide ? activeSlide.querySelector('.video-backdrop') : null;
-          
-          if (CONFIG.waitForTrailerToEnd && video && !video.paused) {
-             // Don't restart interval if waiting for a currently playing trailer
+              } catch (e) { console.warn("🎬 Media Bar:", e); }
+            }
           } else {
-             if (STATE.slideshow.slideInterval) {
-               STATE.slideshow.slideInterval.start();
-             }
+            // No video was playing, just restart interval
+            const activeSlide = document.querySelector('.slide.active');
+            const video = activeSlide ? activeSlide.querySelector('.video-backdrop') : null;
+
+            if (getEffectiveWaitForTrailer() && video && !video.paused) {
+              // Don't restart interval if waiting for a currently playing trailer
+            } else {
+              if (STATE.slideshow.slideInterval) {
+                STATE.slideshow.slideInterval.start();
+              }
+            }
           }
+          wasVideoPlayingBeforeHide = false;
         }
-        wasVideoPlayingBeforeHide = false;
       }
+    });
+  };
+
+  /**
+   * Initialize the slideshow
+   */
+  const slidesInit = async () => {
+    if (STATE.slideshow.hasInitialized) {
+      console.log("🎬 Media Bar:", "⚠️ Slideshow already initialized, skipping");
+      return;
     }
-  });
-};
 
-/**
- * Initialize the slideshow
- */
-const slidesInit = async () => {
-  if (STATE.slideshow.hasInitialized) {
-    console.log("🎬 Media Bar:", "⚠️ Slideshow already initialized, skipping");
-    return;
-  }
-  
-  const renderCustomOverlay = () => {
-    let activeOverlayText = CONFIG.customOverlayText;
-    let activeOverlayImage = CONFIG.customOverlayImageUrl;
-    let isSeasonOverride = false;
+    const mobileMode = MediaBarEnhancedSettingsManager.getSetting('mobileMode', CONFIG.mobileCompactMode);
 
-    if (CONFIG.enableSeasonalContent && CONFIG.seasonalSections) {
-      try {
-        const sections = JSON.parse(CONFIG.seasonalSections || "[]");
-        const now = new Date();
-        const currentMonth = now.getMonth() + 1;
-        const currentDay = now.getDate();
+    document.body.classList.remove('media-bar-mobile-16-9', 'media-bar-mobile-4-3');
+    if (mobileMode === '16:9') {
+      document.body.classList.add('media-bar-mobile-16-9');
+    } else if (mobileMode === '4:3') {
+      document.body.classList.add('media-bar-mobile-4-3');
+    }
 
-        for (const section of sections) {
-          const startMonth = parseInt(section.StartMonth);
-          const startDay = parseInt(section.StartDay);
-          const endMonth = parseInt(section.EndMonth);
-          const endDay = parseInt(section.EndDay);
+    const renderCustomOverlay = () => {
+      let activeOverlayText = CONFIG.customOverlayText;
+      let activeOverlayImage = CONFIG.customOverlayImageUrl;
+      let isSeasonOverride = false;
 
-          let isActive = false;
-          if (startMonth === endMonth) {
-            if (currentMonth === startMonth && currentDay >= startDay && currentDay <= endDay) {
-              isActive = true;
+      if (CONFIG.enableSeasonalContent && CONFIG.seasonalSections) {
+        try {
+          const sections = JSON.parse(CONFIG.seasonalSections || "[]");
+          const now = new Date();
+          const currentMonth = now.getMonth() + 1;
+          const currentDay = now.getDate();
+
+          for (const section of sections) {
+            const startMonth = parseInt(section.StartMonth);
+            const startDay = parseInt(section.StartDay);
+            const endMonth = parseInt(section.EndMonth);
+            const endDay = parseInt(section.EndDay);
+
+            let isActive = false;
+            if (startMonth === endMonth) {
+              if (currentMonth === startMonth && currentDay >= startDay && currentDay <= endDay) {
+                isActive = true;
+              }
+            } else if (startMonth < endMonth) {
+              if (currentMonth > startMonth && currentMonth < endMonth) {
+                isActive = true;
+              } else if (currentMonth === startMonth && currentDay >= startDay) {
+                isActive = true;
+              } else if (currentMonth === endMonth && currentDay <= endDay) {
+                isActive = true;
+              }
+            } else { // Wraps around year
+              if (currentMonth > startMonth || currentMonth < endMonth) {
+                isActive = true;
+              } else if (currentMonth === startMonth && currentDay >= startDay) {
+                isActive = true;
+              } else if (currentMonth === endMonth && currentDay <= endDay) {
+                isActive = true;
+              }
             }
-          } else if (startMonth < endMonth) {
-            if (currentMonth > startMonth && currentMonth < endMonth) {
-              isActive = true;
-            } else if (currentMonth === startMonth && currentDay >= startDay) {
-              isActive = true;
-            } else if (currentMonth === endMonth && currentDay <= endDay) {
-              isActive = true;
-            }
-          } else { // Wraps around year
-            if (currentMonth > startMonth || currentMonth < endMonth) {
-              isActive = true;
-            } else if (currentMonth === startMonth && currentDay >= startDay) {
-              isActive = true;
-            } else if (currentMonth === endMonth && currentDay <= endDay) {
-              isActive = true;
-            }
-          }
 
-          if (isActive) {
-            if (section.OverlayText || section.OverlayImageUrl) {
+            if (isActive) {
+              if (section.OverlayText || section.OverlayImageUrl) {
                 isSeasonOverride = true;
                 // Season fully overrides global overlay, even if empty
                 activeOverlayImage = section.OverlayImageUrl || null;
                 activeOverlayText = section.OverlayText || null;
+              }
+              break;
             }
-            break;
           }
+        } catch (e) {
+          console.error("🎬 Media Bar:", "Error parsing seasonal sections for overlay:", e);
         }
-      } catch (e) {
-        console.error("🎬 Media Bar:", "Error parsing seasonal sections for overlay:", e);
       }
-    }
 
-    if (!CONFIG.enableCustomOverlay && !isSeasonOverride) {
-      return; 
-    }
+      if (!CONFIG.enableCustomOverlay && !isSeasonOverride) {
+        return;
+      }
 
-    if (!activeOverlayText && !activeOverlayImage) return;
+      if (!activeOverlayText && !activeOverlayImage) return;
 
-    const overlayContainer = document.createElement("div");
-    overlayContainer.className = "custom-overlay-container";
+      const overlayContainer = document.createElement("div");
+      overlayContainer.className = "custom-overlay-container";
 
-    const overlayPriority = CONFIG.customOverlayPriority || "Image";
-    const showImage = activeOverlayImage && (overlayPriority === "Image" || !activeOverlayText);
-    const showText = activeOverlayText && (!showImage);
+      const overlayPriority = CONFIG.customOverlayPriority || "Image";
+      const showImage = activeOverlayImage && (overlayPriority === "Image" || !activeOverlayText);
+      const showText = activeOverlayText && (!showImage);
 
-    if (showImage) {
-      const img = document.createElement("img");
-      const imgStyle = CONFIG.customOverlayImageStyle || "None";
-      img.className = `custom-overlay-image custom-overlay-img-${imgStyle}`;
-      
-      // If activeOverlayImage starts with /, adjust for base URL
-      if (activeOverlayImage.startsWith('/') && !activeOverlayImage.startsWith('//')) {
+      if (showImage) {
+        const img = document.createElement("img");
+        const imgStyle = CONFIG.customOverlayImageStyle || "None";
+        img.className = `custom-overlay-image custom-overlay-img-${imgStyle}`;
+
+        // If activeOverlayImage starts with /, adjust for base URL
+        if (activeOverlayImage.startsWith('/') && !activeOverlayImage.startsWith('//')) {
           img.src = `${STATE.jellyfinData.serverAddress}${activeOverlayImage}`;
-      } else {
+        } else {
           img.src = activeOverlayImage;
+        }
+
+        overlayContainer.appendChild(img);
+      } else if (showText) {
+        const p = document.createElement("p");
+        p.className = `custom-overlay-text custom-overlay-style-${CONFIG.customOverlayStyle || 'Shadowed'}`;
+        p.textContent = activeOverlayText;
+        overlayContainer.appendChild(p);
       }
-      
-      overlayContainer.appendChild(img);
-    } else if (showText) {
-      const p = document.createElement("p");
-      p.className = `custom-overlay-text custom-overlay-style-${CONFIG.customOverlayStyle || 'Shadowed'}`;
-      p.textContent = activeOverlayText;
-      overlayContainer.appendChild(p);
-    }
 
-    const slidesContainer = document.getElementById("slides-container");
-    if (slidesContainer) {
-      const posX = CONFIG.customOverlayPositionX || 0;
-      const posY = CONFIG.customOverlayPositionY || 0;
-      const scaleValue = (CONFIG.customOverlayScale !== undefined ? CONFIG.customOverlayScale : 100) / 100;
-      
-      overlayContainer.style.setProperty('--overlay-x', `${posX}vw`);
-      overlayContainer.style.setProperty('--overlay-y', `${posY}vh`);
-      overlayContainer.style.setProperty('--overlay-scale', scaleValue);
+      const slidesContainer = document.getElementById("slides-container");
+      if (slidesContainer) {
+        const posX = CONFIG.customOverlayPositionX || 0;
+        const posY = CONFIG.customOverlayPositionY || 0;
+        const scaleValue = (CONFIG.customOverlayScale !== undefined ? CONFIG.customOverlayScale : 100) / 100;
 
-      slidesContainer.appendChild(overlayContainer);
-    }
-  };
-  
-  if (CONFIG.enableClientSideSettings) {
+        overlayContainer.style.setProperty('--overlay-x', `${posX}vw`);
+        overlayContainer.style.setProperty('--overlay-y', `${posY}vh`);
+        overlayContainer.style.setProperty('--overlay-scale', scaleValue);
+
+        slidesContainer.appendChild(overlayContainer);
+      }
+    };
+
+    if (CONFIG.enableClientSideSettings) {
       MediaBarEnhancedSettingsManager.init();
       const isClientSideEnabled = MediaBarEnhancedSettingsManager.getSetting('enabled', true);
       if (!isClientSideEnabled) {
-          console.log("🎬 Media Bar:", "Disabled by client-side setting.");
-          const homeSections = document.querySelector('.homeSectionsContainer');
-          if (homeSections) {
-            homeSections.style.top = '0';
-            homeSections.style.marginTop = '0';
-          }
-          let container = document.getElementById('slides-container');
-          if (container) {
-            container.style.display = 'none';
-          } else {
-            // Create dummy container so loading screen's interval can trigger its own cleanup
-            container = document.createElement('div');
-            container.id = 'slides-container';
-            container.style.display = 'none';
-            document.body.appendChild(container);
-          }
-          
-          return;
+        console.log("🎬 Media Bar:", "Disabled by client-side setting.");
+        const homeSections = document.querySelector('.homeSectionsContainer');
+        if (homeSections) {
+          homeSections.style.top = '0';
+          homeSections.style.marginTop = '0';
+        }
+        let container = document.getElementById('slides-container');
+        if (container) {
+          container.style.display = 'none';
+        } else {
+          // Create dummy container so loading screen's interval can trigger its own cleanup
+          container = document.createElement('div');
+          container.id = 'slides-container';
+          container.style.display = 'none';
+          document.body.appendChild(container);
+        }
+
+        return;
       }
-  }
+    }
 
-  STATE.slideshow.hasInitialized = true;
+    STATE.slideshow.hasInitialized = true;
 
-  /**
-   * Initialize IntersectionObserver for lazy loading images
-   */
-  const initLazyLoading = () => {
-    const imageObserver = new IntersectionObserver(
-      (entries, observer) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            const image = entry.target;
-            const highQualityUrl = image.getAttribute("data-high-quality");
+    /**
+     * Initialize IntersectionObserver for lazy loading images
+     */
+    const initLazyLoading = () => {
+      const imageObserver = new IntersectionObserver(
+        (entries, observer) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              const image = entry.target;
+              const highQualityUrl = image.getAttribute("data-high-quality");
 
-            if (
-              highQualityUrl &&
-              image.closest(".slide").style.opacity === "1"
-            ) {
-              requestQueue.push({
-                url: highQualityUrl,
-                callback: () => {
-                  image.src = highQualityUrl;
-                  image.classList.remove("low-quality");
-                  image.classList.add("high-quality");
-                },
-              });
+              if (
+                highQualityUrl &&
+                image.closest(".slide").style.opacity === "1"
+              ) {
+                requestQueue.push({
+                  url: highQualityUrl,
+                  callback: () => {
+                    image.src = highQualityUrl;
+                    image.classList.remove("low-quality");
+                    image.classList.add("high-quality");
+                  },
+                });
 
-              if (requestQueue.length === 1) {
-                processNextRequest();
+                if (requestQueue.length === 1) {
+                  processNextRequest();
+                }
               }
-            }
 
-            observer.unobserve(image);
-          }
-        });
-      },
-      {
-        rootMargin: "50px",
-        threshold: 0.1,
-      }
-    );
-
-    const observeSlideImages = () => {
-      const slidesContainer = SlideUtils.getOrCreateSlidesContainer();
-      const slides = slidesContainer.querySelectorAll(".slide");
-      slides.forEach((slide) => {
-        const images = slide.querySelectorAll("img.low-quality");
-        images.forEach((image) => {
-          imageObserver.observe(image);
-        });
-      });
-    };
-
-    const slideObserver = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
-        if (mutation.addedNodes) {
-          mutation.addedNodes.forEach((node) => {
-            if (node.classList && node.classList.contains("slide")) {
-              const images = node.querySelectorAll("img.low-quality");
-              images.forEach((image) => {
-                imageObserver.observe(image);
-              });
+              observer.unobserve(image);
             }
           });
+        },
+        {
+          rootMargin: "50px",
+          threshold: 0.1,
         }
+      );
+
+      const observeSlideImages = () => {
+        const slidesContainer = SlideUtils.getOrCreateSlidesContainer();
+        const slides = slidesContainer.querySelectorAll(".slide");
+        slides.forEach((slide) => {
+          const images = slide.querySelectorAll("img.low-quality");
+          images.forEach((image) => {
+            imageObserver.observe(image);
+          });
+        });
+      };
+
+      const slideObserver = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+          if (mutation.addedNodes) {
+            mutation.addedNodes.forEach((node) => {
+              if (node.classList && node.classList.contains("slide")) {
+                const images = node.querySelectorAll("img.low-quality");
+                images.forEach((image) => {
+                  imageObserver.observe(image);
+                });
+              }
+            });
+          }
+        });
       });
-    });
 
-    const container = SlideUtils.getOrCreateSlidesContainer();
-    slideObserver.observe(container, { childList: true });
+      const container = SlideUtils.getOrCreateSlidesContainer();
+      slideObserver.observe(container, { childList: true });
 
-    observeSlideImages();
+      observeSlideImages();
 
-    return imageObserver;
+      return imageObserver;
+    };
+
+    const lazyLoadObserver = initLazyLoading();
+
+    try {
+      console.log("🎬 Media Bar:", "🌟 Initializing Enhanced Jellyfin Slideshow");
+
+      initArrowNavigation();
+
+      renderCustomOverlay();
+
+      await SlideshowManager.loadSlideshowData();
+
+      SlideshowManager.initTouchEvents();
+
+      SlideshowManager.initKeyboardEvents();
+
+      initPageVisibilityHandler();
+
+      VisibilityObserver.init();
+
+      console.log("🎬 Media Bar:", "✅ Enhanced Jellyfin Slideshow initialized successfully");
+    } catch (error) {
+      console.error("🎬 Media Bar:", "Error initializing slideshow:", error);
+      STATE.slideshow.hasInitialized = false;
+    }
   };
 
-  const lazyLoadObserver = initLazyLoading();
+  window.mediaBarEnhanced = {
+    CONFIG,
+    STATE,
+    SlideUtils,
+    ApiUtils,
+    SlideCreator,
+    SlideshowManager,
+    VisibilityObserver,
+    initSlideshowData: () => {
+      SlideshowManager.loadSlideshowData();
+    },
+    nextSlide: () => {
+      SlideshowManager.nextSlide();
+    },
+    prevSlide: () => {
+      SlideshowManager.prevSlide();
+    },
+  };
 
-  try {
-    console.log("🎬 Media Bar:", "🌟 Initializing Enhanced Jellyfin Slideshow");
+  initLoadingScreen();
 
-    initArrowNavigation();
-
-    renderCustomOverlay();
-
-    await SlideshowManager.loadSlideshowData();
-
-    SlideshowManager.initTouchEvents();
-
-    SlideshowManager.initKeyboardEvents();
-
-    initPageVisibilityHandler();
-
-    VisibilityObserver.init();
-
-    console.log("🎬 Media Bar:", "✅ Enhanced Jellyfin Slideshow initialized successfully");
-  } catch (error) {
-    console.error("🎬 Media Bar:", "Error initializing slideshow:", error);
-    STATE.slideshow.hasInitialized = false;
-  }
-};
-
-window.mediaBarEnhanced = {
-  CONFIG,
-  STATE,
-  SlideUtils,
-  ApiUtils,
-  SlideCreator,
-  SlideshowManager,
-  VisibilityObserver,
-  initSlideshowData: () => {
-    SlideshowManager.loadSlideshowData();
-  },
-  nextSlide: () => {
-    SlideshowManager.nextSlide();
-  },
-  prevSlide: () => {
-    SlideshowManager.prevSlide();
-  },
-};
-
-initLoadingScreen();
-
-fetchPluginConfig().then(() => {
-  startLoginStatusWatcher();
-});
+  fetchPluginConfig().then(() => {
+    startLoginStatusWatcher();
+  });
+})();
