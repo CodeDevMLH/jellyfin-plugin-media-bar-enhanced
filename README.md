@@ -81,25 +81,42 @@ Trailer modal in portrait mode
 This plugin builds upon the original Media Bar with new capabilities and improvements:
 
 ### New Features & Enhancements
-*   **Video Backdrop Support**: Play trailer as background video directly in the slideshow
-*   **SponsorBlock Integration**: Automatically skip intro/outro segments in YouTube trailers
+*   **Video Backdrop Support**: Play trailer as background video directly in the slideshow.
+*   **SponsorBlock Integration**: Automatically skip intro/outro segments in YouTube trailers.
+*   **Mobile Compact Aspect Ratio Modes**:
+    *   **16:9 Compact Wide** & **4:3 Compact Classic** aspect ratio options designed specifically for portrait mobile screens.
+    *   Aligns navigation arrows vertically to the center of the scaled banner.
+    *   Stacks year, age rating, and end times vertically on the right to prevent horizontal overflows.
+    *   Automatically limits font sizes and wraps logo title fallback text to fit cleanly.
+    *   Fades out the static background image when the video backdrop is playing so it doesn't bleed through.
+*   **Flexible Client Settings Location**:
+    *   Choose where the client-side configuration button appears (Navbar header gear icon, Sidebar navigation drawer, or Both).
+    *   Allows freeing up valuable navigation header space on small mobile phone screens.
+*   **Premium Dialog Modals & Animations**:
+    *   Opening client settings via the sidebar closes the drawer automatically and renders the options in a centered dialog modal.
+    *   Features a blurred, dimmed backdrop overlay (`backdrop-filter: blur(4px)`) and smooth pop-in and fade transitions.
+*   **Trailer Volume Controls**:
+    *   Choose a default volume level (10% - 100%) for background trailer playback.
+    *   Applies seamlessly to both YouTube and HTML5 local video players.
+*   **Advanced Collection & Library Support**:
+    *   Input a folder ID, BoxSet ID, or even a full Library ID (like a Collection Folder or UserView) and the plugin will recursively fetch and display all matching films and series items.
 *   **Enhanced Controls**:
-    *   Keyboard shortcuts (Arrow keys to navigate, Space to pause, M to mute)
-    *   Option to always show navigation arrows
-    *   Standalone "Trailer" button (opens in a modal) if video backdrops are disabled
+    *   Keyboard shortcuts (Arrow keys to navigate, Space to pause, M to mute).
+    *   Option to always show navigation arrows.
+    *   Standalone "Trailer" button (opens in a modal) if video backdrops are disabled.
 *   **Smarter Playback**:
     *   Option to wait for the trailer to end before advancing the slide.
-    *   Mute/Unmute controls
-*   **Override Trailers**: Manually specify a custom trailer URL for any item via the Custom Media IDs list
+    *   Mute/Unmute controls.
+*   **Override Trailers**: Manually specify a custom trailer URL for any item via the Custom Media IDs list.
 *   **Customization**:
-    *   **Custom Media IDs**: Manually specify which items (Movies, Series, Collections/Boxsets) to display. Easily configurable via the plugin settings
-    *   **Seasonal Content Mode**: Define date-based lists for holidays and seasons (e.g., Halloween, Christmas)
-    *   Pagination dots turn into a counter (e.g., 1/20) if the limit is exceeded
+    *   **Custom Media IDs**: Manually specify which items to display. Easily configurable via the plugin settings.
+    *   **Seasonal Content Mode**: Define date-based lists for holidays and seasons (e.g., Halloween, Christmas).
+    *   Pagination dots turn into a counter (e.g., 1/20) if the limit is exceeded.
         <details>
         <summary>Have a look:</summary>
         <img width="167" height="142" alt="PagDots_Number" src="https://github.com/user-attachments/assets/6a0a5040-cf13-4d9c-ae96-f50ec249c3f1" />
         </details>
-    *   Option to disable the loading screen
+    *   Option to disable the loading screen.
     *   Client Settings: Optionally allow users to set selected media bar settings from their client.
         <details>
         <summary>Have a look:</summary>
@@ -118,12 +135,12 @@ This plugin builds upon the original Media Bar with new capabilities and improve
     *   **Client-Side Settings**: Allow users to override settings locally on their device.
 
 ### Core Features
-*   **Immersive Slideshow**: Rotates through your media library
-*   **Metadata Display**: Shows title, rating, year, and plot summary
-*   **Direct Play**: Click "Play" to start watching immediately
-*   **Details View**: Click "Info" to jump to the item's detail page
-*   **Add To Favorites**: Click the heart to add the item to your favorites
-*   **Customize**: Change the plugins behavior through the Jellyfin admin panel
+*   **Immersive Slideshow**: Rotates through your media library.
+*   **Metadata Display**: Shows title, rating, year, and plot summary.
+*   **Direct Play**: Click "Play" to start watching immediately.
+*   **Details View**: Click "Info" to jump to the item's detail page.
+*   **Add To Favorites**: Click the heart to add the item to your favorites.
+*   **Customize**: Change the plugins behavior through the Jellyfin admin panel.
 
 ## Installation
 
@@ -153,6 +170,7 @@ Because this plugin relies on injecting JavaScript and CSS into the web interfac
 | **Android App** | ✅ | Uses a web wrapper |
 | **iOS App** | ✅ | Uses a web wrapper |
 | **Android TV / Fire TV** | ❌ | **Not supported.** Uses a native Java/Kotlin UI. |
+| **Tizen OS** | ❌ | **Not supported.** Uses a native UI. |
 | **Roku** | ❌ | **Not supported.** Uses a native UI. |
 | **Swiftfin** (iOS/tvOS) | ❌ | **Not supported.** Uses a native Swift UI. |
 | **Kodi** (via Jellyfin Addon) | ❌ | **Not supported.** Uses Kodi's native skinning engine. |
@@ -169,9 +187,12 @@ Configure the plugin via **Dashboard** > **Plugins** > **Media Bar Enhanced**.
 *   **Enable Video Backdrops**: Dynamically plays trailers in the background.
 *   **Wait For Trailer To End**: Prevents slide transition until the video finishes.
 *   **Enable Trailer on Mobile**: specific setting to allow video playback on mobile devices (disabled by default to save data/battery).
-*   **Show Trailer Button**: Adds a button to open the trailer in a popup modal if video backdrops are disabled (e.g. on mobile if trailers are disabled there)
+*   **Show Trailer Button**: Adds a button to open the trailer in a popup modal if video backdrops are disabled (e.g. on mobile if trailers are disabled there).
 *   **Prefer Local Trailers**: If enabled, local trailers will be preferred over remote (YouTube) trailers.
 *   **Prefer Local Backdrops / Theme Videos**: If enabled, local backdrop videos (Theme Videos) will be preferred over remote and local trailers.
+*   **Mobile Aspect Ratio**: Set a global default layout format (`Original` 65vh, `16:9` Compact, `4:3` Classic) for mobile portrait clients.
+*   **Client Settings Menu Location**: Set where users can access the settings popup (`Navbar`, `Sidebar`, or `Both`).
+*   **Default Trailer Volume**: Select the global default trailer volume (10% - 100%).
 
 ### Custom Content
 Define exactly what shows up in your bar.

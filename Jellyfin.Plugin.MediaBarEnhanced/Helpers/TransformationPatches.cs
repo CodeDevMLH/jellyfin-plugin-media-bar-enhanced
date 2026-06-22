@@ -18,7 +18,7 @@ namespace Jellyfin.Plugin.MediaBarEnhanced.Helpers
             try 
             {
                 // Safety Check: If plugin is disabled, do nothing
-                if (!MediaBarEnhancedPlugin.Instance.Configuration.IsEnabled)
+                if (MediaBarEnhancedPlugin.Instance?.Configuration?.IsEnabled != true)
                 {
                     return originalContents;
                 }
