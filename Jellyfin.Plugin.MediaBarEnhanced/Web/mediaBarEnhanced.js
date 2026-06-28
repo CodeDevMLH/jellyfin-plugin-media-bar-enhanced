@@ -30,7 +30,7 @@
   window.mediaBarEnhancedLoaded = true;
 
   // MARK: Version
-  const PLUGIN_VERSION = "3.0.1.0";
+  const PLUGIN_VERSION = "3.0.2.0";
 
   //Core Module Configuration
   const CONFIG = {
@@ -95,7 +95,8 @@
     maxCachedItems: 20,
     isEnabled: true,
     mobileCompactMode: "Original",
-    clientMenuLocation: "Sidebar",
+    clientMenuLocation: "Navbar",
+    clientMenuLocationMobile: "Sidebar",
     transitionEffect: "Fade",
     showProgressBar: true,
     progressBarLocation: "Dots",
@@ -127,6 +128,8 @@
       defaultTrailerVolumeDesc: 'Set default volume for trailer playback (in %).',
       clientMenuLocationLabel: 'Settings Button Location',
       clientMenuLocationDesc: 'Choose where the settings button is displayed (Navbar, Sidebar, or Both).',
+      clientMenuLocationMobileLabel: 'Settings Button Location (Mobile)',
+      clientMenuLocationMobileDesc: 'Choose where the settings button is displayed on mobile devices.',
       transitionEffectLabel: 'Transition Effect',
       transitionEffectDesc: 'Select the transition style between slides.',
       showProgressBarLabel: 'Show Progress Bar',
@@ -205,6 +208,8 @@
       defaultTrailerVolumeDesc: 'Standard-Lautstärke für die Trailer-Wiedergabe (in %).',
       clientMenuLocationLabel: 'Ort der Einstellungen',
       clientMenuLocationDesc: 'Wähle aus, wo das Einstellungs-Symbol angezeigt wird (Kopfzeile, Seitenleiste oder Beide).',
+      clientMenuLocationMobileLabel: 'Ort der Einstellungen (Mobil)',
+      clientMenuLocationMobileDesc: 'Wähle aus, wo das Einstellungs-Symbol auf mobilen Geräten angezeigt wird.',
       resetBtn: 'Server-Standardwerte laden',
       resetTitle: 'Auf Server-Standardwerte zurücksetzen',
       saveBtn: 'Speichern & Neu laden',
@@ -233,6 +238,8 @@
       defaultTrailerVolumeDesc: 'Ajustar el volumen predeterminado del tráiler (en %).',
       clientMenuLocationLabel: 'Ubicación de ajustes',
       clientMenuLocationDesc: 'Elige dónde se muestra el botón de ajustes (Barra de navegación, Menú lateral o Ambos).',
+      clientMenuLocationMobileLabel: 'Ubicación de ajustes (Móvil)',
+      clientMenuLocationMobileDesc: 'Elige dónde se muestra el botón de ajustes en dispositivos móviles.',
       transitionEffectLabel: 'Efecto de transición',
       transitionEffectDesc: 'Selecciona el estilo de transición entre diapositivas.',
       showProgressBarLabel: 'Mostrar barra de progreso',
@@ -286,6 +293,8 @@
       defaultTrailerVolumeDesc: 'Définir le volume par défaut de la bande-annonce (en %).',
       clientMenuLocationLabel: 'Emplacement des paramètres',
       clientMenuLocationDesc: 'Choisissez où afficher le bouton des paramètres (Barre de navigation, Menu latéral ou Les deux).',
+      clientMenuLocationMobileLabel: 'Emplacement des paramètres (Mobile)',
+      clientMenuLocationMobileDesc: 'Choisissez où afficher le bouton des paramètres sur les appareils mobiles.',
       transitionEffectLabel: 'Effet de transition',
       transitionEffectDesc: 'Sélectionnez le style de transition entre les diapositives.',
       showProgressBarLabel: 'Afficher la barre de progression',
@@ -339,6 +348,8 @@
       defaultTrailerVolumeDesc: 'Imposta il volume predefinito per il trailer (in %).',
       clientMenuLocationLabel: 'Posizione impostazioni',
       clientMenuLocationDesc: 'Scegli dove mostrare il pulsante delle impostazioni (Barra di navigazione, Menu laterale o Entrambi).',
+      clientMenuLocationMobileLabel: 'Posizione impostazioni (Mobile)',
+      clientMenuLocationMobileDesc: 'Scegli dove mostrare il pulsante delle impostazioni sui dispositivi mobili.',
       transitionEffectLabel: 'Effetto di transizione',
       transitionEffectDesc: 'Seleziona lo stile di transizione tra le diapositive.',
       showProgressBarLabel: 'Mostra barra di avanzamento',
@@ -4661,7 +4672,10 @@
     },
 
     injectSettingsIcon() {
-      const menuLocation = this.getSetting('menuLocation', CONFIG.clientMenuLocation);
+      const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.matchMedia("only screen and (max-width: 768px)").matches;
+      const menuLocation = isMobile
+        ? this.getSetting('menuLocationMobile', CONFIG.clientMenuLocationMobile)
+        : this.getSetting('menuLocation', CONFIG.clientMenuLocation);
       let navbarInjected = false;
       let debounceTimer = null;
 
@@ -4965,6 +4979,21 @@
     </div>
     `;
 
+      const menuLocationMobileVal = this.getSetting('menuLocationMobile', CONFIG.clientMenuLocationMobile);
+      html += `
+    <div class="media-bar-select-container">
+        <div class="media-bar-select-info">
+            <span class="media-bar-select-label">${t.clientMenuLocationMobileLabel}</span>
+            <span class="media-bar-select-desc">${t.clientMenuLocationMobileDesc}</span>
+        </div>
+        <select id="mb-setting-menuLocationMobile" class="media-bar-select">
+            <option value="Navbar" ${menuLocationMobileVal === 'Navbar' ? 'selected' : ''}>${t.optionMenuLocationNavbar || 'Navbar'}</option>
+            <option value="Sidebar" ${menuLocationMobileVal === 'Sidebar' ? 'selected' : ''}>${t.optionMenuLocationSidebar || 'Sidebar'}</option>
+            <option value="Both" ${menuLocationMobileVal === 'Both' ? 'selected' : ''}>${t.optionMenuLocationBoth || 'Both'}</option>
+        </select>
+    </div>
+    `;
+
       const transitionEffectVal = this.getSetting('transitionEffect', CONFIG.transitionEffect);
       html += `
     <div class="media-bar-select-container" style="margin-top: 0.5em;">
@@ -5063,6 +5092,11 @@
       const menuLocationSelect = popup.querySelector('#mb-setting-menuLocation');
       menuLocationSelect.addEventListener('change', (e) => {
         this.setSetting('menuLocation', e.target.value);
+      });
+
+      const menuLocationMobileSelect = popup.querySelector('#mb-setting-menuLocationMobile');
+      menuLocationMobileSelect.addEventListener('change', (e) => {
+        this.setSetting('menuLocationMobile', e.target.value);
       });
 
       const activePlaylistSelect = popup.querySelector('#mb-setting-activePlaylist');

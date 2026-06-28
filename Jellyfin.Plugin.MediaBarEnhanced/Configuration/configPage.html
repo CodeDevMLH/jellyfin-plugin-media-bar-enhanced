@@ -119,6 +119,20 @@
                                     <div class="fieldDescription">Choose where the client-side settings menu can be
                                         accessed.</div>
                                 </div>
+                                <div class="selectContainer" style="margin-top: 1em;">
+                                    <label class="selectLabel" for="ClientMenuLocationMobile">Client Settings Menu
+                                        Location (Mobile)</label>
+                                    <select is="emby-select" id="ClientMenuLocationMobile"
+                                        name="ClientMenuLocationMobile"
+                                        class="selectLayout emby-select-withcolor emby-select"
+                                        style="width: 100%; -webkit-appearance: menulist; appearance: menulist;">
+                                        <option value="Navbar">Navbar (Gear Icon in Header)</option>
+                                        <option value="Sidebar">Sidebar (Item in Navigation Drawer)</option>
+                                        <option value="Both">Both Navbar &amp; Sidebar</option>
+                                    </select>
+                                    <div class="fieldDescription">Choose where the client-side settings menu can be
+                                        accessed on mobile devices.</div>
+                                </div>
                             </div>
 
                             <!-- Card 2: Trailer Backdrops -->
@@ -1111,7 +1125,8 @@
                             'CustomOverlayStyle', 'CustomOverlayImageStyle', 'CustomOverlayPriority',
                             'CustomOverlayPositionX', 'CustomOverlayPositionY', 'CustomOverlayScale',
                             'BackdropVideoDelay', 'ConstrainPlotWidth', 'MobileCompactMode', 'DefaultTrailerVolume',
-                            'ClientMenuLocation', 'CustomPlaylists', 'TransitionEffect', 'ShowProgressBar', 'ProgressBarLocation'
+                            'ClientMenuLocation', 'ClientMenuLocationMobile', 'CustomPlaylists', 'TransitionEffect',
+                            'ShowProgressBar', 'ProgressBarLocation'
                         ];
 
                         // Manual mapping for MediaBarIsEnabled -> IsEnabled, to avoid conflicts with other plugins
@@ -1373,7 +1388,8 @@
                         'CustomOverlayStyle', 'CustomOverlayImageStyle', 'CustomOverlayPriority',
                         'CustomOverlayPositionX', 'CustomOverlayPositionY', 'CustomOverlayScale',
                         'BackdropVideoDelay', 'ConstrainPlotWidth', 'MobileCompactMode', 'DefaultTrailerVolume',
-                        'ClientMenuLocation', 'CustomPlaylists', 'TransitionEffect', 'ShowProgressBar', 'ProgressBarLocation'
+                        'ClientMenuLocation', 'ClientMenuLocationMobile', 'CustomPlaylists', 'TransitionEffect',
+                        'ShowProgressBar', 'ProgressBarLocation'
                     ];
 
                     keys.forEach(function (key) {
