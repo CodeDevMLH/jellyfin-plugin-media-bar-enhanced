@@ -65,7 +65,8 @@ namespace Jellyfin.Plugin.MediaBarEnhanced.Configuration
         public int CustomOverlayScale { get; set; } = 100;
  
         public string MobileCompactMode { get; set; } = "Original";
-        public string ClientMenuLocation { get; set; } = "Sidebar";
+        public string ClientMenuLocation { get; set; } = "Navbar";
+        public string ClientMenuLocationMobile { get; set; } = "Sidebar";
 
         public string TransitionEffect { get; set; } = "Fade";
         public bool ShowProgressBar { get; set; } = true;
