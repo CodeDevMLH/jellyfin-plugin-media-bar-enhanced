@@ -12,9 +12,9 @@
         "version": "3.0.2.0",
         "changelog": "- feat: Add option for mobile client-side menu",
         "targetAbi": "10.11.0.0",
-        "sourceUrl": "https://github.com/CodeDevMLH/jellyfin-plugin-media-bar-enhanced/releases/download/v3.0.1.0/Jellyfin.Plugin.MediaBarEnhanced.zip",
-        "checksum": "8ba94b5efaa5b5fa6a49c42c175f8fb3",
-        "timestamp": "2026-06-22T14:09:59Z"
+        "sourceUrl": "https://github.com/CodeDevMLH/jellyfin-plugin-media-bar-enhanced/releases/download/v3.0.2.0/Jellyfin.Plugin.MediaBarEnhanced.zip",
+        "checksum": "e9668147dcc9563eca71a7e1ad427826",
+        "timestamp": "2026-06-28T16:24:46Z"
       },
       {
         "version": "3.0.1.0",
