@@ -907,6 +907,13 @@
                                         <div class="fieldDescription">Maximum plot character limit.</div>
                                     </div>
                                 </div>
+                                <div class="inputContainer" style="margin-top: 1.5em; width: 100%;">
+                                    <label class="inputLabel">Libraries to include in Media Bar (unchecked libraries will be excluded)</label>
+                                    <div id="admin-libraries-list" style="display: flex; flex-direction: column; gap: 0.5em; max-height: 200px; overflow-y: auto; border: 1px solid #3f3f3f; border-radius: 4px; padding: 0.8em; margin-top: 0.5em;">
+                                        <div class="fieldDescription">Loading libraries...</div>
+                                    </div>
+                                </div>
+                                <input type="hidden" id="ExcludedLibraries" name="ExcludedLibraries" />
                                 <div class="checkboxContainer checkboxContainer-withDescription"
                                     style="margin-top: 1.5em;">
                                     <label>
@@ -1126,7 +1133,7 @@
                             'CustomOverlayPositionX', 'CustomOverlayPositionY', 'CustomOverlayScale',
                             'BackdropVideoDelay', 'ConstrainPlotWidth', 'MobileCompactMode', 'DefaultTrailerVolume',
                             'ClientMenuLocation', 'ClientMenuLocationMobile', 'CustomPlaylists', 'TransitionEffect',
-                            'ShowProgressBar', 'ProgressBarLocation'
+                            'ShowProgressBar', 'ProgressBarLocation', 'ExcludedLibraries'
                         ];
 
                         // Manual mapping for MediaBarIsEnabled -> IsEnabled, to avoid conflicts with other plugins
@@ -1145,6 +1152,47 @@
                                 }
                             }
                         });
+
+                        // Load and render admin libraries checkboxes
+                        (function() {
+                            var listContainer = page.querySelector('#admin-libraries-list');
+                            var hiddenInput = page.querySelector('#ExcludedLibraries');
+                            if (!listContainer || !hiddenInput) return;
+
+                            var excludedStr = hiddenInput.value || '';
+                            var excludedIds = excludedStr.split(',').filter(function(id) { return id; });
+
+                            var viewsUrl = ApiClient.serverAddress() + '/Users/' + ApiClient.getCurrentUserId() + '/Views';
+                            fetch(viewsUrl, {
+                                headers: {
+                                    'Authorization': 'MediaBrowser Client="' + ApiClient.appName() + '", Device="' + ApiClient.deviceName() + '", DeviceId="' + ApiClient.deviceId() + '", Version="' + ApiClient.appVersion() + '", Token="' + ApiClient.accessToken() + '"'
+                                }
+                            }).then(function (response) {
+                                return response.json();
+                            }).then(function (data) {
+                                var views = data.Items || [];
+                                var html = '';
+
+                                views.forEach(function (view) {
+                                    var isChecked = excludedIds.indexOf(view.Id) === -1;
+                                    html += '<div class="checkboxContainer checkboxContainer-withDescription" style="margin: 0.3em 0;">' +
+                                                '<label>' +
+                                                    '<input is="emby-checkbox" type="checkbox" class="admin-library-checkbox" data-id="' + view.Id + '" ' + (isChecked ? 'checked' : '') + ' />' +
+                                                    '<span>' + view.Name + '</span>' +
+                                                '</label>' +
+                                            '</div>';
+                                });
+
+                                if (html === '') {
+                                    listContainer.innerHTML = '<div class="fieldDescription">No libraries found.</div>';
+                                } else {
+                                    listContainer.innerHTML = html;
+                                }
+                            }).catch(function (err) {
+                                console.error('Error fetching libraries in admin panel:', err);
+                                listContainer.innerHTML = '<div class="fieldDescription" style="color: #ff3b30;">Failed to load libraries.</div>';
+                            });
+                        })();
 
                         // Render Seasonal Sections
                         try {
@@ -1363,6 +1411,17 @@
                     var playlistsInput = page.querySelector('#CustomPlaylists');
                     if (playlistsInput) playlistsInput.value = playlistsJson;
 
+                    // Excluded Libraries: unchecked checkboxes are excluded
+                    var checkboxes = page.querySelectorAll('.admin-library-checkbox');
+                    var uncheckedIds = [];
+                    checkboxes.forEach(function (cb) {
+                        if (!cb.checked) {
+                            uncheckedIds.push(cb.getAttribute('data-id'));
+                        }
+                    });
+                    var excludedInput = page.querySelector('#ExcludedLibraries');
+                    if (excludedInput) excludedInput.value = uncheckedIds.join(',');
+
                     var config = {};
 
                     // Manual mapping for MediaBarIsEnabled -> IsEnabled, to avoid conflicts with other plugins
@@ -1389,8 +1448,29 @@
                         'CustomOverlayPositionX', 'CustomOverlayPositionY', 'CustomOverlayScale',
                         'BackdropVideoDelay', 'ConstrainPlotWidth', 'MobileCompactMode', 'DefaultTrailerVolume',
                         'ClientMenuLocation', 'ClientMenuLocationMobile', 'CustomPlaylists', 'TransitionEffect',
-                        'ShowProgressBar', 'ProgressBarLocation'
+                        'ShowProgressBar', 'ProgressBarLocation', 'ExcludedLibraries'
                     ];
+
+                    var numberDefaults = {
+                        'ShuffleInterval': 7000,
+                        'RetryInterval': 500,
+                        'MinSwipeDistance': 50,
+                        'LoadingCheckInterval': 100,
+                        'MaxPlotLength': 360,
+                        'MaxMovies': 20,
+                        'MaxTvShows': 20,
+                        'MaxItems': 20,
+                        'MaxParentalRating': 0,
+                        'MaxDaysRecent': 0,
+                        'PreloadCount': 3,
+                        'FadeTransitionDuration': 500,
+                        'MaxPaginationDots': 15,
+                        'DefaultTrailerVolume': 40,
+                        'BackdropVideoDelay': 0,
+                        'CustomOverlayPositionX': 0,
+                        'CustomOverlayPositionY': 0,
+                        'CustomOverlayScale': 100
+                    };
 
                     keys.forEach(function (key) {
                         var el = page.querySelector('#' + key);
@@ -1398,9 +1478,16 @@
                             if (el.type === 'checkbox') {
                                 config[key] = el.checked;
                             } else {
-                                var val = (el.type === 'number') ? parseInt(el.value, 10) : el.value;
+                                var val = el.value;
+                                if (el.type === 'number') {
+                                    var parsed = parseInt(val, 10);
+                                    if (isNaN(parsed)) {
+                                        parsed = numberDefaults[key] !== undefined ? numberDefaults[key] : 0;
+                                    }
+                                    val = parsed;
+                                }
                                 if (key === 'MaxPaginationDots') {
-                                    val = Math.max(6, isNaN(val) ? 6 : val);
+                                    val = Math.max(6, val);
                                 }
                                 config[key] = val;
                             }
@@ -1409,6 +1496,10 @@
 
                     ApiClient.updatePluginConfiguration(MediaBarEnhancedConfigurationPage.pluginId, config).then(function (result) {
                         Dashboard.processPluginConfigurationUpdateResult(result);
+                    }).catch(function (err) {
+                        console.error('Error updating plugin configuration:', err);
+                        Dashboard.alert('Failed to save settings: ' + err);
+                        Dashboard.hideLoadingMsg();
                     });
                 },
 
@@ -2397,6 +2488,12 @@
                 border-radius: 6px !important;
                 font-weight: 500 !important;
                 transition: all 0.2s !important;
+            }
+
+            /* Spacing overrides for the admin library list */
+            #MediaBarEnhancedConfigurationPage #admin-libraries-list .checkboxContainer {
+                margin-top: 0.2em !important;
+                margin-bottom: 0.2em !important;
             }
         </style>
     </div>
