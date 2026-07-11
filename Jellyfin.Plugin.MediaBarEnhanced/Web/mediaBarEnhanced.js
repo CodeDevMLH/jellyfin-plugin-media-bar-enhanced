@@ -30,7 +30,7 @@
   window.mediaBarEnhancedLoaded = true;
 
   // MARK: Version
-  const PLUGIN_VERSION = "3.0.2.0";
+  const PLUGIN_VERSION = "3.0.3.0";
 
   //Core Module Configuration
   const CONFIG = {
@@ -110,6 +110,7 @@
       groupGeneral: 'General',
       groupTrailers: 'Trailers & Backdrops',
       groupLayout: 'Layout & Volume',
+      groupLibraries: 'Libraries',
       enabledLabel: 'Enable Media Bar Enhanced',
       enabledDesc: 'Toggle the entire media bar visibility.',
       videoBackdropsLabel: 'Enable Trailer Backdrops',
@@ -158,13 +159,15 @@
       resetBtn: 'Load Server Defaults',
       resetTitle: 'Reset to Server Defaults',
       saveBtn: 'Save & Reload',
-      confirmReset: 'Reset all local Media Bar settings to server defaults?'
+      confirmReset: 'Reset all local Media Bar settings to server defaults?',
+      libraryFilterHint: 'Note: These filters only apply when fetching random or recent items. They do not affect custom playlists or fixed item ID lists.'
     },
     'de': {
       title: 'Media Bar Einstellungen',
       groupGeneral: 'Allgemein',
       groupTrailers: 'Trailer & Hintergründe',
       groupLayout: 'Layout & Lautstärke',
+      groupLibraries: 'Bibliotheken',
       transitionEffectLabel: 'Übergangseffekt',
       transitionEffectDesc: 'Wähle den Effekt für den Folienwechsel.',
       showProgressBarLabel: 'Fortschrittsbalken anzeigen',
@@ -213,13 +216,15 @@
       resetBtn: 'Server-Standardwerte laden',
       resetTitle: 'Auf Server-Standardwerte zurücksetzen',
       saveBtn: 'Speichern & Neu laden',
-      confirmReset: 'Alle lokalen Media Bar Einstellungen auf Server-Standardwerte zurücksetzen?'
+      confirmReset: 'Alle lokalen Media Bar Einstellungen auf Server-Standardwerte zurücksetzen?',
+      libraryFilterHint: 'Hinweis: Diese Filter gelten nur für zufällige oder kürzlich hinzugefügte Medien. Sie haben keinen Einfluss auf feste Wiedergabelisten oder manuell angegebene Element-IDs.'
     },
     'es': {
       title: 'Ajustes de Media Bar',
       groupGeneral: 'General',
       groupTrailers: 'Tráilers y fondos',
       groupLayout: 'Diseño y volumen',
+      groupLibraries: 'Bibliotecas',
       enabledLabel: 'Habilitar Media Bar Enhanced',
       enabledDesc: 'Activa o desactiva toda la Media Bar.',
       videoBackdropsLabel: 'Habilitar fondos de tráiler',
@@ -268,13 +273,15 @@
       resetBtn: 'Cargar valores del servidor',
       resetTitle: 'Restablecer a valores del servidor',
       saveBtn: 'Guardar y recargar',
-      confirmReset: '¿Restablecer todos los ajustes locales de Media Bar a los valores predeterminados del servidor?'
+      confirmReset: '¿Restablecer todos los ajustes locales de Media Bar a los valores predeterminados del servidor?',
+      libraryFilterHint: 'Nota: Estos filtros solo se aplican cuando se obtienen elementos aleatorios o recientes. No afectan a las listas de reproducción personalizadas ni a las listas fijas de IDs de elementos.'
     },
     'fr': {
       title: 'Paramètres de Media Bar',
       groupGeneral: 'Général',
       groupTrailers: 'Bande-annonce & Fonds',
       groupLayout: 'Mise en page & Volume',
+      groupLibraries: 'Bibliothèques',
       enabledLabel: 'Activer Media Bar Enhanced',
       enabledDesc: 'Active ou désactive toute la Media Bar.',
       videoBackdropsLabel: 'Activer les fonds de bande-annonce',
@@ -323,13 +330,15 @@
       resetBtn: 'Charger les valeurs par défaut',
       resetTitle: 'Réinitialiser aux valeurs du serveur',
       saveBtn: 'Enregistrer et recharger',
-      confirmReset: 'Réinitialiser tous les paramètres locaux de Media Bar aux valeurs par défaut du serveur ?'
+      confirmReset: 'Réinitialiser tous les paramètres locaux de Media Bar aux valeurs par défaut du serveur ?',
+      libraryFilterHint: 'Remarque : ces filtres ne s\'appliquent que lors de la récupération d\'éléments aléatoires ou récents. Ils n\'affectent pas les listes de lecture personnalisées ni les listes fixes d\'identifiants d\'éléments.'
     },
     'it': {
       title: 'Impostazioni Media Bar',
       groupGeneral: 'Generale',
       groupTrailers: 'Trailer & Sfondi',
       groupLayout: 'Layout & Volume',
+      groupLibraries: 'Librerie',
       enabledLabel: 'Abilita Media Bar Enhanced',
       enabledDesc: 'Attiva o disattiva l\'intera Media Bar.',
       videoBackdropsLabel: 'Abilita sfondi trailer',
@@ -378,7 +387,8 @@
       resetBtn: 'Carica valori del server',
       resetTitle: 'Ripristina valori del server',
       saveBtn: 'Salva e ricarica',
-      confirmReset: 'Ripristinare tutte le impostazioni locali di Media Bar ai valori predefiniti del server?'
+      confirmReset: 'Ripristinare tutte le impostazioni locali di Media Bar ai valori predefiniti del server?',
+      libraryFilterHint: 'Nota: questi filtri si applicano solo quando si recuperano elementi casuali o recenti. Non influiscono sulle playlist personalizzate o sugli elenchi fissi di ID elemento.'
     }
   };
 
@@ -1006,6 +1016,10 @@
      * @returns {Promise<void>}
      */
     loadYouTubeIframeAPI() {
+      if (window.YT && window.YT.Player) {
+        return Promise.resolve(window.YT);
+      }
+
       if (STATE.slideshow.ytPromise) return STATE.slideshow.ytPromise;
 
       STATE.slideshow.ytPromise = new Promise((resolve) => {
@@ -1014,18 +1028,54 @@
           return;
         }
 
-        window.onYouTubeIframeAPIReady = () => resolve(window.YT);
-
-        if (!document.querySelector('script[src*="youtube.com/iframe_api"]')) {
-          const tag = document.createElement('script');
-          tag.src = "https://www.youtube.com/iframe_api";
-          const firstScriptTag = document.getElementsByTagName('script')[0];
-          if (firstScriptTag && firstScriptTag.parentNode) {
-            firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+        let timeout;
+        let settled = false;
+        const previousReady = window.onYouTubeIframeAPIReady;
+        const finish = (YT = null) => {
+          if (settled) return;
+          settled = true;
+          clearTimeout(timeout);
+          if (!YT || !YT.Player) {
+            // Reset cached promise so we can retry loading later
+            STATE.slideshow.ytPromise = null;
+            resolve(null);
           } else {
-            document.head.appendChild(tag);
+            resolve(YT);
           }
+        };
+
+        window.onYouTubeIframeAPIReady = () => {
+          if (typeof previousReady === "function") {
+            try { previousReady(); } catch(e) {}
+          }
+          finish(window.YT);
+        };
+
+        // Remove any existing script tag to force a clean reload
+        const existingTag = document.querySelector('script[src*="youtube.com/iframe_api"]');
+        if (existingTag) {
+          existingTag.remove();
         }
+
+        const tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        tag.async = true;
+        tag.onerror = () => {
+          console.warn("🎬 Media Bar:", "YouTube iframe API failed to load.");
+          finish();
+        };
+
+        const firstScriptTag = document.getElementsByTagName('script')[0];
+        if (firstScriptTag && firstScriptTag.parentNode) {
+          firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+        } else {
+          document.head.appendChild(tag);
+        }
+
+        timeout = setTimeout(() => {
+          console.warn("🎬 Media Bar:", "Timed out loading YouTube iframe API.");
+          finish();
+        }, 10000); // Safe 10s timeout
       });
 
       return STATE.slideshow.ytPromise;
@@ -1411,6 +1461,55 @@
       }
     },
 
+    async fetchLibraryIds() {
+      if (STATE.slideshow.libraryIds) return STATE.slideshow.libraryIds;
+
+      try {
+        const viewsUrl = `${STATE.jellyfinData.serverAddress}/Users/${STATE.jellyfinData.userId}/Views`;
+        const response = await fetch(viewsUrl, { headers: this.getAuthHeaders() });
+        if (!response.ok) throw new Error("Failed to fetch views");
+        const data = await response.json();
+        const views = data.Items || [];
+
+        const map = {};
+        views.forEach(view => {
+          map[view.Name.toLowerCase().trim()] = view.Id;
+          map[view.Id] = view.Id;
+        });
+
+        STATE.slideshow.libraryIds = map;
+        return map;
+      } catch (e) {
+        console.error("🎬 Media Bar:", "Error fetching user views for library filtering:", e);
+        return null;
+      }
+    },
+
+    async applyLibraryFilters(items) {
+      if (!items || items.length === 0) return items;
+
+      const clientExcludedStr = localStorage.getItem('mediaBarEnhanced-excludedLibraries') || '';
+      const clientExcludedIds = clientExcludedStr.split(',').filter(id => id);
+
+      const serverExcludedNames = CONFIG.excludedLibraries ? CONFIG.excludedLibraries.split(',').map(s => s.trim().toLowerCase()).filter(s => s) : [];
+
+      let serverExcludedIds = [];
+
+      if (serverExcludedNames.length > 0) {
+        const libraryMap = await this.fetchLibraryIds() || {};
+        serverExcludedIds = serverExcludedNames.map(name => libraryMap[name]).filter(id => id);
+      }
+
+      const allExcludedIds = [...new Set([...clientExcludedIds, ...serverExcludedIds])];
+
+      let filteredItems = items;
+      if (allExcludedIds.length > 0) {
+        filteredItems = filteredItems.filter(item => !item.ParentId || !allExcludedIds.includes(item.ParentId));
+      }
+
+      return filteredItems;
+    },
+
     /**
      * Fetches random items from the server
      * @returns {Promise<Array>} Array of item objects
@@ -1501,43 +1600,122 @@
           }
         }
 
-        const fetchItems = async (currentDateFilter) => {
-          const url = `${STATE.jellyfinData.serverAddress}/Items?IncludeItemTypes=${itemTypes.join(",")}&Recursive=true&hasOverview=true&imageTypes=Logo,Backdrop&${sortParams}${playedFilter}${parentalFilter}${currentDateFilter}${excludeFilter}&enableUserData=true&Limit=${CONFIG.maxItems}&fields=Id,Type,DateCreated`;
+        const fetchItems = async (currentDateFilter, parentId = '') => {
+          const parentParam = parentId ? `&parentId=${parentId}` : '';
+          const url = `${STATE.jellyfinData.serverAddress}/Items?IncludeItemTypes=${itemTypes.join(",")}&Recursive=true&hasOverview=true&imageTypes=Logo,Backdrop&${sortParams}${playedFilter}${parentalFilter}${currentDateFilter}${excludeFilter}${parentParam}&enableUserData=true&Limit=${CONFIG.maxItems}&fields=Id,Type,DateCreated`;
           const resp = await fetch(url, { headers: this.getAuthHeaders() });
           return resp;
         };
 
-        let response = await fetchItems(dateFilter);
+        // Determine library inclusions/exclusions
+        const libraryMap = await this.fetchLibraryIds() || {};
+        const allLibraryIds = [...new Set(Object.values(libraryMap))];
 
-        if (!response.ok) {
-          console.error("🎬 Media Bar:",
-            `Failed to fetch items: ${response.status} ${response.statusText}`
-          );
+        const clientExcludedStr = localStorage.getItem('mediaBarEnhanced-excludedLibraries') || '';
+        const clientExcludedIds = clientExcludedStr.split(',').filter(id => id);
+
+        const serverExcludedNames = CONFIG.excludedLibraries ? CONFIG.excludedLibraries.split(',').map(s => s.trim().toLowerCase()).filter(s => s) : [];
+        let serverExcludedIds = [];
+        if (serverExcludedNames.length > 0) {
+          serverExcludedIds = serverExcludedNames.map(name => libraryMap[name]).filter(id => id);
+        }
+
+        const allExcludedIds = [...new Set([...clientExcludedIds, ...serverExcludedIds])];
+        const includedIds = allLibraryIds.filter(id => !allExcludedIds.includes(id));
+
+        let items = [];
+        if (allLibraryIds.length > 0 && includedIds.length === 0) {
+          // All libraries excluded
           return [];
-        }
-
-        let data = await response.json();
-        let items = data.Items || [];
-
-        // Local exact DateCreated filter: minDateLastSaved pulls items that were merely modified recently (e.g. metadata updates)
-        // explicitly discard them if their actual DateCreated is older than X days
-        if (CONFIG.maxDaysRecent && dateFilter !== '') {
-          const pastDate = new Date();
-          pastDate.setDate(pastDate.getDate() - CONFIG.maxDaysRecent);
-          items = items.filter(item => {
-            if (!item.DateCreated) return true;
-            return new Date(item.DateCreated) >= pastDate;
+        } else if (includedIds.length > 0 && includedIds.length < allLibraryIds.length) {
+          // Fetch from each included library in parallel
+          const fetchPromises = includedIds.map(async (libId) => {
+            try {
+              const resp = await fetchItems(dateFilter, libId);
+              if (resp.ok) {
+                const data = await resp.json();
+                return data.Items || [];
+              }
+            } catch (e) {
+              console.error("🎬 Media Bar:", `Error fetching items for library ${libId}:`, e);
+            }
+            return [];
           });
-        }
+          const results = await Promise.all(fetchPromises);
+          results.forEach(resList => {
+            items.push(...resList);
+          });
 
-        // Fallback: If we have a date filter but no items are returned, try again without it
-        if (items.length === 0 && dateFilter !== '') {
-          console.warn("🎬 Media Bar:", `No items found within the last ${CONFIG.maxDaysRecent} days. Falling back to random fetching.`);
-          response = await fetchItems('');
+          // Sort combined results client-side
+          if (CONFIG.sortBy === 'Random' || CONFIG.sortBy === 'Original') {
+            items.sort(() => Math.random() - 0.5);
+          } else if (CONFIG.sortBy === 'DateCreated') {
+            items.sort((a, b) => new Date(b.DateCreated) - new Date(a.DateCreated));
+          } else {
+            items.sort((a, b) => (a.SortName || '').localeCompare(b.SortName || ''));
+          }
 
+          // Exact DateCreated filter
+          if (CONFIG.maxDaysRecent && dateFilter !== '') {
+            const pastDate = new Date();
+            pastDate.setDate(pastDate.getDate() - CONFIG.maxDaysRecent);
+            items = items.filter(item => {
+              if (!item.DateCreated) return true;
+              return new Date(item.DateCreated) >= pastDate;
+            });
+          }
+
+          // Fallback if no items in date range
+          if (items.length === 0 && dateFilter !== '') {
+            console.warn("🎬 Media Bar:", "No items found in libraries with date filter. Falling back to no date limit.");
+            const fallbackPromises = includedIds.map(async (libId) => {
+              try {
+                const resp = await fetchItems('', libId);
+                if (resp.ok) {
+                  const data = await resp.json();
+                  return data.Items || [];
+                }
+              } catch (e) {
+                console.error("🎬 Media Bar:", `Error fetching items fallback for library ${libId}:`, e);
+              }
+              return [];
+            });
+            const fallbackResults = await Promise.all(fallbackPromises);
+            fallbackResults.forEach(resList => {
+              items.push(...resList);
+            });
+            if (CONFIG.sortBy === 'Random' || CONFIG.sortBy === 'Original') {
+              items.sort(() => Math.random() - 0.5);
+            } else if (CONFIG.sortBy === 'DateCreated') {
+              items.sort((a, b) => new Date(b.DateCreated) - new Date(a.DateCreated));
+            } else {
+              items.sort((a, b) => (a.SortName || '').localeCompare(b.SortName || ''));
+            }
+          }
+        } else {
+          // No library restrictions, query globally
+          let response = await fetchItems(dateFilter);
           if (response.ok) {
-            data = await response.json();
+            const data = await response.json();
             items = data.Items || [];
+          }
+
+          if (CONFIG.maxDaysRecent && dateFilter !== '') {
+            const pastDate = new Date();
+            pastDate.setDate(pastDate.getDate() - CONFIG.maxDaysRecent);
+            items = items.filter(item => {
+              if (!item.DateCreated) return true;
+              return new Date(item.DateCreated) >= pastDate;
+            });
+          }
+
+          if (items.length === 0 && dateFilter !== '') {
+            console.warn("🎬 Media Bar:", "No items found with date filter. Falling back to no date limit.");
+            response = await fetchItems('');
+            if (response.ok) {
+              const data = await response.json();
+              items = data.Items || [];
+            }
           }
         }
 
@@ -1666,25 +1844,80 @@
 
         console.log("🎬 Media Bar:", `Fetching items by genre/tag filter (genres: [${genres.join(', ')}], tags: [${tags.join(', ')}])...`);
 
-        const url = `${STATE.jellyfinData.serverAddress}/Items?IncludeItemTypes=${itemTypes.join(",")}&Recursive=true&hasOverview=true&imageTypes=Logo,Backdrop&${sortParams}${playedFilter}${parentalFilter}${dateFilter}${excludeFilter}${genreParam}${tagParam}&enableUserData=true&Limit=${CONFIG.maxItems}&fields=Id,DateCreated,Type`;
-        const response = await fetch(url, { headers: this.getAuthHeaders() });
+        const fetchItemsByGenreTag = async (parentId = '') => {
+          const parentParam = parentId ? `&parentId=${parentId}` : '';
+          const url = `${STATE.jellyfinData.serverAddress}/Items?IncludeItemTypes=${itemTypes.join(",")}&Recursive=true&hasOverview=true&imageTypes=Logo,Backdrop&${sortParams}${playedFilter}${parentalFilter}${dateFilter}${excludeFilter}${genreParam}${tagParam}${parentParam}&enableUserData=true&Limit=${CONFIG.maxItems}&fields=Id,DateCreated,Type`;
+          const resp = await fetch(url, { headers: this.getAuthHeaders() });
+          return resp;
+        };
 
-        if (!response.ok) {
-          console.error("🎬 Media Bar:", `Failed to fetch items by genre/tag: ${response.status} ${response.statusText}`);
-          return [];
+        const libraryMap = await this.fetchLibraryIds() || {};
+        const allLibraryIds = [...new Set(Object.values(libraryMap))];
+
+        const clientExcludedStr = localStorage.getItem('mediaBarEnhanced-excludedLibraries') || '';
+        const clientExcludedIds = clientExcludedStr.split(',').filter(id => id);
+
+        const serverExcludedNames = CONFIG.excludedLibraries ? CONFIG.excludedLibraries.split(',').map(s => s.trim().toLowerCase()).filter(s => s) : [];
+        let serverExcludedIds = [];
+        if (serverExcludedNames.length > 0) {
+          serverExcludedIds = serverExcludedNames.map(name => libraryMap[name]).filter(id => id);
         }
 
-        const data = await response.json();
-        let items = data.Items || [];
+        const allExcludedIds = [...new Set([...clientExcludedIds, ...serverExcludedIds])];
+        const includedIds = allLibraryIds.filter(id => !allExcludedIds.includes(id));
 
-        // Apply exact DateCreated filter (same as fetchItemIdsFromServer)
-        if (CONFIG.maxDaysRecent && dateFilter !== '') {
-          const pastDate = new Date();
-          pastDate.setDate(pastDate.getDate() - CONFIG.maxDaysRecent);
-          items = items.filter(item => {
-            if (!item.DateCreated) return true;
-            return new Date(item.DateCreated) >= pastDate;
+        let items = [];
+        if (allLibraryIds.length > 0 && includedIds.length === 0) {
+          return [];
+        } else if (includedIds.length > 0 && includedIds.length < allLibraryIds.length) {
+          const fetchPromises = includedIds.map(async (libId) => {
+            try {
+              const resp = await fetchItemsByGenreTag(libId);
+              if (resp.ok) {
+                const data = await resp.json();
+                return data.Items || [];
+              }
+            } catch (e) {
+              console.error("🎬 Media Bar:", `Error fetching items by genre/tag for library ${libId}:`, e);
+            }
+            return [];
           });
+          const results = await Promise.all(fetchPromises);
+          results.forEach(resList => {
+            items.push(...resList);
+          });
+
+          // Sort combined results client-side
+          if (CONFIG.sortBy === 'Random' || CONFIG.sortBy === 'Original') {
+            items.sort(() => Math.random() - 0.5);
+          } else if (CONFIG.sortBy === 'DateCreated') {
+            items.sort((a, b) => new Date(b.DateCreated) - new Date(a.DateCreated));
+          } else {
+            items.sort((a, b) => (a.SortName || '').localeCompare(b.SortName || ''));
+          }
+
+          if (CONFIG.maxDaysRecent && dateFilter !== '') {
+            const pastDate = new Date();
+            pastDate.setDate(pastDate.getDate() - CONFIG.maxDaysRecent);
+            items = items.filter(item => {
+              if (!item.DateCreated) return true;
+              return new Date(item.DateCreated) >= pastDate;
+            });
+          }
+        } else {
+          const response = await fetchItemsByGenreTag();
+          if (response.ok) {
+            const data = await response.json();
+            items = data.Items || [];
+          }
+          if (CONFIG.maxDaysRecent && dateFilter !== '') {
+            const pastDate = new Date();
+            pastDate.setDate(pastDate.getDate() - CONFIG.maxDaysRecent);
+            items = items.filter(item => {
+              if (!item.DateCreated) return true;
+              return new Date(item.DateCreated) >= pastDate;
+            });
+          }
         }
 
         console.log("🎬 Media Bar:", `Found ${items.length} items matching genre/tag filters`);
@@ -2352,7 +2585,11 @@
           Promise.all([
             SlideUtils.loadYouTubeIframeAPI(),
             ApiUtils.fetchSponsorBlockData(videoId)
-          ]).then(([_, segments]) => {
+          ]).then(([yt, segments]) => {
+            if (!yt || !yt.Player) {
+              console.warn("🎬 Media Bar:", "YouTube API not available, skipping player initialization");
+              return;
+            }
             const playerVars = {
               autoplay: 0,
               mute: STATE.slideshow.isMuted ? 1 : 0,
@@ -2423,9 +2660,10 @@
                   }
                 },
                 'onStateChange': (event) => {
+                  const slide = document.querySelector(`.slide[data-item-id="${itemId}"]`);
+                  const isActive = slide && slide.classList.contains('active');
+
                   if (event.data === YT.PlayerState.PLAYING) {
-                    const slide = document.querySelector(`.slide[data-item-id="${itemId}"]`);
-                    const isActive = slide && slide.classList.contains('active');
                     const playAllowed = STATE.slideshow.playSignals[itemId] === true;
 
                     if (!isActive) {
@@ -2458,35 +2696,40 @@
                       SlideshowManager.startYouTubeProgressLoop(event.target);
                     }
                   } else if (event.data === YT.PlayerState.ENDED) {
-                    STATE.slideshow.isVideoPlaying = false;
-                    if (typeof SlideshowManager !== 'undefined') {
-                      SlideshowManager.stopYouTubeProgressLoop();
-                    }
-                    if (event.target._wrapperDiv) {
-                      event.target._wrapperDiv.style.transition = "none";
-                      event.target._wrapperDiv.style.opacity = "0";
-                    }
-                    const slide = document.querySelector(`.slide[data-item-id="${itemId}"]`);
-                    if (slide && slide.classList.contains('active')) {
+                    if (isActive) {
+                      STATE.slideshow.isVideoPlaying = false;
+                      if (typeof SlideshowManager !== 'undefined') {
+                        SlideshowManager.stopYouTubeProgressLoop();
+                      }
+                      if (event.target._wrapperDiv) {
+                        event.target._wrapperDiv.style.transition = "none";
+                        event.target._wrapperDiv.style.opacity = "0";
+                      }
                       if (typeof SlideshowManager !== 'undefined' && SlideshowManager.nextSlide) SlideshowManager.nextSlide();
                     }
                   } else {
-                    STATE.slideshow.isVideoPlaying = false;
-                    if (typeof SlideshowManager !== 'undefined') {
-                      SlideshowManager.stopYouTubeProgressLoop();
-                    }
-                    if (event.target._wrapperDiv) {
-                      event.target._wrapperDiv.style.transition = "opacity 0.5s ease-in-out";
-                      event.target._wrapperDiv.style.opacity = "0";
+                    if (isActive) {
+                      STATE.slideshow.isVideoPlaying = false;
+                      if (typeof SlideshowManager !== 'undefined') {
+                        SlideshowManager.stopYouTubeProgressLoop();
+                      }
+                      if (event.target._wrapperDiv) {
+                        event.target._wrapperDiv.style.transition = "opacity 0.5s ease-in-out";
+                        event.target._wrapperDiv.style.opacity = "0";
+                      }
                     }
                   }
                 },
                 'onError': (event) => {
                   console.warn("🎬 Media Bar:", `YouTube player error ${event.data} for video ${videoId}`);
-                  STATE.slideshow.isVideoPlaying = false;
-                  // Fallback to normal slideshow interval on error
-                  if (STATE.slideshow.slideInterval && !STATE.slideshow.isPaused) {
-                    STATE.slideshow.slideInterval.start();
+                  const slide = document.querySelector(`.slide[data-item-id="${itemId}"]`);
+                  const isActive = slide && slide.classList.contains('active');
+                  if (isActive) {
+                    STATE.slideshow.isVideoPlaying = false;
+                    // Fallback to normal slideshow interval on error
+                    if (STATE.slideshow.slideInterval && !STATE.slideshow.isPaused) {
+                      STATE.slideshow.slideInterval.start();
+                    }
                   }
                 }
               }
@@ -2542,9 +2785,9 @@
           });
 
           videoBackdrop.addEventListener('ended', (event) => {
-            STATE.slideshow.isVideoPlaying = false;
             const slide = event.target.closest('.slide');
             if (slide && slide.classList.contains('active')) {
+              STATE.slideshow.isVideoPlaying = false;
               SlideshowManager.nextSlide();
             }
           });
@@ -2958,6 +3201,10 @@
         const container = SlideUtils.getOrCreateSlidesContainer();
 
         const item = await ApiUtils.fetchItemDetails(itemId);
+        if (!item) {
+          console.warn("🎬 Media Bar:", `Failed to load details for item ${itemId}, skipping slide creation`);
+          return null;
+        }
 
         // Pre-fetch local trailer URL if needed
         if (CONFIG.preferLocalTrailers && item.LocalTrailerCount > 0) {
@@ -4465,7 +4712,11 @@
           if (getEffectiveWaitForTrailer()) {
             const activeSlide = document.querySelector('.slide.active');
             const video = activeSlide ? activeSlide.querySelector('.video-backdrop') : null;
-            if (video && !video.paused) return;
+            const isVideoPlaying = video && (
+              (video.tagName === 'VIDEO' && !video.paused) ||
+              (video.tagName === 'DIV' && STATE.slideshow.isVideoPlaying)
+            );
+            if (isVideoPlaying) return;
           }
 
           this.nextSlide();
@@ -4477,7 +4728,11 @@
         if (waitForTrailer && STATE.slideshow.slideInterval) {
           const activeSlide = document.querySelector('.slide.active');
           const video = activeSlide ? activeSlide.querySelector('.video-backdrop') : null;
-          if (video && !video.paused) {
+          const isVideoPlaying = video && (
+            (video.tagName === 'VIDEO' && !video.paused) ||
+            (video.tagName === 'DIV' && STATE.slideshow.isVideoPlaying)
+          );
+          if (isVideoPlaying) {
             STATE.slideshow.slideInterval.stop();
           }
         }
@@ -4857,6 +5112,10 @@
             <svg style="width: 18px; height: 18px; fill: currentColor; flex-shrink: 0;" viewBox="0 0 24 24"><path d="M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H3V5h18v14zM8 6h8v2H8zm-4 4h16v2H4zm3 4h10v2H7z"/></svg>
             <span>${t.groupLayout.replace(' & ', ' &amp;<br>').replace(' y ', ' y<br>').replace(' et ', ' et<br>')}</span>
         </button>
+        <button type="button" class="media-bar-client-tab" data-tab="mb-client-tab-libraries">
+            <svg style="width: 18px; height: 18px; fill: currentColor; flex-shrink: 0;" viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0-2-.9-2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg>
+            <span>${t.groupLibraries || 'Libraries'}</span>
+        </button>
     </div>
 
     <div class="media-bar-settings-body">
@@ -5023,6 +5282,11 @@
         </select>
     </div>
         </div>
+        
+        <!-- LIBRARIES TAB -->
+        <div id="mb-client-tab-libraries" class="media-bar-client-tab-content" style="display: none; flex-direction: column; gap: 0.5rem; max-height: 250px; overflow-y: auto; padding: 0.5rem; width: 100%; box-sizing: border-box;">
+            <div class="media-bar-loading-libraries" style="text-align: center; color: var(--text-muted); padding: 1rem;">Loading libraries...</div>
+        </div>
     </div> <!-- .media-bar-settings-body -->
 
     <div class="media-bar-settings-buttons">
@@ -5180,6 +5444,83 @@
         });
       }
 
+      // Fetch and render libraries tab
+      const renderLibrariesTab = async () => {
+        const container = popup.querySelector('#mb-client-tab-libraries');
+        if (!container) return;
+
+        try {
+          const viewsUrl = `${STATE.jellyfinData.serverAddress}/Users/${STATE.jellyfinData.userId}/Views`;
+          const viewsResponse = await fetch(viewsUrl, { headers: ApiUtils.getAuthHeaders() });
+          if (!viewsResponse.ok) throw new Error("Failed to fetch views");
+          const viewsData = await viewsResponse.json();
+          const views = viewsData.Items || [];
+
+          // Read currently excluded library IDs from localStorage, or default to server-side exclusions
+          const clientExcludedStr = localStorage.getItem('mediaBarEnhanced-excludedLibraries');
+          let excludedIds = [];
+
+          if (clientExcludedStr !== null) {
+            excludedIds = clientExcludedStr.split(',').filter(id => id);
+          } else {
+            // First run or after reset: default to server-side exclusions
+            const serverExcludedNames = CONFIG.excludedLibraries ? CONFIG.excludedLibraries.split(',').map(s => s.trim().toLowerCase()).filter(s => s) : [];
+            const libraryMap = await ApiUtils.fetchLibraryIds() || {};
+            excludedIds = serverExcludedNames.map(name => libraryMap[name]).filter(id => id);
+          }
+
+          let listHtml = `
+          <div style="color: #bbbbbb; font-size: 0.82rem; line-height: 1.45; margin-bottom: 0.8rem; padding: 0.2rem 0.4rem; border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding-bottom: 0.6rem;">
+              ${t.libraryFilterHint || 'Note: These filters only apply when fetching random or recent items. Checked libraries are included; unchecked libraries are excluded.'}
+          </div>
+          `;
+
+          views.forEach(view => {
+            const isChecked = !excludedIds.includes(view.Id);
+            listHtml += `
+            <div class="media-bar-toggle-container" style="padding: 0.25rem 0;">
+                <div class="media-bar-toggle-info">
+                    <span class="media-bar-toggle-label">${view.Name}</span>
+                </div>
+                <label class="media-bar-switch">
+                    <input class="mb-library-checkbox" data-id="${view.Id}" type="checkbox" ${isChecked ? 'checked' : ''} />
+                    <span class="media-bar-slider"></span>
+                </label>
+            </div>
+            `;
+          });
+
+          if (views.length === 0) {
+            container.innerHTML = '<div style="color: var(--text-muted); text-align: center; padding: 1rem;">No libraries found.</div>';
+          } else {
+            container.innerHTML = listHtml;
+
+            container.querySelectorAll('.mb-library-checkbox').forEach(cb => {
+              cb.addEventListener('change', () => {
+                const libraryId = cb.getAttribute('data-id');
+                const currentExcludedStr = localStorage.getItem('mediaBarEnhanced-excludedLibraries') || '';
+                let currentExcluded = currentExcludedStr.split(',').filter(id => id);
+
+                if (cb.checked) {
+                  currentExcluded = currentExcluded.filter(id => id !== libraryId);
+                } else {
+                  if (!currentExcluded.includes(libraryId)) {
+                    currentExcluded.push(libraryId);
+                  }
+                }
+
+                localStorage.setItem('mediaBarEnhanced-excludedLibraries', currentExcluded.join(','));
+              });
+            });
+          }
+        } catch (e) {
+          console.error("Error rendering libraries in client settings:", e);
+          container.innerHTML = '<div style="color: var(--text-danger); text-align: center; padding: 1rem;">Failed to load libraries.</div>';
+        }
+      };
+
+      renderLibrariesTab();
+
       document.body.appendChild(popup);
     },
 
@@ -5284,8 +5625,12 @@
             // No video was playing, just restart interval
             const activeSlide = document.querySelector('.slide.active');
             const video = activeSlide ? activeSlide.querySelector('.video-backdrop') : null;
+            const isVideoPlaying = video && (
+              (video.tagName === 'VIDEO' && !video.paused) ||
+              (video.tagName === 'DIV' && STATE.slideshow.isVideoPlaying)
+            );
 
-            if (getEffectiveWaitForTrailer() && video && !video.paused) {
+            if (getEffectiveWaitForTrailer() && isVideoPlaying) {
               // Don't restart interval if waiting for a currently playing trailer
             } else {
               if (STATE.slideshow.slideInterval) {

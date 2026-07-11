@@ -2018,8 +2018,8 @@
   padding: 1.6em 1.8em;
   border-radius: 1.2em;
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.08);
-  width: 460px;
-  height: 680px;
+  width: 480px;
+  height: 700px;
   max-width: calc(100vw - 2.5rem);
   max-height: calc(100vh - 38px);
   color: #fff;
@@ -2031,8 +2031,8 @@
 
 /* Client Tabs Styling */
 .media-bar-client-tabs {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
   gap: 0.4em;
   margin-bottom: 1em;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
@@ -2055,7 +2055,6 @@
   display: inline-flex;
   align-items: center;
   gap: 0.4em;
-  flex: 1 1 0;
   justify-content: center;
   min-width: 0;
   white-space: normal;
@@ -2078,14 +2077,12 @@
 }
 
 /* Mobile responsive layout for client settings tabs */
-@media (max-width: 500px) {
+@media (max-width: 520px) {
   .media-bar-client-tabs {
-    flex-direction: column !important;
-    align-items: stretch !important;
-    gap: 0.4em !important;
+    grid-template-columns: 1fr !important;
   }
+
   .media-bar-client-tab {
-    flex: 1 1 auto !important;
     width: 100% !important;
     min-height: 42px !important;
     box-sizing: border-box !important;
@@ -2599,4 +2596,29 @@ select.media-bar-select option {
 .transition-effect-zoomout .slide.active {
   transform: scale3d(1, 1, 1);
   opacity: 1;
+}
+
+/* Libraries Tab Scrollbar & List Styling */
+#mb-client-tab-libraries {
+  max-height: 250px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+#mb-client-tab-libraries::-webkit-scrollbar {
+  width: 6px;
+}
+
+#mb-client-tab-libraries::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 3px;
+}
+
+#mb-client-tab-libraries::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 3px;
+}
+
+#mb-client-tab-libraries::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
 }
