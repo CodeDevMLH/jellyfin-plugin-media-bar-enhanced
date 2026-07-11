@@ -23,6 +23,7 @@
  */
 
 @import url(https://fonts.googleapis.com/css2?family=Archivo+Narrow:ital,wght@0,400..700;1,400..700&display=swap);
+/* @import url(https://fonts.googleapis.com/icon?family=Material+Icons); */
 
 .backdrop.animate {
   animation:
@@ -2508,6 +2509,14 @@ select.media-bar-select option {
   animation-fill-mode: forwards;
 }
 
+.media-bar-progress-bar.reverse-progress.animating .media-bar-progress-fill {
+  animation-name: mediaBarProgressReverse;
+}
+
+.media-bar-progress-bar.reverse-progress .media-bar-progress-fill {
+  transform-origin: right;
+}
+
 .media-bar-progress-bar.paused .media-bar-progress-fill {
   animation-play-state: paused !important;
 }
@@ -2519,6 +2528,16 @@ select.media-bar-select option {
 
   to {
     transform: scaleX(1);
+  }
+}
+
+@keyframes mediaBarProgressReverse {
+  from {
+    transform: scaleX(1);
+  }
+
+  to {
+    transform: scaleX(0);
   }
 }
 

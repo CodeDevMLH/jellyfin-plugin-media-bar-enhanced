@@ -168,6 +168,15 @@
                                             remote (YouTube) trailers.</div>
                                     </div>
                                     <div class="checkboxContainer checkboxContainer-withDescription"
+                                        id="OnlyLocalTrailersContainer">
+                                        <label>
+                                            <input is="emby-checkbox" type="checkbox" id="OnlyLocalTrailers"
+                                                name="OnlyLocalTrailers" />
+                                            <span>Only Play Local Trailers</span>
+                                        </label>
+                                        <div class="fieldDescription">If enabled, remote (YouTube) trailers will not be played. Shows static image if no local trailer is available.</div>
+                                    </div>
+                                    <div class="checkboxContainer checkboxContainer-withDescription"
                                         id="PreferLocalBackdropsContainer">
                                         <label>
                                             <input is="emby-checkbox" type="checkbox" id="PreferLocalBackdrops"
@@ -349,6 +358,15 @@
                                     </select>
                                     <div class="fieldDescription">Choose where the slide timing progress bar is
                                         rendered.</div>
+                                </div>
+
+                                <div class="checkboxContainer checkboxContainer-withDescription" id="YoYoProgressBarContainer" style="margin-top: 1.5em;">
+                                    <label>
+                                        <input is="emby-checkbox" type="checkbox" id="YoYoProgressBar"
+                                            name="YoYoProgressBar" />
+                                        <span>Yo-Yo Progress Bar Animation</span>
+                                    </label>
+                                    <div class="fieldDescription">If enabled, the progress bar empties from left to right on alternating slides instead of resetting to 0%.</div>
                                 </div>
 
                                 <div class="selectContainer" style="margin-top: 1.5em;">
@@ -1055,6 +1073,7 @@
                 var isTrailerCheckbox = page.querySelector('#EnableVideoBackdrop');
                 var isTrailerEnabled = isTrailerCheckbox ? isTrailerCheckbox.checked : false;
                 toggleSetting('PreferLocalTrailers', isTrailerEnabled);
+                toggleSetting('OnlyLocalTrailers', isTrailerEnabled);
                 toggleSetting('PreferLocalBackdrops', isTrailerEnabled);
                 toggleSetting('WaitForTrailerToEnd', isTrailerEnabled);
                 toggleSetting('EnableMobileVideo', isTrailerEnabled);
@@ -1095,6 +1114,7 @@
                 var isProgressCheckbox = page.querySelector('#ShowProgressBar');
                 var isProgressEnabled = isProgressCheckbox ? isProgressCheckbox.checked : false;
                 toggleSetting('ProgressBarLocation', isProgressEnabled);
+                toggleSetting('YoYoProgressBar', isProgressEnabled);
             }
 
             var MediaBarEnhancedConfigurationPage = {
@@ -1124,7 +1144,7 @@
                             'ShowTrailerButton', 'AlwaysShowArrows', 'EnableKeyboardControls',
                             'EnableCustomMediaIds', 'CustomMediaIds', 'EnableLoadingScreen',
                             'EnableSeasonalContent', 'EnableClientSideSettings', 'SortBy', 'SortOrder',
-                            'PreferLocalTrailers', 'ApplyLimitsToCustomIds', 'SeasonalSections',
+                            'PreferLocalTrailers', 'OnlyLocalTrailers', 'ApplyLimitsToCustomIds', 'SeasonalSections',
                             'PreferLocalBackdrops', 'RandomizeThemeVideos', 'RandomizeLocalTrailers',
                             'IncludeWatchedContent', 'ShowPaginationDots', 'ForceSlideCounter', 'MaxParentalRating',
                             'MaxDaysRecent', 'ExcludeSeasonalContent', 'HideArrowsOnMobile',
@@ -1133,7 +1153,7 @@
                             'CustomOverlayPositionX', 'CustomOverlayPositionY', 'CustomOverlayScale',
                             'BackdropVideoDelay', 'ConstrainPlotWidth', 'MobileCompactMode', 'DefaultTrailerVolume',
                             'ClientMenuLocation', 'ClientMenuLocationMobile', 'CustomPlaylists', 'TransitionEffect',
-                            'ShowProgressBar', 'ProgressBarLocation', 'ExcludedLibraries'
+                            'ShowProgressBar', 'ProgressBarLocation', 'ExcludedLibraries', 'YoYoProgressBar'
                         ];
 
                         // Manual mapping for MediaBarIsEnabled -> IsEnabled, to avoid conflicts with other plugins
@@ -1439,7 +1459,7 @@
                         'ShowTrailerButton', 'AlwaysShowArrows', 'EnableKeyboardControls',
                         'EnableCustomMediaIds', 'CustomMediaIds', 'EnableLoadingScreen',
                         'EnableSeasonalContent', 'EnableClientSideSettings', 'SortBy', 'SortOrder',
-                        'PreferLocalTrailers', 'ApplyLimitsToCustomIds', 'SeasonalSections',
+                        'PreferLocalTrailers', 'OnlyLocalTrailers', 'ApplyLimitsToCustomIds', 'SeasonalSections',
                         'PreferLocalBackdrops', 'RandomizeThemeVideos', 'RandomizeLocalTrailers',
                         'IncludeWatchedContent', 'ShowPaginationDots', 'ForceSlideCounter', 'MaxParentalRating',
                         'MaxDaysRecent', 'ExcludeSeasonalContent', 'HideArrowsOnMobile',
@@ -1448,7 +1468,7 @@
                         'CustomOverlayPositionX', 'CustomOverlayPositionY', 'CustomOverlayScale',
                         'BackdropVideoDelay', 'ConstrainPlotWidth', 'MobileCompactMode', 'DefaultTrailerVolume',
                         'ClientMenuLocation', 'ClientMenuLocationMobile', 'CustomPlaylists', 'TransitionEffect',
-                        'ShowProgressBar', 'ProgressBarLocation', 'ExcludedLibraries'
+                        'ShowProgressBar', 'ProgressBarLocation', 'ExcludedLibraries', 'YoYoProgressBar'
                     ];
 
                     var numberDefaults = {

@@ -30,7 +30,7 @@
   window.mediaBarEnhancedLoaded = true;
 
   // MARK: Version
-  const PLUGIN_VERSION = "3.0.3.0";
+  const PLUGIN_VERSION = "3.1.0.0";
 
   //Core Module Configuration
   const CONFIG = {
@@ -102,6 +102,9 @@
     progressBarLocation: "Dots",
     customPlaylists: "[]",
     forceSlideCounter: false,
+    excludedLibraries: "",
+    onlyLocalTrailers: false,
+    yoYoProgressBar: true,
   };
 
   const CLIENT_MENU_TRANSLATIONS = {
@@ -160,7 +163,11 @@
       resetTitle: 'Reset to Server Defaults',
       saveBtn: 'Save & Reload',
       confirmReset: 'Reset all local Media Bar settings to server defaults?',
-      libraryFilterHint: 'Note: These filters only apply when fetching random or recent items. They do not affect custom playlists or fixed item ID lists.'
+      libraryFilterHint: 'Note: These filters only apply when fetching random or recent items. They do not affect custom playlists or fixed item ID lists.',
+      onlyLocalTrailersLabel: 'Only Play Local Trailers',
+      onlyLocalTrailersDesc: 'Do not play remote (YouTube) trailers.',
+      yoYoProgressBarLabel: 'Yo-Yo Progress Bar',
+      yoYoProgressBarDesc: 'Empty progress bar from left to right on alternating slides instead of resetting.'
     },
     'de': {
       title: 'Media Bar Einstellungen',
@@ -217,7 +224,11 @@
       resetTitle: 'Auf Server-Standardwerte zurücksetzen',
       saveBtn: 'Speichern & Neu laden',
       confirmReset: 'Alle lokalen Media Bar Einstellungen auf Server-Standardwerte zurücksetzen?',
-      libraryFilterHint: 'Hinweis: Diese Filter gelten nur für zufällige oder kürzlich hinzugefügte Medien. Sie haben keinen Einfluss auf feste Wiedergabelisten oder manuell angegebene Element-IDs.'
+      libraryFilterHint: 'Hinweis: Diese Filter gelten nur für zufällige oder kürzlich hinzugefügte Medien. Sie haben keinen Einfluss auf feste Wiedergabelisten oder manuell angegebene Element-IDs.',
+      onlyLocalTrailersLabel: 'Nur lokale Trailer abspielen',
+      onlyLocalTrailersDesc: 'Keine Online-/YouTube-Trailer abspielen.',
+      yoYoProgressBarLabel: 'Yo-Yo-Ladebalken',
+      yoYoProgressBarDesc: 'Ladebalken bei abwechselnden Folien von links nach rechts leeren anstatt zurückzuspringen.'
     },
     'es': {
       title: 'Ajustes de Media Bar',
@@ -274,7 +285,11 @@
       resetTitle: 'Restablecer a valores del servidor',
       saveBtn: 'Guardar y recargar',
       confirmReset: '¿Restablecer todos los ajustes locales de Media Bar a los valores predeterminados del servidor?',
-      libraryFilterHint: 'Nota: Estos filtros solo se aplican cuando se obtienen elementos aleatorios o recientes. No afectan a las listas de reproducción personalizadas ni a las listas fijas de IDs de elementos.'
+      libraryFilterHint: 'Nota: Estos filtros solo se aplican cuando se obtienen elementos aleatorios o recientes. No afectan a las listas de reproducción personalizadas ni a las listas fijas de IDs de elementos.',
+      onlyLocalTrailersLabel: 'Solo reproducir trailers locales',
+      onlyLocalTrailersDesc: 'No reproducir trailers remotos/YouTube.',
+      yoYoProgressBarLabel: 'Barra de progreso Yo-Yo',
+      yoYoProgressBarDesc: 'Vaciar la barra de progreso de izquierda a derecha en diapositivas alternas en lugar de reiniciar.'
     },
     'fr': {
       title: 'Paramètres de Media Bar',
@@ -331,7 +346,11 @@
       resetTitle: 'Réinitialiser aux valeurs du serveur',
       saveBtn: 'Enregistrer et recharger',
       confirmReset: 'Réinitialiser tous les paramètres locaux de Media Bar aux valeurs par défaut du serveur ?',
-      libraryFilterHint: 'Remarque : ces filtres ne s\'appliquent que lors de la récupération d\'éléments aléatoires ou récents. Ils n\'affectent pas les listes de lecture personnalisées ni les listes fixes d\'identifiants d\'éléments.'
+      libraryFilterHint: 'Remarque : ces filtres ne s\'appliquent que lors de la récupération d\'éléments aléatoires ou récents. Ils n\'affectent pas les listes de lecture personnalisées ni les listes fixes d\'identifiants d\'éléments.',
+      onlyLocalTrailersLabel: 'Ne lire que les bandes-annonces locales',
+      onlyLocalTrailersDesc: 'Ne pas lire les bandes-annonces distantes/YouTube.',
+      yoYoProgressBarLabel: 'Barre de progression Yo-Yo',
+      yoYoProgressBarDesc: 'Vider la barre de progression de gauche à droite sur les diapositives alternées au lieu de réinitialiser.'
     },
     'it': {
       title: 'Impostazioni Media Bar',
@@ -388,7 +407,11 @@
       resetTitle: 'Ripristina valori del server',
       saveBtn: 'Salva e ricarica',
       confirmReset: 'Ripristinare tutte le impostazioni locali di Media Bar ai valori predefiniti del server?',
-      libraryFilterHint: 'Nota: questi filtri si applicano solo quando si recuperano elementi casuali o recenti. Non influiscono sulle playlist personalizzate o sugli elenchi fissi di ID elemento.'
+      libraryFilterHint: 'Nota: questi filtri si applicano solo quando si recuperano elementi casuali o recenti. Non influiscono sulle playlist personalizzate o sugli elenchi fissi di ID elemento.',
+      onlyLocalTrailersLabel: 'Riproduci solo trailer locali',
+      onlyLocalTrailersDesc: 'Non riprodurre trailer remoti/YouTube.',
+      yoYoProgressBarLabel: 'Barra di avanzamento Yo-Yo',
+      yoYoProgressBarDesc: 'Svuota la barra di avanzamento da sinistra a destra nelle diapositive alternate invece di ripristinare.'
     }
   };
 
@@ -1046,7 +1069,7 @@
 
         window.onYouTubeIframeAPIReady = () => {
           if (typeof previousReady === "function") {
-            try { previousReady(); } catch(e) {}
+            try { previousReady(); } catch (e) { }
           }
           finish(window.YT);
         };
@@ -1611,16 +1634,17 @@
         const libraryMap = await this.fetchLibraryIds() || {};
         const allLibraryIds = [...new Set(Object.values(libraryMap))];
 
-        const clientExcludedStr = localStorage.getItem('mediaBarEnhanced-excludedLibraries') || '';
-        const clientExcludedIds = clientExcludedStr.split(',').filter(id => id);
+        const clientExcludedStr = localStorage.getItem('mediaBarEnhanced-excludedLibraries');
+        let allExcludedIds = [];
 
-        const serverExcludedNames = CONFIG.excludedLibraries ? CONFIG.excludedLibraries.split(',').map(s => s.trim().toLowerCase()).filter(s => s) : [];
-        let serverExcludedIds = [];
-        if (serverExcludedNames.length > 0) {
-          serverExcludedIds = serverExcludedNames.map(name => libraryMap[name]).filter(id => id);
+        if (clientExcludedStr !== null) {
+          allExcludedIds = clientExcludedStr.split(',').filter(id => id);
+        } else {
+          const serverExcludedNames = CONFIG.excludedLibraries ? CONFIG.excludedLibraries.split(',').map(s => s.trim().toLowerCase()).filter(s => s) : [];
+          if (serverExcludedNames.length > 0) {
+            allExcludedIds = serverExcludedNames.map(name => libraryMap[name]).filter(id => id);
+          }
         }
-
-        const allExcludedIds = [...new Set([...clientExcludedIds, ...serverExcludedIds])];
         const includedIds = allLibraryIds.filter(id => !allExcludedIds.includes(id));
 
         let items = [];
@@ -1854,16 +1878,17 @@
         const libraryMap = await this.fetchLibraryIds() || {};
         const allLibraryIds = [...new Set(Object.values(libraryMap))];
 
-        const clientExcludedStr = localStorage.getItem('mediaBarEnhanced-excludedLibraries') || '';
-        const clientExcludedIds = clientExcludedStr.split(',').filter(id => id);
+        const clientExcludedStr = localStorage.getItem('mediaBarEnhanced-excludedLibraries');
+        let allExcludedIds = [];
 
-        const serverExcludedNames = CONFIG.excludedLibraries ? CONFIG.excludedLibraries.split(',').map(s => s.trim().toLowerCase()).filter(s => s) : [];
-        let serverExcludedIds = [];
-        if (serverExcludedNames.length > 0) {
-          serverExcludedIds = serverExcludedNames.map(name => libraryMap[name]).filter(id => id);
+        if (clientExcludedStr !== null) {
+          allExcludedIds = clientExcludedStr.split(',').filter(id => id);
+        } else {
+          const serverExcludedNames = CONFIG.excludedLibraries ? CONFIG.excludedLibraries.split(',').map(s => s.trim().toLowerCase()).filter(s => s) : [];
+          if (serverExcludedNames.length > 0) {
+            allExcludedIds = serverExcludedNames.map(name => libraryMap[name]).filter(id => id);
+          }
         }
-
-        const allExcludedIds = [...new Set([...clientExcludedIds, ...serverExcludedIds])];
         const includedIds = allLibraryIds.filter(id => !allExcludedIds.includes(id));
 
         let items = [];
@@ -2474,6 +2499,8 @@
       let isVideo = false;
       let trailerUrl = null;
 
+      const onlyLocal = MediaBarEnhancedSettingsManager.getSetting('onlyLocalTrailers', CONFIG.onlyLocalTrailers);
+
       // 1. Check for Remote/Local Trailers
       // Priority: Custom Config URL > (PreferLocal -> Local) > Metadata RemoteTrailer
 
@@ -2503,13 +2530,13 @@
         trailerUrl = item.themeVideoUrl;
         console.log("🎬 Media Bar:", `Using theme video (local backdrop) for ${itemId}: ${trailerUrl.url || trailerUrl}`);
       }
-      // 1c. Check Local Trailer if preferred
-      else if (CONFIG.preferLocalTrailers && item.LocalTrailerCount > 0 && item.localTrailerUrl) {
+      // 1c. Check Local Trailer if preferred or restricted to only local
+      else if ((CONFIG.preferLocalTrailers || onlyLocal) && item.LocalTrailerCount > 0 && item.localTrailerUrl) {
         trailerUrl = item.localTrailerUrl;
         console.log("🎬 Media Bar:", `Using local trailer for ${itemId}: ${trailerUrl}`);
       }
-      // 1d. Fallback to Remote Trailer
-      else if (item.RemoteTrailers && item.RemoteTrailers.length > 0) {
+      // 1d. Fallback to Remote Trailer (only if not restricted to only local)
+      else if (!onlyLocal && item.RemoteTrailers && item.RemoteTrailers.length > 0) {
         trailerUrl = item.RemoteTrailers[0].Url;
       }
       // 1e. Final Fallback to Local Trailer (even if not preferred)
@@ -2810,8 +2837,12 @@
               const fill = document.querySelector('.media-bar-progress-fill');
               if (fill) {
                 const bar = fill.closest('.media-bar-progress-bar');
-                if (bar) bar.classList.remove('animating');
-                fill.style.transform = `scaleX(${progress})`;
+                if (bar) {
+                  bar.classList.remove('animating');
+                  const isReverse = bar.classList.contains('reverse-progress');
+                  const displayProgress = isReverse ? (1 - progress) : progress;
+                  fill.style.transform = `scaleX(${displayProgress})`;
+                }
               }
             }
           });
@@ -3207,7 +3238,8 @@
         }
 
         // Pre-fetch local trailer URL if needed
-        if (CONFIG.preferLocalTrailers && item.LocalTrailerCount > 0) {
+        const onlyLocal = MediaBarEnhancedSettingsManager.getSetting('onlyLocalTrailers', CONFIG.onlyLocalTrailers);
+        if ((CONFIG.preferLocalTrailers || onlyLocal) && item.LocalTrailerCount > 0) {
           item.localTrailerUrl = await ApiUtils.fetchLocalTrailer(itemId);
         }
 
@@ -3270,8 +3302,12 @@
           const fill = document.querySelector('.media-bar-progress-fill');
           if (fill) {
             const bar = fill.closest('.media-bar-progress-bar');
-            if (bar) bar.classList.remove('animating');
-            fill.style.transform = `scaleX(${progressFraction})`;
+            if (bar) {
+              bar.classList.remove('animating');
+              const isReverse = bar.classList.contains('reverse-progress');
+              const displayProgress = isReverse ? (1 - progressFraction) : progressFraction;
+              fill.style.transform = `scaleX(${displayProgress})`;
+            }
           }
         } catch (e) {
           console.error("🎬 Media Bar:", "Error in YouTube progress loop:", e);
@@ -3710,7 +3746,7 @@
 
         this.preloadAdjacentSlides(index);
         this.updateDots();
-        this.updateProgressBar(hasVideo);
+        this.updateProgressBar(hasVideo, index);
 
         if (STATE.slideshow.slideInterval && !STATE.slideshow.isPaused) {
           if (getEffectiveWaitForTrailer() && hasVideo) {
@@ -3759,7 +3795,7 @@
       }
     },
 
-    updateProgressBar(hasVideo) {
+    updateProgressBar(hasVideo, index) {
       const showProgress = MediaBarEnhancedSettingsManager.getSetting('showProgressBar', CONFIG.showProgressBar);
       let progressBar = document.querySelector('.media-bar-progress-bar');
 
@@ -3800,11 +3836,19 @@
         parentContainer.appendChild(progressBar);
       }
 
+      // Determine reverse status based on slide index and settings
+      const useYoYo = MediaBarEnhancedSettingsManager.getSetting('yoYoProgressBar', CONFIG.yoYoProgressBar);
+      const isReverse = (useYoYo && index) ? (index % 2 === 1) : false;
+
       // Reset animation state
-      progressBar.classList.remove('animating', 'paused');
+      progressBar.classList.remove('animating', 'paused', 'reverse-progress');
+      if (isReverse) {
+        progressBar.classList.add('reverse-progress');
+      }
+
       const fill = progressBar.querySelector('.media-bar-progress-fill');
       if (fill) {
-        fill.style.transform = 'scaleX(0)';
+        fill.style.transform = isReverse ? 'scaleX(1)' : 'scaleX(0)';
         fill.style.animationDuration = '0s';
       }
       void progressBar.offsetWidth; // force reflow
@@ -4919,7 +4963,6 @@
       button.style.verticalAlign = 'middle';
 
       button.addEventListener('click', (e) => {
-        e.stopPropagation();
         this.toggleSettingsPopup(button);
       });
 
@@ -5028,6 +5071,16 @@
             }
           });
         }
+
+        // 3. Ensure Media Bar settings button is always immediately to the left of Seasonals settings button
+        const headerRight = document.querySelector('.headerRight');
+        if (headerRight) {
+          const mbBtn = headerRight.querySelector('.media-bar-settings-button');
+          const seasBtn = headerRight.querySelector('.seasonal-settings-button');
+          if (mbBtn && seasBtn && mbBtn.nextElementSibling !== seasBtn) {
+            seasBtn.parentNode.insertBefore(mbBtn, seasBtn);
+          }
+        }
       };
 
       const observer = new MutationObserver(() => {
@@ -5084,10 +5137,12 @@
         { key: 'enabled', label: t.enabledLabel, description: t.enabledDesc, default: true },
         { key: 'slideAnimations', label: t.slideAnimationsLabel, description: t.slideAnimationsDesc, default: CONFIG.slideAnimationEnabled },
         { key: 'showProgressBar', label: t.showProgressBarLabel || 'Show Progress Bar', description: t.showProgressBarDesc || 'Display timing progress line.', default: CONFIG.showProgressBar },
+        { key: 'yoYoProgressBar', label: t.yoYoProgressBarLabel || 'Yo-Yo Progress Bar', description: t.yoYoProgressBarDesc || 'Empty progress bar from left to right on alternating slides instead of resetting.', default: CONFIG.yoYoProgressBar },
         { key: 'forceSlideCounter', label: t.forceSlideCounterLabel || 'Always Use Slide Counter', description: t.forceSlideCounterDesc || 'Force numeric slide counter instead of pagination dots.', default: CONFIG.forceSlideCounter },
       ];
       const trailerSettings = [
         { key: 'videoBackdrops', label: t.videoBackdropsLabel, description: t.videoBackdropsDesc, default: CONFIG.enableVideoBackdrop },
+        { key: 'onlyLocalTrailers', label: t.onlyLocalTrailersLabel || 'Only Play Local Trailers', description: t.onlyLocalTrailersDesc || 'Do not play remote (YouTube) trailers.', default: CONFIG.onlyLocalTrailers },
         { key: 'trailerButton', label: t.trailerButtonLabel, description: t.trailerButtonDesc, default: CONFIG.showTrailerButton },
         { key: 'mobileVideo', label: t.mobileVideoLabel, description: t.mobileVideoDesc, default: CONFIG.enableMobileVideo },
         { key: 'waitForTrailer', label: t.waitForTrailerLabel, description: t.waitForTrailerDesc, default: CONFIG.waitForTrailerToEnd },
