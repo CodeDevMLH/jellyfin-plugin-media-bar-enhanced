@@ -73,5 +73,7 @@ namespace Jellyfin.Plugin.MediaBarEnhanced.Configuration
         public string ProgressBarLocation { get; set; } = "Dots";
         public string CustomPlaylists { get; set; } = "[]";
         public string ExcludedLibraries { get; set; } = "";
+        public bool OnlyLocalTrailers { get; set; } = false;
+        public bool YoYoProgressBar { get; set; } = true;
     }
 }
