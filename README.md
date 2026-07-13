@@ -45,7 +45,7 @@ Expand to get more impressions:
 <details>
 <summary>Desktop Layout</summary> 
 
-<img width="1920" height="1080" alt="trailer button" src="https://github.com/user-attachments/assets/5dce8eb1-8f2f-4583-a6d5-16f27ced8608" />
+<img width="1919" height="990" alt="dashboard trailer button" src="https://github.com/user-attachments/assets/a3c3c8a8-7925-473c-b15f-fc9695cb573f" />
 Normal mode like the original with additional trailer button
 <br><br><br>
 
@@ -61,40 +61,34 @@ Excerpt from the config: E.g. here you can simply add your items that should be 
 <details>
 <summary>Client side settings menu</summary>
 
-<img width="1080" height="2199" alt="css_mbe" src="https://github.com/user-attachments/assets/1a8aa1b0-2cd0-486d-8adf-91560ed2d6fe" />
+| **Mobile Client Menu** | **Client Menu** |
+|:---:|:---:|
+| ![Mobile Client Menu](https://github.com/user-attachments/assets/a0e3912b-2fd3-4364-a9b9-235831b2b028) | ![Client Menu](https://github.com/user-attachments/assets/3a5f8715-09aa-4f97-9bb6-8c58059bc308) |
+
 Supported languages (English, German, Spanish, French, Italian)
 </details>
 
 <details>
 <summary>Mobile Layout</summary> 
 
-![demo_mobile](https://github.com/user-attachments/assets/d11a7ed0-ceb7-43c3-9b22-09510251e0aa)
-
-![demo_mobile_16-9](https://github.com/user-attachments/assets/4116c3ab-0de3-4928-82e9-938802e06aa3)
 
 <br>If trailer on mobile is enabled...
+| **Demo Mobile** | **Demo Mobile 16:9** |
+|:---:|:---:|
+| ![demo_mobile](https://github.com/user-attachments/assets/d11a7ed0-ceb7-43c3-9b22-09510251e0aa) | ![demo_mobile_16-9](https://github.com/user-attachments/assets/4116c3ab-0de3-4928-82e9-938802e06aa3) |
+
 <br><br><br>
 
-<img width="1080" height="2199" alt="mobile" src="https://github.com/user-attachments/assets/f0a0cc0d-f019-45f5-96c8-a5de14bf92ba" />
-Normal mode like the original with additional trailer button
+| **Normal mode like the original with additional trailer button** | **Trailer modal in portrait mode** |
+|:---:|:---:|
+| ![demo_mobile](https://github.com/user-attachments/assets/f0a0cc0d-f019-45f5-96c8-a5de14bf92ba) | ![trailer_modal_mobile](https://github.com/user-attachments/assets/944f9b82-9c9b-411f-883b-877b65ed933f) |
+
 <br><br><br>
 
-<img width="1080" height="2199" alt="trailer_modal_mobile" src="https://github.com/user-attachments/assets/944f9b82-9c9b-411f-883b-877b65ed933f" />
-Trailer modal in portrait mode
-<br><br><br>
+| **Compact 16:9 mode** | **Classic 4:3 mode** |
+|:---:|:---:|
+| ![Compact 16:9 mode](https://github.com/user-attachments/assets/216cff8d-900d-4add-b6cf-b782cfc2fb6e) | ![Classic 4:3 mode](https://github.com/user-attachments/assets/9d6e6139-c381-45cb-9671-a7686e85efdd) |
 
-<img width="1080" height="2340" alt="16-9" src="https://github.com/user-attachments/assets/216cff8d-900d-4add-b6cf-b782cfc2fb6e" />
-
-Compact 16:9 mode
-<br><br><br>
-
-<img width="1080" height="2340" alt="4-3" src="https://github.com/user-attachments/assets/9d6e6139-c381-45cb-9671-a7686e85efdd" />
-
-Classic 4:3 mode
-
-<img width="1080" height="2199" alt="mobile" src="https://github.com/user-attachments/assets/f0a0cc0d-f019-45f5-96c8-a5de14bf92ba" />
-Normal mode like the original with additional trailer button
-<br><br><br>
 </details>
 
 
