@@ -26,6 +26,7 @@ If applicable, add screenshots to help explain your problem.
 **Jellyfin Server (please complete the following information):**
  - OS: [e.g. Linux]
  - Containerized with docker? [Yes/No]
+ - Media Bar Enhanced Plugin version: [e.g. 3.0.0.0]
 
 **Desktop (please complete the following information):**
  - OS: [e.g. Linux]
