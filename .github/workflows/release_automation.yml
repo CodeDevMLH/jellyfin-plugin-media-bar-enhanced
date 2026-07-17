@@ -111,7 +111,8 @@ jobs:
             jq --arg hash "${{ env.ZIP_HASH }}" \
              --arg time "${{ env.BUILD_TIME }}" \
              --arg url "$DOWNLOAD_URL" \
-             '.[0].versions[0].checksum = $hash | .[0].versions[0].timestamp = $time | .[0].versions[0].sourceUrl = $url' \
+             --arg ver "$VERSION" \
+             '.[0].versions |= map(if .version == $ver then .checksum = $hash | .timestamp = $time | .sourceUrl = $url else . end)' \
              manifest.json > manifest.json.tmp && mv manifest.json.tmp manifest.json
 
       - name: Commit manifest.json
@@ -164,38 +165,12 @@ jobs:
             
             echo "Updating Central Manifest for Plugin GUID: $PLUGIN_GUID"
             
-            # 3. Update/Prepend entry in central manifest.json
-            # Logic:
-            # - If array is empty or new version != old version: PREPEND new entry
-            # - If new version == old version: OVERWRITE (update) existing entry (re-release)
+            # 3. Update/Overwrite versions in central manifest.json with local manifest.json
+            LOCAL_VERSIONS=$(jq '.[0].versions' ../manifest.json)
             
             jq --arg guid "$PLUGIN_GUID" \
-               --arg hash "$HASH" \
-               --arg time "$TIME" \
-               --arg url "$DOWNLOAD_URL" \
-               --arg ver "$VERSION" \
-               --arg changelog "$CHANGELOG" \
-               --arg abi "$TARGET_ABI" \
-               'map(if .guid == $guid then 
-                  if .versions[0].version != $ver then
-                      # New Version -> Prepend
-                      .versions = [{
-                        "version": $ver,
-                        "changelog": $changelog,
-                        "targetAbi": $abi,
-                        "sourceUrl": $url,
-                        "checksum": $hash,
-                        "timestamp": $time
-                      }] + .versions
-                  else
-                      # Same Version -> Update existing (overwrite top)
-                      .versions[0].changelog = $changelog |
-                      .versions[0].targetAbi = $abi |
-                      .versions[0].sourceUrl = $url |
-                      .versions[0].checksum = $hash |
-                      .versions[0].timestamp = $time
-                  end
-                else . end)' \
+               --argjson local_versions "$LOCAL_VERSIONS" \
+               'map(if .guid == $guid then .versions = $local_versions else . end)' \
                manifest.json > manifest.json.tmp && mv manifest.json.tmp manifest.json
                
       - name: Commit and Push Central Manifest
