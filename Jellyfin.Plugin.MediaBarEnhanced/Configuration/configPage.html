@@ -174,7 +174,8 @@
                                                 name="OnlyLocalTrailers" />
                                             <span>Only Play Local Trailers</span>
                                         </label>
-                                        <div class="fieldDescription">If enabled, remote (YouTube) trailers will not be played. Shows static image if no local trailer is available.</div>
+                                        <div class="fieldDescription">If enabled, remote (YouTube) trailers will not be
+                                            played. Shows static image if no local trailer is available.</div>
                                     </div>
                                     <div class="checkboxContainer checkboxContainer-withDescription"
                                         id="PreferLocalBackdropsContainer">
@@ -223,15 +224,7 @@
                                         <div class="fieldDescription">Start trailer video playback muted. Autoplay might
                                             fail if unmuted.</div>
                                     </div>
-                                    <div class="checkboxContainer checkboxContainer-withDescription">
-                                        <label>
-                                            <input is="emby-checkbox" type="checkbox" id="UseSponsorBlock"
-                                                name="UseSponsorBlock" />
-                                            <span>Use SponsorBlock</span>
-                                        </label>
-                                        <div class="fieldDescription">Skip intro/outro segments in YouTube trailers (if
-                                            data is available).</div>
-                                    </div>
+
                                     <div class="checkboxContainer checkboxContainer-withDescription">
                                         <label>
                                             <input is="emby-checkbox" type="checkbox" id="RandomizeThemeVideos"
@@ -243,12 +236,92 @@
                                     </div>
                                     <div class="checkboxContainer checkboxContainer-withDescription">
                                         <label>
+                                            <input is="emby-checkbox" type="checkbox" id="UseSponsorBlock"
+                                                name="UseSponsorBlock" />
+                                            <span>Use SponsorBlock</span>
+                                        </label>
+                                        <div class="fieldDescription">Skip intro/outro segments in YouTube trailers (if
+                                            data is available).</div>
+                                    </div>
+                                    <div class="checkboxContainer checkboxContainer-withDescription">
+                                        <label>
                                             <input is="emby-checkbox" type="checkbox" id="RandomizeLocalTrailers"
                                                 name="RandomizeLocalTrailers" />
                                             <span>Randomize Local Trailer</span>
                                         </label>
                                         <div class="fieldDescription">Select a random local trailer if multiple exist.
                                         </div>
+                                    </div>
+                                    <div id="SponsorBlockCategoriesContainer"
+                                        style="margin: 0.5em 0 1.5em 2em; display: none;">
+                                        <div style="font-weight: bold; margin-bottom: 0.5em; font-size: 0.95em;">
+                                            SponsorBlock Categories to Skip:</div>
+                                        <div id="sponsorblock-categories-list"
+                                            style="display: flex; flex-direction: column; gap: 0.5em; border: 1px solid #3f3f3f; border-radius: 4px; padding: 0.8em; margin-top: 0.5em;">
+                                            <div class="checkboxContainer" style="margin: 0;">
+                                                <label>
+                                                    <input is="emby-checkbox" type="checkbox"
+                                                        class="sb-category-checkbox" data-category="sponsor" />
+                                                    <span>Sponsor (Advertisement)</span>
+                                                </label>
+                                            </div>
+                                            <div class="checkboxContainer" style="margin: 0;">
+                                                <label>
+                                                    <input is="emby-checkbox" type="checkbox"
+                                                        class="sb-category-checkbox" data-category="intro" />
+                                                    <span>Intro (Opening Credits)</span>
+                                                </label>
+                                            </div>
+                                            <div class="checkboxContainer" style="margin: 0;">
+                                                <label>
+                                                    <input is="emby-checkbox" type="checkbox"
+                                                        class="sb-category-checkbox" data-category="outro" />
+                                                    <span>Outro (End Credits)</span>
+                                                </label>
+                                            </div>
+                                            <div class="checkboxContainer" style="margin: 0;">
+                                                <label>
+                                                    <input is="emby-checkbox" type="checkbox"
+                                                        class="sb-category-checkbox" data-category="preview" />
+                                                    <span>Preview (Recap/Teaser)</span>
+                                                </label>
+                                            </div>
+                                            <div class="checkboxContainer" style="margin: 0;">
+                                                <label>
+                                                    <input is="emby-checkbox" type="checkbox"
+                                                        class="sb-category-checkbox" data-category="selfpromo" />
+                                                    <span>Self-Promotion</span>
+                                                </label>
+                                            </div>
+                                            <div class="checkboxContainer" style="margin: 0;">
+                                                <label>
+                                                    <input is="emby-checkbox" type="checkbox"
+                                                        class="sb-category-checkbox" data-category="interaction" />
+                                                    <span>Interaction Reminder</span>
+                                                </label>
+                                            </div>
+                                            <div class="checkboxContainer" style="margin: 0;">
+                                                <label>
+                                                    <input is="emby-checkbox" type="checkbox"
+                                                        class="sb-category-checkbox" data-category="music_offtopic" />
+                                                    <span>Non-Music Section</span>
+                                                </label>
+                                            </div>
+                                            <div class="checkboxContainer" style="margin: 0;">
+                                                <label>
+                                                    <input is="emby-checkbox" type="checkbox"
+                                                        class="sb-category-checkbox" data-category="filler" />
+                                                    <span>Filler / Tangent</span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="fieldDescription" style="margin-top: 0.8em;">
+                                            Note: Only segments at the very start and very end of the video are skipped
+                                            (chained dynamically if they are directly one after the other). Mid-video
+                                            segments are ignored to prevent playback interruptions.
+                                        </div>
+                                        <input type="hidden" id="SponsorBlockCategories" name="SponsorBlockCategories"
+                                            value="intro,outro,preview" />
                                     </div>
                                 </div>
 
@@ -360,13 +433,15 @@
                                         rendered.</div>
                                 </div>
 
-                                <div class="checkboxContainer checkboxContainer-withDescription" id="YoYoProgressBarContainer" style="margin-top: 1.5em;">
+                                <div class="checkboxContainer checkboxContainer-withDescription"
+                                    id="YoYoProgressBarContainer" style="margin-top: 1.5em;">
                                     <label>
                                         <input is="emby-checkbox" type="checkbox" id="YoYoProgressBar"
                                             name="YoYoProgressBar" />
                                         <span>Yo-Yo Progress Bar Animation</span>
                                     </label>
-                                    <div class="fieldDescription">If enabled, the progress bar empties from left to right on alternating slides instead of resetting to 0%.</div>
+                                    <div class="fieldDescription">If enabled, the progress bar empties from left to
+                                        right on alternating slides instead of resetting to 0%.</div>
                                 </div>
 
                                 <div class="selectContainer" style="margin-top: 1.5em;">
@@ -926,8 +1001,10 @@
                                     </div>
                                 </div>
                                 <div class="inputContainer" style="margin-top: 1.5em; width: 100%;">
-                                    <label class="inputLabel">Libraries to include in Media Bar (unchecked libraries will be excluded)</label>
-                                    <div id="admin-libraries-list" style="display: flex; flex-direction: column; gap: 0.5em; max-height: 200px; overflow-y: auto; border: 1px solid #3f3f3f; border-radius: 4px; padding: 0.8em; margin-top: 0.5em;">
+                                    <label class="inputLabel">Libraries to include in Media Bar (unchecked libraries
+                                        will be excluded)</label>
+                                    <div id="admin-libraries-list"
+                                        style="display: flex; flex-direction: column; gap: 0.5em; border: 1px solid #3f3f3f; border-radius: 4px; padding: 0.8em; margin-top: 0.5em;">
                                         <div class="fieldDescription">Loading libraries...</div>
                                     </div>
                                 </div>
@@ -1139,7 +1216,7 @@
                             'ShuffleInterval', 'RetryInterval', 'MinSwipeDistance',
                             'LoadingCheckInterval', 'MaxPlotLength', 'MaxMovies', 'MaxTvShows',
                             'MaxItems', 'PreloadCount', 'FadeTransitionDuration', 'MaxPaginationDots',
-                            'SlideAnimationEnabled', 'EnableVideoBackdrop', 'UseSponsorBlock',
+                            'SlideAnimationEnabled', 'EnableVideoBackdrop', 'UseSponsorBlock', 'SponsorBlockCategories',
                             'WaitForTrailerToEnd', 'StartMuted', 'FullWidthVideo', 'EnableMobileVideo',
                             'ShowTrailerButton', 'AlwaysShowArrows', 'EnableKeyboardControls',
                             'EnableCustomMediaIds', 'CustomMediaIds', 'EnableLoadingScreen',
@@ -1173,16 +1250,41 @@
                             }
                         });
 
+                        // Sync checkboxes for SponsorBlockCategories
+                        (function () {
+                            var hiddenVal = page.querySelector('#SponsorBlockCategories').value || 'intro,outro,preview';
+                            var categoriesList = hiddenVal.split(',').map(function (s) { return s.trim(); });
+                            page.querySelectorAll('.sb-category-checkbox').forEach(function (cb) {
+                                var cat = cb.getAttribute('data-category');
+                                cb.checked = categoriesList.indexOf(cat) !== -1;
+                            });
+
+                            var useSB = page.querySelector('#UseSponsorBlock');
+                            var container = page.querySelector('#SponsorBlockCategoriesContainer');
+                            if (container && useSB) {
+                                container.style.display = useSB.checked ? 'block' : 'none';
+
+                                // Clean up existing listener to avoid duplicates
+                                if (useSB._hasSBListener) {
+                                    useSB.removeEventListener('change', useSB._hasSBListener);
+                                }
+                                useSB._hasSBListener = function () {
+                                    container.style.display = useSB.checked ? 'block' : 'none';
+                                };
+                                useSB.addEventListener('change', useSB._hasSBListener);
+                            }
+                        })();
+
                         // Load and render admin libraries checkboxes
-                        (function() {
+                        (function () {
                             var listContainer = page.querySelector('#admin-libraries-list');
                             var hiddenInput = page.querySelector('#ExcludedLibraries');
                             if (!listContainer || !hiddenInput) return;
 
                             var excludedStr = hiddenInput.value || '';
-                            var excludedIds = excludedStr.split(',').filter(function(id) { return id; });
+                            var excludedIds = excludedStr.split(',').filter(function (id) { return id; });
 
-                            var viewsUrl = ApiClient.serverAddress() + '/Users/' + ApiClient.getCurrentUserId() + '/Views';
+                            var viewsUrl = ApiClient.serverAddress() + '/Items?IncludeItemTypes=CollectionFolder&userId=' + ApiClient.getCurrentUserId();
                             fetch(viewsUrl, {
                                 headers: {
                                     'Authorization': 'MediaBrowser Client="' + ApiClient.appName() + '", Device="' + ApiClient.deviceName() + '", DeviceId="' + ApiClient.deviceId() + '", Version="' + ApiClient.appVersion() + '", Token="' + ApiClient.accessToken() + '"'
@@ -1196,11 +1298,11 @@
                                 views.forEach(function (view) {
                                     var isChecked = excludedIds.indexOf(view.Id) === -1;
                                     html += '<div class="checkboxContainer checkboxContainer-withDescription" style="margin: 0.3em 0;">' +
-                                                '<label>' +
-                                                    '<input is="emby-checkbox" type="checkbox" class="admin-library-checkbox" data-id="' + view.Id + '" ' + (isChecked ? 'checked' : '') + ' />' +
-                                                    '<span>' + view.Name + '</span>' +
-                                                '</label>' +
-                                            '</div>';
+                                        '<label>' +
+                                        '<input is="emby-checkbox" type="checkbox" class="admin-library-checkbox" data-id="' + view.Id + '" ' + (isChecked ? 'checked' : '') + ' />' +
+                                        '<span>' + view.Name + '</span>' +
+                                        '</label>' +
+                                        '</div>';
                                 });
 
                                 if (html === '') {
@@ -1442,6 +1544,20 @@
                     var excludedInput = page.querySelector('#ExcludedLibraries');
                     if (excludedInput) excludedInput.value = uncheckedIds.join(',');
 
+                    // Sync hidden input from SponsorBlock checkboxes
+                    (function () {
+                        var checkedCats = [];
+                        page.querySelectorAll('.sb-category-checkbox').forEach(function (cb) {
+                            if (cb.checked) {
+                                checkedCats.push(cb.getAttribute('data-category'));
+                            }
+                        });
+                        var hiddenInput = page.querySelector('#SponsorBlockCategories');
+                        if (hiddenInput) {
+                            hiddenInput.value = checkedCats.join(',');
+                        }
+                    })();
+
                     var config = {};
 
                     // Manual mapping for MediaBarIsEnabled -> IsEnabled, to avoid conflicts with other plugins
@@ -1454,7 +1570,7 @@
                         'ShuffleInterval', 'RetryInterval', 'MinSwipeDistance',
                         'LoadingCheckInterval', 'MaxPlotLength', 'MaxMovies', 'MaxTvShows',
                         'MaxItems', 'PreloadCount', 'FadeTransitionDuration', 'MaxPaginationDots',
-                        'SlideAnimationEnabled', 'EnableVideoBackdrop', 'UseSponsorBlock',
+                        'SlideAnimationEnabled', 'EnableVideoBackdrop', 'UseSponsorBlock', 'SponsorBlockCategories',
                         'WaitForTrailerToEnd', 'StartMuted', 'FullWidthVideo', 'EnableMobileVideo',
                         'ShowTrailerButton', 'AlwaysShowArrows', 'EnableKeyboardControls',
                         'EnableCustomMediaIds', 'CustomMediaIds', 'EnableLoadingScreen',

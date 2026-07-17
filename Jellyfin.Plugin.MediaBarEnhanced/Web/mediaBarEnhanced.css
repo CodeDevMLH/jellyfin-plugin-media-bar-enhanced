@@ -178,13 +178,16 @@
 }
 
 #slides-container {
-  position: relative;
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100vw;
-  height: 90%;
+  height: 90vh;
   overflow: hidden;
   margin: 0 auto;
   pointer-events: auto;
   outline: none;
+  z-index: 1;
 }
 
 #slides-container[style*="display: none"],

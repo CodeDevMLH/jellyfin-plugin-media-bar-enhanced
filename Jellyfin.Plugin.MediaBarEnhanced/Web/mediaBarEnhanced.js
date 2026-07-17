@@ -57,6 +57,7 @@
     slideAnimationEnabled: true,
     enableVideoBackdrop: true,
     useSponsorBlock: true,
+    sponsorBlockCategories: "intro,outro,preview",
     preferLocalTrailers: false,
     randomizeLocalTrailers: false,
     preferLocalBackdrops: false,
@@ -1488,7 +1489,7 @@
       if (STATE.slideshow.libraryIds) return STATE.slideshow.libraryIds;
 
       try {
-        const viewsUrl = `${STATE.jellyfinData.serverAddress}/Users/${STATE.jellyfinData.userId}/Views`;
+        const viewsUrl = `${STATE.jellyfinData.serverAddress}/Items?IncludeItemTypes=CollectionFolder&userId=${STATE.jellyfinData.userId}`;
         const response = await fetch(viewsUrl, { headers: this.getAuthHeaders() });
         if (!response.ok) throw new Error("Failed to fetch views");
         const data = await response.json();
@@ -2061,10 +2062,10 @@
     /**
      * Fetches SponsorBlock segments for a YouTube video
      * @param {string} videoId - YouTube Video ID
-     * @returns {Promise<Object>} Object containing intro and outro segments
+     * @returns {Promise<Object>} Object containing segments, calculated start time and end time
      */
     async fetchSponsorBlockData(videoId) {
-      if (!CONFIG.useSponsorBlock) return { intro: null, outro: null };
+      if (!CONFIG.useSponsorBlock) return { segments: [], startTime: 0, endTime: null };
 
       // Return cached result if available
       if (!this._sponsorBlockCache) this._sponsorBlockCache = {};
@@ -2073,31 +2074,50 @@
       }
 
       try {
-        const response = await fetch(`https://sponsor.ajay.app/api/skipSegments?videoID=${videoId}&categories=["intro","outro"]`);
+        const categories = CONFIG.sponsorBlockCategories || "intro,outro,preview";
+        const catArray = categories.split(',').map(c => c.trim()).filter(Boolean);
+        const catParam = encodeURIComponent(JSON.stringify(catArray));
+        const response = await fetch(`https://sponsor.ajay.app/api/skipSegments?videoID=${videoId}&categories=${catParam}`);
         if (!response.ok) {
-          const result = { intro: null, outro: null };
+          const result = { segments: [], startTime: 0, endTime: null };
           this._sponsorBlockCache[videoId] = result;
           return result;
         }
 
         const segments = await response.json();
-        let intro = null;
-        let outro = null;
 
+        // 1. Calculate combined start skip (chaining from 0)
+        let startTime = 0;
+        let changed = true;
+        while (changed) {
+          changed = false;
+          for (const segment of segments) {
+            if (Array.isArray(segment.segment)) {
+              const segStart = segment.segment[0];
+              const segEnd = segment.segment[1];
+              if (segStart <= startTime + 1.5 && segEnd > startTime) {
+                startTime = segEnd;
+                changed = true;
+                break;
+              }
+            }
+          }
+        }
+
+        // 2. Find end skip (outro or other end segments)
+        let endTime = null;
         segments.forEach(segment => {
-          if (segment.category === "intro" && Array.isArray(segment.segment)) {
-            intro = segment.segment;
-          } else if (segment.category === "outro" && Array.isArray(segment.segment)) {
-            outro = segment.segment;
+          if (segment.category === "outro" && Array.isArray(segment.segment)) {
+            endTime = segment.segment[0];
           }
         });
 
-        const result = { intro, outro };
+        const result = { segments, startTime, endTime };
         this._sponsorBlockCache[videoId] = result;
         return result;
       } catch (error) {
         console.warn("🎬 Media Bar:", 'Error fetching SponsorBlock data:', error);
-        return { intro: null, outro: null };
+        return { segments: [], startTime: 0, endTime: null };
       }
     },
 
@@ -2632,23 +2652,50 @@
             };
 
             // Apply SponsorBlock start/end times
-            if (segments.intro) {
-              playerVars.start = Math.ceil(segments.intro[1]);
-              console.info("🎬 Media Bar:", `SponsorBlock intro detected for video ${videoId}: skipping to ${playerVars.start}s`);
+            if (segments.startTime > 0) {
+              playerVars.start = Math.ceil(segments.startTime);
+              console.info("🎬 Media Bar:", `SponsorBlock start skip calculated for video ${videoId}: starting at ${playerVars.start}s`);
             }
-            if (segments.outro) {
-              playerVars.end = Math.floor(segments.outro[0]);
-              console.info("🎬 Media Bar:", `SponsorBlock outro detected for video ${videoId}: ending at ${playerVars.end}s`);
+            if (segments.endTime) {
+              playerVars.end = Math.floor(segments.endTime);
+              console.info("🎬 Media Bar:", `SponsorBlock end skip calculated for video ${videoId}: ending at ${playerVars.end}s`);
             }
 
             STATE.slideshow.videoPlayers[itemId] = new YT.Player(ytPlayerIframe, {
               playerVars: playerVars,
               events: {
                 'onReady': (event) => {
-                  // Store start/end time and videoId for later use
+                  const duration = event.target.getDuration();
+                  let endTime = playerVars.end || undefined;
+
+                  if (duration && Array.isArray(segments.segments)) {
+                    let calculatedEndTime = duration;
+                    let changed = true;
+                    while (changed) {
+                      changed = false;
+                      for (const seg of segments.segments) {
+                        if (Array.isArray(seg.segment)) {
+                          const segStart = seg.segment[0];
+                          const segEnd = seg.segment[1];
+                          // If segment ends at/near calculatedEndTime and starts before it
+                          if (segEnd >= calculatedEndTime - 2.5 && segStart < calculatedEndTime) {
+                            calculatedEndTime = segStart;
+                            changed = true;
+                            break;
+                          }
+                        }
+                      }
+                    }
+                    if (calculatedEndTime < duration) {
+                      endTime = Math.floor(calculatedEndTime);
+                    }
+                  }
+
+                  // Store start/end time, videoId, and segments for later use
                   event.target._startTime = playerVars.start || 0;
-                  event.target._endTime = playerVars.end || undefined;
+                  event.target._endTime = endTime;
                   event.target._videoId = videoId;
+                  event.target._sponsorSegments = segments.segments || [];
 
                   // Store reference to wrapper for fading
                   event.target._wrapperDiv = videoBackdrop;
@@ -2664,7 +2711,15 @@
                   const isVideoPlayerOpen = document.querySelector('.videoPlayerContainer') || document.querySelector('.youtubePlayerContainer');
 
                   if (slide && slide.classList.contains('active') && STATE.slideshow.playSignals[itemId] === true && !document.hidden && (!isVideoPlayerOpen || isVideoPlayerOpen.classList.contains('hide'))) {
-                    event.target.playVideo();
+                    if (endTime !== undefined && typeof event.target.loadVideoById === 'function') {
+                      event.target.loadVideoById({
+                        videoId: videoId,
+                        startSeconds: event.target._startTime || 0,
+                        endSeconds: endTime
+                      });
+                    } else {
+                      event.target.playVideo();
+                    }
                     const timeoutId = setTimeout(() => {
                       const isVideoPlayerOpenNow = document.querySelector('.videoPlayerContainer') || document.querySelector('.youtubePlayerContainer');
                       if (document.hidden || (isVideoPlayerOpenNow && !isVideoPlayerOpenNow.classList.contains('hide')) || !slide.classList.contains('active')) {
@@ -2678,7 +2733,15 @@
                         event.target.getPlayerState() !== YT.PlayerState.BUFFERING) {
                         console.warn("🎬 Media Bar:", `Autoplay blocked for ${itemId}, attempting muted fallback`);
                         event.target.mute();
-                        event.target.playVideo();
+                        if (endTime !== undefined && typeof event.target.loadVideoById === 'function') {
+                          event.target.loadVideoById({
+                            videoId: videoId,
+                            startSeconds: event.target._startTime || 0,
+                            endSeconds: endTime
+                          });
+                        } else {
+                          event.target.playVideo();
+                        }
                       }
                     }, 2000);
 
@@ -3282,7 +3345,7 @@
 
       const update = () => {
         try {
-          if (typeof player.getCurrentTime !== 'function' || typeof player.getDuration !== 'function') return;
+          if (!player || typeof player.getCurrentTime !== 'function' || typeof player.getDuration !== 'function') return;
 
           const currentTime = player.getCurrentTime();
           const duration = player.getDuration();
@@ -5505,7 +5568,7 @@
         if (!container) return;
 
         try {
-          const viewsUrl = `${STATE.jellyfinData.serverAddress}/Users/${STATE.jellyfinData.userId}/Views`;
+          const viewsUrl = `${STATE.jellyfinData.serverAddress}/Items?IncludeItemTypes=CollectionFolder&userId=${STATE.jellyfinData.userId}`;
           const viewsResponse = await fetch(viewsUrl, { headers: ApiUtils.getAuthHeaders() });
           if (!viewsResponse.ok) throw new Error("Failed to fetch views");
           const viewsData = await viewsResponse.json();
