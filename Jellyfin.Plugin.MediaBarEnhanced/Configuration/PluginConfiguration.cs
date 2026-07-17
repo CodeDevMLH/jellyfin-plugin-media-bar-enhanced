@@ -25,6 +25,7 @@ namespace Jellyfin.Plugin.MediaBarEnhanced.Configuration
         public bool SlideAnimationEnabled { get; set; } = true;
         public bool EnableVideoBackdrop { get; set; } = true;
         public bool UseSponsorBlock { get; set; } = true;
+        public string SponsorBlockCategories { get; set; } = "intro,outro,preview";
         public bool PreferLocalTrailers { get; set; } = false;
         public bool RandomizeLocalTrailers { get; set; } = false;
         public bool PreferLocalBackdrops { get; set; } = false;
