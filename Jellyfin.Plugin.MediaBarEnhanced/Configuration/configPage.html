@@ -252,6 +252,32 @@
                                         <div class="fieldDescription">Select a random local trailer if multiple exist.
                                         </div>
                                     </div>
+                                    <div class="checkboxContainer checkboxContainer-withDescription"
+                                        id="RandomTrailerStartOffsetContainer">
+                                        <label>
+                                            <input is="emby-checkbox" type="checkbox" id="RandomTrailerStartOffset"
+                                                name="RandomTrailerStartOffset" />
+                                            <span>Random Trailer Start Position</span>
+                                        </label>
+                                        <div class="fieldDescription">Start each backdrop trailer at a random time
+                                            instead of the beginning. Improves variety when slides rotate every few
+                                            seconds through multi-minute trailers.</div>
+                                    </div>
+                                    <div id="RandomTrailerStartRangeContainer"
+                                        style="margin: 0.5em 0 1.5em 2em; display: none;">
+                                        <div class="inputContainer" style="display:inline-block; width:45%; margin-right:4%;">
+                                            <label class="inputLabel inputLabelUnfocused" for="RandomTrailerStartMinPercent">Min start %</label>
+                                            <input is="emby-input" type="number" id="RandomTrailerStartMinPercent"
+                                                name="RandomTrailerStartMinPercent" min="0" max="100" step="1" />
+                                            <div class="fieldDescription">Earliest start within usable trailer (default 10).</div>
+                                        </div>
+                                        <div class="inputContainer" style="display:inline-block; width:45%;">
+                                            <label class="inputLabel inputLabelUnfocused" for="RandomTrailerStartMaxPercent">Max start %</label>
+                                            <input is="emby-input" type="number" id="RandomTrailerStartMaxPercent"
+                                                name="RandomTrailerStartMaxPercent" min="0" max="100" step="1" />
+                                            <div class="fieldDescription">Latest start within usable trailer (default 75).</div>
+                                        </div>
+                                    </div>
                                     <div id="SponsorBlockCategoriesContainer"
                                         style="margin: 0.5em 0 1.5em 2em; display: none;">
                                         <div style="font-weight: bold; margin-bottom: 0.5em; font-size: 0.95em;">
@@ -1160,7 +1186,18 @@
                 toggleSetting('UseSponsorBlock', isTrailerEnabled);
                 toggleSetting('RandomizeThemeVideos', isTrailerEnabled);
                 toggleSetting('RandomizeLocalTrailers', isTrailerEnabled);
+                toggleSetting('RandomTrailerStartOffset', isTrailerEnabled);
+                toggleSetting('RandomTrailerStartMinPercent', isTrailerEnabled);
+                toggleSetting('RandomTrailerStartMaxPercent', isTrailerEnabled);
                 toggleSetting('BackdropVideoDelay', isTrailerEnabled);
+
+                var rts = page.querySelector('#RandomTrailerStartOffset');
+                var rtsRange = page.querySelector('#RandomTrailerStartRangeContainer');
+                if (rts && rtsRange) {
+                    var showRts = rts.checked && isTrailerEnabled;
+                    rtsRange.style.display = showRts ? 'block' : 'none';
+                }
+
 
                 // 3. Custom Media IDs and Seasonal settings are kept editable per user request!
 
@@ -1222,7 +1259,8 @@
                             'EnableCustomMediaIds', 'CustomMediaIds', 'EnableLoadingScreen',
                             'EnableSeasonalContent', 'EnableClientSideSettings', 'SortBy', 'SortOrder',
                             'PreferLocalTrailers', 'OnlyLocalTrailers', 'ApplyLimitsToCustomIds', 'SeasonalSections',
-                            'PreferLocalBackdrops', 'RandomizeThemeVideos', 'RandomizeLocalTrailers',
+                            'PreferLocalBackdrops', 'RandomizeThemeVideos', 'RandomizeLocalTrailers', 'RandomTrailerStartOffset',
+                            'RandomTrailerStartMinPercent', 'RandomTrailerStartMaxPercent',
                             'IncludeWatchedContent', 'ShowPaginationDots', 'ForceSlideCounter', 'MaxParentalRating',
                             'MaxDaysRecent', 'ExcludeSeasonalContent', 'HideArrowsOnMobile',
                             'EnableCustomOverlay', 'CustomOverlayText', 'CustomOverlayImageUrl',
@@ -1576,7 +1614,8 @@
                         'EnableCustomMediaIds', 'CustomMediaIds', 'EnableLoadingScreen',
                         'EnableSeasonalContent', 'EnableClientSideSettings', 'SortBy', 'SortOrder',
                         'PreferLocalTrailers', 'OnlyLocalTrailers', 'ApplyLimitsToCustomIds', 'SeasonalSections',
-                        'PreferLocalBackdrops', 'RandomizeThemeVideos', 'RandomizeLocalTrailers',
+                        'PreferLocalBackdrops', 'RandomizeThemeVideos', 'RandomizeLocalTrailers', 'RandomTrailerStartOffset',
+                        'RandomTrailerStartMinPercent', 'RandomTrailerStartMaxPercent',
                         'IncludeWatchedContent', 'ShowPaginationDots', 'ForceSlideCounter', 'MaxParentalRating',
                         'MaxDaysRecent', 'ExcludeSeasonalContent', 'HideArrowsOnMobile',
                         'EnableCustomOverlay', 'CustomOverlayText', 'CustomOverlayImageUrl',
@@ -1602,6 +1641,8 @@
                         'FadeTransitionDuration': 500,
                         'MaxPaginationDots': 15,
                         'DefaultTrailerVolume': 40,
+                        'RandomTrailerStartMinPercent': 10,
+                        'RandomTrailerStartMaxPercent': 75,
                         'BackdropVideoDelay': 0,
                         'CustomOverlayPositionX': 0,
                         'CustomOverlayPositionY': 0,

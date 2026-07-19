@@ -60,6 +60,9 @@
     sponsorBlockCategories: "intro,outro,preview",
     preferLocalTrailers: false,
     randomizeLocalTrailers: false,
+    randomTrailerStartOffset: false,
+    randomTrailerStartMinPercent: 10,
+    randomTrailerStartMaxPercent: 75,
     preferLocalBackdrops: false,
     randomizeThemeVideos: false,
     includeWatchedContent: false,
@@ -167,6 +170,8 @@
       libraryFilterHint: 'Note: These filters only apply when fetching random or recent items. They do not affect custom playlists or fixed item ID lists.',
       onlyLocalTrailersLabel: 'Only Play Local Trailers',
       onlyLocalTrailersDesc: 'Do not play remote (YouTube) trailers.',
+      randomTrailerStartLabel: 'Random Trailer Start Position',
+      randomTrailerStartDesc: 'Start each backdrop trailer at a random time instead of the beginning.',
       yoYoProgressBarLabel: 'Yo-Yo Progress Bar',
       yoYoProgressBarDesc: 'Empty progress bar from left to right on alternating slides instead of resetting.'
     },
@@ -2714,7 +2719,7 @@
                     if (endTime !== undefined && typeof event.target.loadVideoById === 'function') {
                       event.target.loadVideoById({
                         videoId: videoId,
-                        startSeconds: event.target._startTime || 0,
+                        startSeconds: pickRandomTrailerStartSeconds(event.target._startTime || 0, event.target._endTime, true, itemId),
                         endSeconds: endTime
                       });
                     } else {
@@ -2736,7 +2741,7 @@
                         if (endTime !== undefined && typeof event.target.loadVideoById === 'function') {
                           event.target.loadVideoById({
                             videoId: videoId,
-                            startSeconds: event.target._startTime || 0,
+                            startSeconds: pickRandomTrailerStartSeconds(event.target._startTime || 0, event.target._endTime, true, itemId),
                             endSeconds: endTime
                           });
                         } else {
@@ -3661,11 +3666,8 @@
               videoBackdrop.src = lazySrc;
               videoBackdrop.load(); // Force pre-buffering
             } else {
-              try {
-                if (videoBackdrop.currentTime > 0) {
-                  videoBackdrop.currentTime = 0;
-                }
-              } catch (e) { }
+              // Random or zero start for this slide activation (issue #103)
+              applyHtml5TrailerStartOffset(videoBackdrop, currentItemId, true);
             }
 
             videoBackdrop.muted = STATE.slideshow.isMuted;
@@ -3680,7 +3682,7 @@
                 // Use cueVideoById to buffer video without auto-playing it
                 player.cueVideoById({
                   videoId: player._videoId,
-                  startSeconds: player._startTime || 0,
+                  startSeconds: pickRandomTrailerStartSeconds(player._startTime || 0, player._endTime, true, currentItemId),
                   endSeconds: player._endTime
                 });
 
@@ -3691,7 +3693,7 @@
                   player.setVolume(getEffectiveTrailerVolume());
                 }
               } else if (player && typeof player.seekTo === 'function') {
-                const startTime = player._startTime || 0;
+                const startTime = pickRandomTrailerStartSeconds(player._startTime || 0, player._endTime, true, currentItemId);
                 player.seekTo(startTime);
               }
             }
@@ -3709,6 +3711,7 @@
             }
 
             if (videoBackdrop.tagName === 'VIDEO') {
+              applyHtml5TrailerStartOffset(videoBackdrop, currentItemId, false);
               videoBackdrop.play().catch(e => {
                 // Ignore intentional aborts when sliding away quickly
                 if (e.name === 'AbortError') return;
@@ -3737,7 +3740,7 @@
                 // Zero delay: Natively load and play immediately to preserve Autoplay tokens
                 player.loadVideoById({
                   videoId: player._videoId,
-                  startSeconds: player._startTime || 0,
+                  startSeconds: pickRandomTrailerStartSeconds(player._startTime || 0, player._endTime, true, currentItemId),
                   endSeconds: player._endTime
                 });
 
@@ -5209,6 +5212,7 @@
         { key: 'trailerButton', label: t.trailerButtonLabel, description: t.trailerButtonDesc, default: CONFIG.showTrailerButton },
         { key: 'mobileVideo', label: t.mobileVideoLabel, description: t.mobileVideoDesc, default: CONFIG.enableMobileVideo },
         { key: 'waitForTrailer', label: t.waitForTrailerLabel, description: t.waitForTrailerDesc, default: CONFIG.waitForTrailerToEnd },
+        { key: 'randomTrailerStart', label: t.randomTrailerStartLabel || 'Random Trailer Start Position', description: t.randomTrailerStartDesc || 'Start each backdrop trailer at a random time instead of the beginning.', default: CONFIG.randomTrailerStartOffset },
       ];
 
       let html = `
@@ -5666,6 +5670,116 @@
    * Returns the effective value for waiting for trailer to end, respecting client-side overrides.
    * @returns {boolean} Whether to wait for the trailer to end
    */
+
+  /**
+   * Whether random in-trailer start offset is enabled (client override aware).
+   * @returns {boolean}
+   */
+  function getEffectiveRandomTrailerStart() {
+    return MediaBarEnhancedSettingsManager.getSetting('randomTrailerStart', CONFIG.randomTrailerStartOffset);
+  }
+
+  /**
+   * Clamp a percent-like value into 0..100.
+   * @param {*} v
+   * @param {number} fallback
+   * @returns {number}
+   */
+  function clampTrailerStartPercent(v, fallback) {
+    const n = Number(v);
+    if (!Number.isFinite(n)) return fallback;
+    return Math.max(0, Math.min(100, n));
+  }
+
+  /**
+   * Pick a start time (seconds) within [rangeStart, rangeEnd] for backdrop trailers.
+   * When random start is disabled, returns rangeStart (usually 0 or SponsorBlock start).
+   * Leaves a short residual tail so a brief slide dwell still has motion.
+   *
+   * @param {number} rangeStart
+   * @param {number} rangeEnd
+   * @param {boolean} forceNew - re-roll even if this item already has a cached offset
+   * @param {string} [itemId]
+   * @returns {number}
+   */
+  function pickRandomTrailerStartSeconds(rangeStart, rangeEnd, forceNew, itemId) {
+    const start = Math.max(0, Number(rangeStart) || 0);
+    if (!getEffectiveRandomTrailerStart()) {
+      return start;
+    }
+
+    let end = Number(rangeEnd);
+    if (!Number.isFinite(end) || end <= start + 0.25) {
+      return start;
+    }
+
+    const span = end - start;
+    const minClip = Math.min(5, Math.max(1, span * 0.15));
+    const usableEnd = Math.max(start, end - minClip);
+    const usableSpan = usableEnd - start;
+    if (usableSpan <= 0.5) {
+      return start;
+    }
+
+    let minP = clampTrailerStartPercent(CONFIG.randomTrailerStartMinPercent, 10) / 100;
+    let maxP = clampTrailerStartPercent(CONFIG.randomTrailerStartMaxPercent, 75) / 100;
+    if (minP > maxP) {
+      const tmp = minP;
+      minP = maxP;
+      maxP = tmp;
+    }
+
+    const lo = start + usableSpan * minP;
+    const hi = start + usableSpan * maxP;
+    if (hi <= lo + 0.05) {
+      return lo;
+    }
+
+    if (!STATE.slideshow.trailerStartByItem) {
+      STATE.slideshow.trailerStartByItem = {};
+    }
+
+    if (!forceNew && itemId && STATE.slideshow.trailerStartByItem[itemId] != null) {
+      return STATE.slideshow.trailerStartByItem[itemId];
+    }
+
+    const t = lo + Math.random() * (hi - lo);
+    if (itemId) {
+      STATE.slideshow.trailerStartByItem[itemId] = t;
+    }
+    return t;
+  }
+
+  /**
+   * Apply start offset to an HTML5 video element once duration is known.
+   * @param {HTMLVideoElement} video
+   * @param {string} itemId
+   * @param {boolean} forceNew
+   */
+  function applyHtml5TrailerStartOffset(video, itemId, forceNew) {
+    if (!video || video.tagName !== 'VIDEO') return;
+    const run = () => {
+      try {
+        const duration = video.duration;
+        if (!duration || !Number.isFinite(duration) || duration < 1) return;
+        const t = pickRandomTrailerStartSeconds(0, duration, forceNew, itemId);
+        if (Math.abs((video.currentTime || 0) - t) > 0.4) {
+          video.currentTime = t;
+        }
+      } catch (e) { /* ignore seek races */ }
+    };
+
+    if (video.readyState >= 1 && Number.isFinite(video.duration) && video.duration > 0) {
+      run();
+    } else {
+      const onMeta = () => {
+        video.removeEventListener('loadedmetadata', onMeta);
+        run();
+      };
+      video.addEventListener('loadedmetadata', onMeta);
+    }
+  }
+
   function getEffectiveWaitForTrailer() {
     return MediaBarEnhancedSettingsManager.getSetting('waitForTrailer', CONFIG.waitForTrailerToEnd);
   }
