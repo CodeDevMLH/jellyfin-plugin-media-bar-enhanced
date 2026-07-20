@@ -82,6 +82,7 @@
     customOverlayPositionY: 0,
     customOverlayScale: 100,
     backdropVideoDelay: 0,
+    trailerStartOffset: 0,
     constrainPlotWidth: false,
     enableCustomMediaIds: true,
     enableSeasonalContent: false,
@@ -2656,6 +2657,13 @@
               playerVars.start = Math.ceil(segments.startTime);
               console.info("🎬 Media Bar:", `SponsorBlock start skip calculated for video ${videoId}: starting at ${playerVars.start}s`);
             }
+
+            // Skip the configured intro offset, unless SponsorBlock already skips further
+            const startOffset = getTrailerStartOffsetSeconds();
+            if (startOffset > 0 && Math.ceil(startOffset) > (playerVars.start || 0)) {
+              playerVars.start = Math.ceil(startOffset);
+              console.info("🎬 Media Bar:", `Trailer start offset applied for video ${videoId}: starting at ${playerVars.start}s`);
+            }
             if (segments.endTime) {
               playerVars.end = Math.floor(segments.endTime);
               console.info("🎬 Media Bar:", `SponsorBlock end skip calculated for video ${videoId}: ending at ${playerVars.end}s`);
@@ -2847,16 +2855,18 @@
 
           STATE.slideshow.videoPlayers[itemId] = videoBackdrop;
 
+          // Seek to the configured start offset as soon as the duration is known,
+          // including after the src is re-attached when revisiting a slide
+          videoBackdrop.addEventListener('loadedmetadata', (event) => {
+            resetLocalVideoToStart(event.target);
+          });
+
           videoBackdrop.addEventListener('play', (event) => {
             const slide = document.querySelector(`.slide[data-item-id="${itemId}"]`);
             if (!slide || !slide.classList.contains('active')) {
               console.log("🎬 Media Bar:", `Local video ${itemId} started playing but slide is not active, pausing.`);
               event.target.pause();
-              try {
-                if (event.target.currentTime > 0) {
-                  event.target.currentTime = 0;
-                }
-              } catch (e) { }
+              resetLocalVideoToStart(event.target);
               return;
             }
 
@@ -3661,11 +3671,7 @@
               videoBackdrop.src = lazySrc;
               videoBackdrop.load(); // Force pre-buffering
             } else {
-              try {
-                if (videoBackdrop.currentTime > 0) {
-                  videoBackdrop.currentTime = 0;
-                }
-              } catch (e) { }
+              resetLocalVideoToStart(videoBackdrop);
             }
 
             videoBackdrop.muted = STATE.slideshow.isMuted;
@@ -5660,6 +5666,31 @@
    */
   function getEffectiveTrailerVolume() {
     return parseInt(MediaBarEnhancedSettingsManager.getSetting('defaultTrailerVolume', CONFIG.defaultTrailerVolume), 10);
+  }
+
+  /**
+   * Returns how much of the beginning of a trailer should be skipped.
+   * @returns {number} Offset in seconds, 0 when the feature is disabled
+   */
+  function getTrailerStartOffsetSeconds() {
+    const offsetMs = parseInt(CONFIG.trailerStartOffset, 10);
+    return offsetMs > 0 ? offsetMs / 1000 : 0;
+  }
+
+  /**
+   * Rewinds a local trailer video to its configured start offset.
+   * Falls back to the very beginning when the offset would land past the end
+   * of the video, which would otherwise finish playback instantly.
+   * @param {HTMLVideoElement} video The local trailer video element
+   */
+  function resetLocalVideoToStart(video) {
+    const offset = getTrailerStartOffsetSeconds();
+    const target = (video.duration && offset >= video.duration) ? 0 : offset;
+    try {
+      if (video.currentTime !== target) {
+        video.currentTime = target;
+      }
+    } catch (e) { }
   }
 
   /**

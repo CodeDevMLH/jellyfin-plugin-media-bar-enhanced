@@ -343,6 +343,18 @@
                                             visible longer).</div>
                                     </div>
                                 </div>
+
+                                <div class="grid-2">
+                                    <div class="inputContainer">
+                                        <label class="inputLabel inputLabelUnfocused" for="TrailerStartOffset">Trailer
+                                            Start Offset (ms)</label>
+                                        <input is="emby-input" type="number" id="TrailerStartOffset"
+                                            name="TrailerStartOffset" min="0" />
+                                        <div class="fieldDescription">Skip the first part of every trailer, e.g. a
+                                            studio logo. YouTube trailers can only be skipped in whole seconds, and
+                                            SponsorBlock still wins if it skips further. Default is 0 (disabled).</div>
+                                    </div>
+                                </div>
                             </div>
 
                             <!-- Card 3: Layout & Keyboard Controls -->
@@ -1161,6 +1173,7 @@
                 toggleSetting('RandomizeThemeVideos', isTrailerEnabled);
                 toggleSetting('RandomizeLocalTrailers', isTrailerEnabled);
                 toggleSetting('BackdropVideoDelay', isTrailerEnabled);
+                toggleSetting('TrailerStartOffset', isTrailerEnabled);
 
                 // 3. Custom Media IDs and Seasonal settings are kept editable per user request!
 
@@ -1228,7 +1241,7 @@
                             'EnableCustomOverlay', 'CustomOverlayText', 'CustomOverlayImageUrl',
                             'CustomOverlayStyle', 'CustomOverlayImageStyle', 'CustomOverlayPriority',
                             'CustomOverlayPositionX', 'CustomOverlayPositionY', 'CustomOverlayScale',
-                            'BackdropVideoDelay', 'ConstrainPlotWidth', 'MobileCompactMode', 'DefaultTrailerVolume',
+                            'BackdropVideoDelay', 'TrailerStartOffset', 'ConstrainPlotWidth', 'MobileCompactMode', 'DefaultTrailerVolume',
                             'ClientMenuLocation', 'ClientMenuLocationMobile', 'CustomPlaylists', 'TransitionEffect',
                             'ShowProgressBar', 'ProgressBarLocation', 'ExcludedLibraries', 'YoYoProgressBar'
                         ];
@@ -1582,7 +1595,7 @@
                         'EnableCustomOverlay', 'CustomOverlayText', 'CustomOverlayImageUrl',
                         'CustomOverlayStyle', 'CustomOverlayImageStyle', 'CustomOverlayPriority',
                         'CustomOverlayPositionX', 'CustomOverlayPositionY', 'CustomOverlayScale',
-                        'BackdropVideoDelay', 'ConstrainPlotWidth', 'MobileCompactMode', 'DefaultTrailerVolume',
+                        'BackdropVideoDelay', 'TrailerStartOffset', 'ConstrainPlotWidth', 'MobileCompactMode', 'DefaultTrailerVolume',
                         'ClientMenuLocation', 'ClientMenuLocationMobile', 'CustomPlaylists', 'TransitionEffect',
                         'ShowProgressBar', 'ProgressBarLocation', 'ExcludedLibraries', 'YoYoProgressBar'
                     ];
@@ -1603,6 +1616,7 @@
                         'MaxPaginationDots': 15,
                         'DefaultTrailerVolume': 40,
                         'BackdropVideoDelay': 0,
+                        'TrailerStartOffset': 0,
                         'CustomOverlayPositionX': 0,
                         'CustomOverlayPositionY': 0,
                         'CustomOverlayScale': 100
