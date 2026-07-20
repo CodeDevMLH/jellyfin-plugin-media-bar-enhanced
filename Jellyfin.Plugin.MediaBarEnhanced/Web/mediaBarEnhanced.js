@@ -65,6 +65,8 @@
     includeWatchedContent: false,
     waitForTrailerToEnd: true,
     startMuted: true,
+    hoverAudioFade: false,
+    hoverAudioFadeMs: 400,
     defaultTrailerVolume: 40,
     fullWidthVideo: true,
     enableMobileVideo: false,
@@ -131,6 +133,8 @@
       mobileModeDesc: 'Height of the media bar on portrait mobile devices.',
       defaultTrailerVolumeLabel: 'Default Trailer Volume',
       defaultTrailerVolumeDesc: 'Set default volume for trailer playback (in %).',
+      hoverAudioFadeLabel: 'Hover Audio Fade',
+      hoverAudioFadeDesc: 'While muted, hover the media bar to fade sound in; leave to fade out. Off by default.',
       clientMenuLocationLabel: 'Settings Button Location',
       clientMenuLocationDesc: 'Choose where the settings button is displayed (Navbar, Sidebar, or Both).',
       clientMenuLocationMobileLabel: 'Settings Button Location (Mobile)',
@@ -443,6 +447,8 @@
       videoPlayers: {},
       sponsorBlockInterval: null,
       isMuted: CONFIG.startMuted,
+      hoverAudioEngaged: false,
+      volumeFadeToken: 0,
       customTrailerUrls: {},
       ytPromise: null,
       autoplayTimeouts: [],
@@ -4091,6 +4097,9 @@
     toggleMute() {
       STATE.slideshow.isMuted = !STATE.slideshow.isMuted;
       const isUnmuting = !STATE.slideshow.isMuted;
+      // Manual mute control cancels ephemeral hover-audio session
+      STATE.slideshow.hoverAudioEngaged = false;
+      STATE.slideshow.volumeFadeToken++;
       const muteButton = document.querySelector('.mute-button');
 
       const updateIcon = () => {
@@ -4959,8 +4968,9 @@
     };
 
     container.addEventListener("mouseenter", showArrows);
-
     container.addEventListener("mouseleave", hideArrows);
+    container.addEventListener("mouseenter", onMediaBarHoverAudioEnter);
+    container.addEventListener("mouseleave", onMediaBarHoverAudioLeave);
 
     if (CONFIG.alwaysShowArrows) {
       showArrows();
@@ -5209,6 +5219,7 @@
         { key: 'trailerButton', label: t.trailerButtonLabel, description: t.trailerButtonDesc, default: CONFIG.showTrailerButton },
         { key: 'mobileVideo', label: t.mobileVideoLabel, description: t.mobileVideoDesc, default: CONFIG.enableMobileVideo },
         { key: 'waitForTrailer', label: t.waitForTrailerLabel, description: t.waitForTrailerDesc, default: CONFIG.waitForTrailerToEnd },
+        { key: 'hoverAudioFade', label: t.hoverAudioFadeLabel || 'Hover Audio Fade', description: t.hoverAudioFadeDesc || 'While muted, hover the media bar to fade sound in; leave to fade out.', default: CONFIG.hoverAudioFade },
       ];
 
       let html = `
@@ -5658,6 +5669,137 @@
    * Returns the effective trailer volume (0-100), respecting client-side overrides.
    * @returns {number} Volume level 0-100
    */
+
+  /**
+   * Whether hover-to-fade audio is enabled (server + optional client override).
+   * Default false.
+   */
+  function isHoverAudioFadeEnabled() {
+    const v = MediaBarEnhancedSettingsManager.getSetting('hoverAudioFade', CONFIG.hoverAudioFade);
+    return v === true || v === 'true' || v === 1 || v === '1';
+  }
+
+  function getHoverAudioFadeMs() {
+    const n = parseInt(
+      MediaBarEnhancedSettingsManager.getSetting('hoverAudioFadeMs', CONFIG.hoverAudioFadeMs),
+      10
+    );
+    if (isNaN(n)) return 400;
+    return Math.max(50, Math.min(3000, n));
+  }
+
+  /**
+   * Get current slide HTML5 video and/or YouTube player, if any.
+   */
+  function getCurrentTrailerPlayback() {
+    const currentItemId = STATE.slideshow.itemIds[STATE.slideshow.currentSlideIndex];
+    if (!currentItemId) return { itemId: null, video: null, yt: null };
+    const currentSlide = document.querySelector(`.slide[data-item-id="${currentItemId}"]`);
+    const video = currentSlide ? currentSlide.querySelector('video') : null;
+    const yt =
+      STATE.slideshow.videoPlayers && STATE.slideshow.videoPlayers[currentItemId]
+        ? STATE.slideshow.videoPlayers[currentItemId]
+        : null;
+    return { itemId: currentItemId, video, yt };
+  }
+
+  /**
+   * Animate trailer volume to target (0-1 for HTML5, 0-100 for YT).
+   * When fading in from muted default, temporarily unmutes without flipping
+   * the mute button / isMuted state unless permanently unmuted.
+   */
+  function fadeTrailerVolume(toAudible, onDone) {
+    const duration = getHoverAudioFadeMs();
+    const token = ++STATE.slideshow.volumeFadeToken;
+    const targetPct = toAudible ? getEffectiveTrailerVolume() : 0;
+    const { video, yt } = getCurrentTrailerPlayback();
+
+    const startHtml5 = video ? (video.muted ? 0 : (typeof video.volume === 'number' ? video.volume : 0)) : 0;
+    const endHtml5 = targetPct / 100;
+    let startYt = 0;
+    try {
+      if (yt && typeof yt.getVolume === 'function') startYt = yt.getVolume();
+    } catch (e) { startYt = toAudible ? 0 : targetPct; }
+    const endYt = targetPct;
+
+    if (toAudible) {
+      STATE.slideshow.hoverAudioEngaged = true;
+      if (video) {
+        try {
+          video.muted = false;
+          video.volume = startHtml5;
+          video.play().catch(() => {});
+        } catch (e) {}
+      }
+      if (yt && typeof yt.unMute === 'function') {
+        try {
+          yt.unMute();
+          if (typeof yt.setVolume === 'function') yt.setVolume(startYt);
+          if (typeof yt.playVideo === 'function') yt.playVideo();
+        } catch (e) {}
+      }
+    }
+
+    const t0 = performance.now();
+    const step = (now) => {
+      if (token !== STATE.slideshow.volumeFadeToken) return;
+      const u = duration <= 0 ? 1 : Math.min(1, (now - t0) / duration);
+      // ease in-out
+      const e = u < 0.5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2;
+      const vHtml5 = startHtml5 + (endHtml5 - startHtml5) * e;
+      const vYt = startYt + (endYt - startYt) * e;
+      if (video) {
+        try {
+          video.volume = Math.max(0, Math.min(1, vHtml5));
+          if (!toAudible && u >= 1) {
+            video.muted = true;
+            video.volume = 0;
+          }
+        } catch (e) {}
+      }
+      if (yt && typeof yt.setVolume === 'function') {
+        try {
+          yt.setVolume(Math.max(0, Math.min(100, Math.round(vYt))));
+          if (!toAudible && u >= 1 && typeof yt.mute === 'function') {
+            yt.mute();
+          }
+        } catch (e) {}
+      }
+      if (u < 1) {
+        requestAnimationFrame(step);
+      } else {
+        if (!toAudible) {
+          STATE.slideshow.hoverAudioEngaged = false;
+        }
+        if (typeof onDone === 'function') onDone();
+      }
+    };
+    requestAnimationFrame(step);
+  }
+
+  function onMediaBarHoverAudioEnter() {
+    if (!isHoverAudioFadeEnabled()) return;
+    // Only while sound is turned off (muted). If user unmuted via button, leave alone.
+    if (!STATE.slideshow.isMuted) return;
+    if (!STATE.slideshow.isVideoPlaying && !getCurrentTrailerPlayback().video && !getCurrentTrailerPlayback().yt) {
+      // still try — video may exist without flag
+    }
+    fadeTrailerVolume(true);
+  }
+
+  function onMediaBarHoverAudioLeave() {
+    if (!isHoverAudioFadeEnabled()) return;
+    // Only reverse if we engaged hover audio while muted
+    if (!STATE.slideshow.isMuted) return;
+    if (!STATE.slideshow.hoverAudioEngaged && getCurrentTrailerPlayback().video && !getCurrentTrailerPlayback().video.muted) {
+      // engaged path missed flag — still fade out if audible while isMuted
+      fadeTrailerVolume(false);
+      return;
+    }
+    if (!STATE.slideshow.hoverAudioEngaged) return;
+    fadeTrailerVolume(false);
+  }
+
   function getEffectiveTrailerVolume() {
     return parseInt(MediaBarEnhancedSettingsManager.getSetting('defaultTrailerVolume', CONFIG.defaultTrailerVolume), 10);
   }

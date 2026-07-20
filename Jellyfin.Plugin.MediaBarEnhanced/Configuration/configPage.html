@@ -224,6 +224,24 @@
                                         <div class="fieldDescription">Start trailer video playback muted. Autoplay might
                                             fail if unmuted.</div>
                                     </div>
+                                    <div class="checkboxContainer checkboxContainer-withDescription"
+                                        id="HoverAudioFadeContainer">
+                                        <label>
+                                            <input is="emby-checkbox" type="checkbox" id="HoverAudioFade"
+                                                name="HoverAudioFade" />
+                                            <span>Hover Audio Fade</span>
+                                        </label>
+                                        <div class="fieldDescription">While muted, hover the media bar to fade sound in;
+                                            leave to fade out. Off by default. Does not change the mute button state.</div>
+                                    </div>
+                                    <div class="inputContainer" id="HoverAudioFadeMsContainer">
+                                        <label class="inputLabel inputLabelUnfocused" for="HoverAudioFadeMs">Hover Audio
+                                            Fade Duration (ms)</label>
+                                        <input is="emby-input" type="number" id="HoverAudioFadeMs"
+                                            name="HoverAudioFadeMs" min="50" max="3000" step="50" />
+                                        <div class="fieldDescription">How long the volume fade takes on hover in/out
+                                            (default 400).</div>
+                                    </div>
 
                                     <div class="checkboxContainer checkboxContainer-withDescription">
                                         <label>
@@ -1156,6 +1174,8 @@
                 toggleSetting('EnableMobileVideo', isTrailerEnabled);
                 toggleSetting('ShowTrailerButton', isTrailerEnabled);
                 toggleSetting('StartMuted', isTrailerEnabled);
+                toggleSetting('HoverAudioFade', isTrailerEnabled);
+                toggleSetting('HoverAudioFadeMs', isTrailerEnabled);
                 toggleSetting('DefaultTrailerVolume', isTrailerEnabled);
                 toggleSetting('UseSponsorBlock', isTrailerEnabled);
                 toggleSetting('RandomizeThemeVideos', isTrailerEnabled);
@@ -1217,7 +1237,7 @@
                             'LoadingCheckInterval', 'MaxPlotLength', 'MaxMovies', 'MaxTvShows',
                             'MaxItems', 'PreloadCount', 'FadeTransitionDuration', 'MaxPaginationDots',
                             'SlideAnimationEnabled', 'EnableVideoBackdrop', 'UseSponsorBlock', 'SponsorBlockCategories',
-                            'WaitForTrailerToEnd', 'StartMuted', 'FullWidthVideo', 'EnableMobileVideo',
+                            'WaitForTrailerToEnd', 'StartMuted', 'HoverAudioFade', 'FullWidthVideo', 'EnableMobileVideo',
                             'ShowTrailerButton', 'AlwaysShowArrows', 'EnableKeyboardControls',
                             'EnableCustomMediaIds', 'CustomMediaIds', 'EnableLoadingScreen',
                             'EnableSeasonalContent', 'EnableClientSideSettings', 'SortBy', 'SortOrder',
@@ -1228,7 +1248,7 @@
                             'EnableCustomOverlay', 'CustomOverlayText', 'CustomOverlayImageUrl',
                             'CustomOverlayStyle', 'CustomOverlayImageStyle', 'CustomOverlayPriority',
                             'CustomOverlayPositionX', 'CustomOverlayPositionY', 'CustomOverlayScale',
-                            'BackdropVideoDelay', 'ConstrainPlotWidth', 'MobileCompactMode', 'DefaultTrailerVolume',
+                            'BackdropVideoDelay', 'ConstrainPlotWidth', 'MobileCompactMode', 'DefaultTrailerVolume', 'HoverAudioFadeMs',
                             'ClientMenuLocation', 'ClientMenuLocationMobile', 'CustomPlaylists', 'TransitionEffect',
                             'ShowProgressBar', 'ProgressBarLocation', 'ExcludedLibraries', 'YoYoProgressBar'
                         ];
@@ -1571,7 +1591,7 @@
                         'LoadingCheckInterval', 'MaxPlotLength', 'MaxMovies', 'MaxTvShows',
                         'MaxItems', 'PreloadCount', 'FadeTransitionDuration', 'MaxPaginationDots',
                         'SlideAnimationEnabled', 'EnableVideoBackdrop', 'UseSponsorBlock', 'SponsorBlockCategories',
-                        'WaitForTrailerToEnd', 'StartMuted', 'FullWidthVideo', 'EnableMobileVideo',
+                        'WaitForTrailerToEnd', 'StartMuted', 'HoverAudioFade', 'FullWidthVideo', 'EnableMobileVideo',
                         'ShowTrailerButton', 'AlwaysShowArrows', 'EnableKeyboardControls',
                         'EnableCustomMediaIds', 'CustomMediaIds', 'EnableLoadingScreen',
                         'EnableSeasonalContent', 'EnableClientSideSettings', 'SortBy', 'SortOrder',
@@ -1582,7 +1602,7 @@
                         'EnableCustomOverlay', 'CustomOverlayText', 'CustomOverlayImageUrl',
                         'CustomOverlayStyle', 'CustomOverlayImageStyle', 'CustomOverlayPriority',
                         'CustomOverlayPositionX', 'CustomOverlayPositionY', 'CustomOverlayScale',
-                        'BackdropVideoDelay', 'ConstrainPlotWidth', 'MobileCompactMode', 'DefaultTrailerVolume',
+                        'BackdropVideoDelay', 'ConstrainPlotWidth', 'MobileCompactMode', 'DefaultTrailerVolume', 'HoverAudioFadeMs',
                         'ClientMenuLocation', 'ClientMenuLocationMobile', 'CustomPlaylists', 'TransitionEffect',
                         'ShowProgressBar', 'ProgressBarLocation', 'ExcludedLibraries', 'YoYoProgressBar'
                     ];
@@ -1602,6 +1622,7 @@
                         'FadeTransitionDuration': 500,
                         'MaxPaginationDots': 15,
                         'DefaultTrailerVolume': 40,
+                        'HoverAudioFadeMs': 400,
                         'BackdropVideoDelay': 0,
                         'CustomOverlayPositionX': 0,
                         'CustomOverlayPositionY': 0,

@@ -32,6 +32,15 @@ namespace Jellyfin.Plugin.MediaBarEnhanced.Configuration
         public bool RandomizeThemeVideos { get; set; } = false;
         public bool WaitForTrailerToEnd { get; set; } = true;
         public bool StartMuted { get; set; } = true;
+        /// <summary>
+        /// When true and playback is muted, hovering the media bar fades sound in;
+        /// leaving fades sound out. Off by default.
+        /// </summary>
+        public bool HoverAudioFade { get; set; } = false;
+        /// <summary>
+        /// Fade duration in milliseconds for hover audio in/out.
+        /// </summary>
+        public int HoverAudioFadeMs { get; set; } = 400;
         public int DefaultTrailerVolume { get; set; } = 40;
         public bool FullWidthVideo { get; set; } = true;
         public bool EnableMobileVideo { get; set; } = false;
