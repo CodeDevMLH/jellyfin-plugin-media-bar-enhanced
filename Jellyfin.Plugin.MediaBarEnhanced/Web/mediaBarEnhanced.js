@@ -60,7 +60,7 @@
     sponsorBlockCategories: "intro,outro,preview",
     preferLocalTrailers: false,
     randomizeLocalTrailers: false,
-    randomTrailerStartOffset: false,
+    randomTrailerStartOffset: true,
     randomTrailerStartMinPercent: 10,
     randomTrailerStartMaxPercent: 75,
     preferLocalBackdrops: false,
@@ -171,7 +171,7 @@
       onlyLocalTrailersLabel: 'Only Play Local Trailers',
       onlyLocalTrailersDesc: 'Do not play remote (YouTube) trailers.',
       randomTrailerStartLabel: 'Random Trailer Start Position',
-      randomTrailerStartDesc: 'Start each backdrop trailer at a random time instead of the beginning.',
+      randomTrailerStartDesc: 'Start each backdrop trailer at a random time instead of the beginning. On by default for the media bar; turn off to always start from the beginning.',
       yoYoProgressBarLabel: 'Yo-Yo Progress Bar',
       yoYoProgressBarDesc: 'Empty progress bar from left to right on alternating slides instead of resetting.'
     },

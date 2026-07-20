@@ -32,7 +32,7 @@ namespace Jellyfin.Plugin.MediaBarEnhanced.Configuration
         /// When true, start trailer/backdrop video playback at a random time within the usable range
         /// instead of always at the beginning (better variety on short slideshow dwell times).
         /// </summary>
-        public bool RandomTrailerStartOffset { get; set; } = false;
+        public bool RandomTrailerStartOffset { get; set; } = true;
         /// <summary>
         /// Minimum start position as percent of usable trailer duration (0-100). Default 10.
         /// </summary>
