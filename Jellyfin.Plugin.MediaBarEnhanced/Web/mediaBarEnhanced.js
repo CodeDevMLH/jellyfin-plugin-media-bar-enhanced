@@ -5850,10 +5850,15 @@
 
   /**
    * Whether random in-trailer start offset is enabled (client override aware).
+   * Only active when "Wait for trailer to end" is disabled.
    * @returns {boolean}
    */
   function getEffectiveRandomTrailerStart() {
-    return MediaBarEnhancedSettingsManager.getSetting('randomTrailerStart', CONFIG.randomTrailerStartOffset);
+    if (getEffectiveWaitForTrailer()) {
+      return false;
+    }
+    const val = MediaBarEnhancedSettingsManager.getSetting('randomTrailerStart', CONFIG.randomTrailerStartOffset);
+    return val === true || val === 'true' || val === 1 || val === '1';
   }
 
   /**
