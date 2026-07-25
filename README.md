@@ -255,6 +255,7 @@ Alternatively, check the URL: `.../web/#/details?id=YOUR_ITEM_ID_IS_HERE&...`
 *   **Randomize Backdrop Video/Local Trailer**: If multiple videos are available, randomly select one instead of always using the first, if backdrop videos or local trailers are enabled.
 *   **Use SponsorBlock**: Skips non-content segments in YouTube trailers (if the data exists).
 *   **Start Muted**: Videos start without sound (user can unmute). On most devices necessary for autoplay!.
+*   **Hover Audio Fade**: While muted, hovering over the media bar smoothly fades sound in; leaving fades sound out. Safe against browser autoplay restrictions and does not change the persistent mute button state. Default is disabled.
 *   **Full Width Video**: Stretches video to cover the entire width (good for desktop, crop on mobile).
 *   **Constrain Plot Width**: Aligns description text left to match logo width, preventing it from crossing the entire screen (also allows 3 lines of text instead of 2).
 *   **Enable Loading Screen**: Enable/disable the loading indicator while the bar initializes.
@@ -269,6 +270,7 @@ Alternatively, check the URL: `.../web/#/details?id=YOUR_ITEM_ID_IS_HERE&...`
 *   **Shuffle Interval (ms)**: Time each slide is displayed before transitioning to the next (only active on trailer slides if "Wait For Trailer To End" is disabled).
 *   **Backdrop Video Delay (ms)**: Time to wait before playing background videos (leaves static backdrop visible longer).
 *   **Trailer Start Offset (ms)**: Skip the first part of every trailer, e.g. a studio logo. YouTube trailers can only be skipped in whole seconds, and SponsorBlock still wins if it skips further. Default is `0` (disabled).
+*   **Random Trailer Start Position**: Start each backdrop trailer at a random point (between 10% and 75% of usable length). Only active when "Wait For Trailer To End" is disabled to improve variety on short slideshow rotations. Default is enabled when "Wait For Trailer To End" is disabled.
 
 #### Content Sorting
 Customize the order of slides in the Media Bar.
@@ -382,3 +384,6 @@ Also, special thanks to IAmParadox27 for the [File Transformation plugin](https:
 ## Contributing
 
 Feel free to contribute to this project by creating pull requests or reporting issues.
+
+> [!NOTE]
+> **Guidelines for Pull Requests:** Please do **not** change version numbers in `manifest.json` or `.csproj` files in your Pull Requests. New releases and version updates are created exclusively by the repository maintainers.
