@@ -65,6 +65,7 @@ namespace Jellyfin.Plugin.MediaBarEnhanced.Configuration
         public string SortBy { get; set; } = "Random";
         public string SortOrder { get; set; } = "Ascending";
         public int BackdropVideoDelay { get; set; } = 0;
+        public int TrailerStartOffset { get; set; } = 0;
         public bool ConstrainPlotWidth { get; set; } = false;
         
         public bool EnableCustomOverlay { get; set; } = false;

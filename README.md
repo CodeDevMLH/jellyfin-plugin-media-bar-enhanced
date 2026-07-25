@@ -268,6 +268,7 @@ Alternatively, check the URL: `.../web/#/details?id=YOUR_ITEM_ID_IS_HERE&...`
 #### Time Settings
 *   **Shuffle Interval (ms)**: Time each slide is displayed before transitioning to the next (only active on trailer slides if "Wait For Trailer To End" is disabled).
 *   **Backdrop Video Delay (ms)**: Time to wait before playing background videos (leaves static backdrop visible longer).
+*   **Trailer Start Offset (ms)**: Skip the first part of every trailer, e.g. a studio logo. YouTube trailers can only be skipped in whole seconds, and SponsorBlock still wins if it skips further. Default is `0` (disabled).
 
 #### Content Sorting
 Customize the order of slides in the Media Bar.

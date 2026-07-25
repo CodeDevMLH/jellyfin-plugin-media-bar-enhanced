@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Jellyfin Slideshow by M0RPH3US v4.0.1
  * Modified by CodeDevMLH
  * 
@@ -85,6 +85,7 @@
     customOverlayPositionY: 0,
     customOverlayScale: 100,
     backdropVideoDelay: 0,
+    trailerStartOffset: 0,
     constrainPlotWidth: false,
     enableCustomMediaIds: true,
     enableSeasonalContent: false,
@@ -2661,6 +2662,13 @@
               playerVars.start = Math.ceil(segments.startTime);
               console.info("🎬 Media Bar:", `SponsorBlock start skip calculated for video ${videoId}: starting at ${playerVars.start}s`);
             }
+
+            // Skip the configured intro offset, unless SponsorBlock already skips further
+            const startOffset = getTrailerStartOffsetSeconds();
+            if (startOffset > 0 && Math.ceil(startOffset) > (playerVars.start || 0)) {
+              playerVars.start = Math.ceil(startOffset);
+              console.info("🎬 Media Bar:", `Trailer start offset applied for video ${videoId}: starting at ${playerVars.start}s`);
+            }
             if (segments.endTime) {
               playerVars.end = Math.floor(segments.endTime);
               console.info("🎬 Media Bar:", `SponsorBlock end skip calculated for video ${videoId}: ending at ${playerVars.end}s`);
@@ -2852,16 +2860,18 @@
 
           STATE.slideshow.videoPlayers[itemId] = videoBackdrop;
 
+          // Seek to the configured start offset as soon as the duration is known,
+          // including after the src is re-attached when revisiting a slide
+          videoBackdrop.addEventListener('loadedmetadata', (event) => {
+            resetLocalVideoToStart(event.target);
+          });
+
           videoBackdrop.addEventListener('play', (event) => {
             const slide = document.querySelector(`.slide[data-item-id="${itemId}"]`);
             if (!slide || !slide.classList.contains('active')) {
               console.log("🎬 Media Bar:", `Local video ${itemId} started playing but slide is not active, pausing.`);
               event.target.pause();
-              try {
-                if (event.target.currentTime > 0) {
-                  event.target.currentTime = 0;
-                }
-              } catch (e) { }
+              resetLocalVideoToStart(event.target);
               return;
             }
 
@@ -3666,7 +3676,7 @@
               videoBackdrop.src = lazySrc;
               videoBackdrop.load(); // Force pre-buffering
             } else {
-              // Random or zero start for this slide activation (issue #103)
+              // Random or fixed trailer start offset for this slide activation
               applyHtml5TrailerStartOffset(videoBackdrop, currentItemId, true);
             }
 
@@ -5667,6 +5677,31 @@
   }
 
   /**
+   * Returns how much of the beginning of a trailer should be skipped.
+   * @returns {number} Offset in seconds, 0 when the feature is disabled
+   */
+  function getTrailerStartOffsetSeconds() {
+    const offsetMs = parseInt(CONFIG.trailerStartOffset, 10);
+    return offsetMs > 0 ? offsetMs / 1000 : 0;
+  }
+
+  /**
+   * Rewinds a local trailer video to its configured start offset.
+   * Falls back to the very beginning when the offset would land past the end
+   * of the video, which would otherwise finish playback instantly.
+   * @param {HTMLVideoElement} video The local trailer video element
+   */
+  function resetLocalVideoToStart(video) {
+    const offset = getTrailerStartOffsetSeconds();
+    const target = (video.duration && offset >= video.duration) ? 0 : offset;
+    try {
+      if (video.currentTime !== target) {
+        video.currentTime = target;
+      }
+    } catch (e) { }
+  }
+
+  /**
    * Returns the effective value for waiting for trailer to end, respecting client-side overrides.
    * @returns {boolean} Whether to wait for the trailer to end
    */
@@ -5703,22 +5738,29 @@
    * @returns {number}
    */
   function pickRandomTrailerStartSeconds(rangeStart, rangeEnd, forceNew, itemId) {
-    const start = Math.max(0, Number(rangeStart) || 0);
-    if (!getEffectiveRandomTrailerStart()) {
-      return start;
-    }
-
+    const fixedOffset = getTrailerStartOffsetSeconds();
+    let baseStart = Math.max(0, Number(rangeStart) || 0);
     let end = Number(rangeEnd);
-    if (!Number.isFinite(end) || end <= start + 0.25) {
-      return start;
+
+    // Apply fixed offset if configured and valid for this trailer
+    if (fixedOffset > 0 && (!Number.isFinite(end) || fixedOffset < end)) {
+      baseStart = Math.max(baseStart, fixedOffset);
     }
 
-    const span = end - start;
+    if (!getEffectiveRandomTrailerStart()) {
+      return baseStart;
+    }
+
+    if (!Number.isFinite(end) || end <= baseStart + 0.25) {
+      return baseStart;
+    }
+
+    const span = end - baseStart;
     const minClip = Math.min(5, Math.max(1, span * 0.15));
-    const usableEnd = Math.max(start, end - minClip);
-    const usableSpan = usableEnd - start;
+    const usableEnd = Math.max(baseStart, end - minClip);
+    const usableSpan = usableEnd - baseStart;
     if (usableSpan <= 0.5) {
-      return start;
+      return baseStart;
     }
 
     let minP = clampTrailerStartPercent(CONFIG.randomTrailerStartMinPercent, 10) / 100;
@@ -5729,8 +5771,8 @@
       maxP = tmp;
     }
 
-    const lo = start + usableSpan * minP;
-    const hi = start + usableSpan * maxP;
+    const lo = baseStart + usableSpan * minP;
+    const hi = baseStart + usableSpan * maxP;
     if (hi <= lo + 0.05) {
       return lo;
     }
