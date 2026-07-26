@@ -28,31 +28,14 @@ namespace Jellyfin.Plugin.MediaBarEnhanced.Configuration
         public string SponsorBlockCategories { get; set; } = "intro,outro,preview";
         public bool PreferLocalTrailers { get; set; } = false;
         public bool RandomizeLocalTrailers { get; set; } = false;
-        /// <summary>
-        /// When true, start trailer/backdrop video playback at a random time within the usable range
-        /// instead of always at the beginning (better variety on short slideshow dwell times).
-        /// </summary>
         public bool RandomTrailerStartOffset { get; set; } = true;
-        /// <summary>
-        /// Minimum start position as percent of usable trailer duration (0-100). Default 10.
-        /// </summary>
         public int RandomTrailerStartMinPercent { get; set; } = 10;
-        /// <summary>
-        /// Maximum start position as percent of usable trailer duration (0-100). Default 75.
-        /// </summary>
         public int RandomTrailerStartMaxPercent { get; set; } = 75;
         public bool PreferLocalBackdrops { get; set; } = false;
         public bool RandomizeThemeVideos { get; set; } = false;
         public bool WaitForTrailerToEnd { get; set; } = true;
         public bool StartMuted { get; set; } = true;
-        /// <summary>
-        /// When true and playback is muted, hovering the media bar fades sound in;
-        /// leaving fades sound out. Off by default.
-        /// </summary>
         public bool HoverAudioFade { get; set; } = false;
-        /// <summary>
-        /// Fade duration in milliseconds for hover audio in/out.
-        /// </summary>
         public int HoverAudioFadeMs { get; set; } = 400;
         public int DefaultTrailerVolume { get; set; } = 40;
         public bool FullWidthVideo { get; set; } = true;
@@ -75,6 +58,7 @@ namespace Jellyfin.Plugin.MediaBarEnhanced.Configuration
         public string SortOrder { get; set; } = "Ascending";
         public int BackdropVideoDelay { get; set; } = 0;
         public int TrailerStartOffset { get; set; } = 0;
+        public int TrailerEndOffset { get; set; } = 0;
         public bool ConstrainPlotWidth { get; set; } = false;
         
         public bool EnableCustomOverlay { get; set; } = false;

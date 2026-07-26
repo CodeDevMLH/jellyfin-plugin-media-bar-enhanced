@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Jellyfin Slideshow by M0RPH3US v4.0.1
  * Modified by CodeDevMLH
  * 
@@ -30,7 +30,7 @@
   window.mediaBarEnhancedLoaded = true;
 
   // MARK: Version
-  const PLUGIN_VERSION = "3.1.0.0";
+  const PLUGIN_VERSION = "3.3.0.0";
 
   //Core Module Configuration
   const CONFIG = {
@@ -60,16 +60,11 @@
     sponsorBlockCategories: "intro,outro,preview",
     preferLocalTrailers: false,
     randomizeLocalTrailers: false,
-    randomTrailerStartOffset: true,
-    randomTrailerStartMinPercent: 10,
-    randomTrailerStartMaxPercent: 75,
     preferLocalBackdrops: false,
     randomizeThemeVideos: false,
     includeWatchedContent: false,
     waitForTrailerToEnd: true,
     startMuted: true,
-    hoverAudioFade: false,
-    hoverAudioFadeMs: 400,
     defaultTrailerVolume: 40,
     fullWidthVideo: true,
     enableMobileVideo: false,
@@ -88,6 +83,12 @@
     customOverlayScale: 100,
     backdropVideoDelay: 0,
     trailerStartOffset: 0,
+    trailerEndOffset: 0,
+    randomTrailerStartOffset: true,
+    randomTrailerStartMinPercent: 10,
+    randomTrailerStartMaxPercent: 75,
+    hoverAudioFade: false,
+    hoverAudioFadeMs: 400,
     constrainPlotWidth: false,
     enableCustomMediaIds: true,
     enableSeasonalContent: false,
@@ -176,7 +177,7 @@
       onlyLocalTrailersLabel: 'Only Play Local Trailers',
       onlyLocalTrailersDesc: 'Do not play remote (YouTube) trailers.',
       randomTrailerStartLabel: 'Random Trailer Start Position',
-      randomTrailerStartDesc: 'Start each backdrop trailer at a random time instead of the beginning. On by default for the media bar; turn off to always start from the beginning.',
+      randomTrailerStartDesc: 'Start each backdrop trailer at a random time instead of the beginning (only active when "Wait For Trailer To End" is disabled). On by default for the media bar; turn off to always start from the beginning.',
       yoYoProgressBarLabel: 'Yo-Yo Progress Bar',
       yoYoProgressBarDesc: 'Empty progress bar from left to right on alternating slides instead of resetting.'
     },
@@ -227,6 +228,8 @@
       mobileModeDesc: 'Höhe der Media Bar auf mobilen Geräten im Hochformat.',
       defaultTrailerVolumeLabel: 'Standard-Lautstärke',
       defaultTrailerVolumeDesc: 'Standard-Lautstärke für die Trailer-Wiedergabe (in %).',
+      hoverAudioFadeLabel: 'Hover Audio Fade',
+      hoverAudioFadeDesc: 'Im stummgeschalteten Zustand wird der Ton beim Drüberfahren mit der Maus sanft eingeblendet und beim Verlassen wieder ausgeblendet. Standardmäßig deaktiviert.',
       clientMenuLocationLabel: 'Ort der Einstellungen',
       clientMenuLocationDesc: 'Wähle aus, wo das Einstellungs-Symbol angezeigt wird (Kopfzeile, Seitenleiste oder Beide).',
       clientMenuLocationMobileLabel: 'Ort der Einstellungen (Mobil)',
@@ -238,6 +241,8 @@
       libraryFilterHint: 'Hinweis: Diese Filter gelten nur für zufällige oder kürzlich hinzugefügte Medien. Sie haben keinen Einfluss auf feste Wiedergabelisten oder manuell angegebene Element-IDs.',
       onlyLocalTrailersLabel: 'Nur lokale Trailer abspielen',
       onlyLocalTrailersDesc: 'Keine Online-/YouTube-Trailer abspielen.',
+      randomTrailerStartLabel: 'Zufällige Trailer-Startposition',
+      randomTrailerStartDesc: 'Startet jeden Hintergrund-Trailer an einer zufälligen Position statt am Anfang (greift nur, wenn "Auf Trailer-Ende warten" deaktiviert ist). Für die Media Bar standardmäßig aktiv; deaktivieren, um immer am Anfang zu starten.',
       yoYoProgressBarLabel: 'Yo-Yo-Ladebalken',
       yoYoProgressBarDesc: 'Ladebalken bei abwechselnden Folien von links nach rechts leeren anstatt zurückzuspringen.'
     },
@@ -263,6 +268,8 @@
       mobileModeDesc: 'Altura de la barra de medios en dispositivos móviles (vertical).',
       defaultTrailerVolumeLabel: 'Volumen predeterminado del tráiler',
       defaultTrailerVolumeDesc: 'Ajustar el volumen predeterminado del tráiler (en %).',
+      hoverAudioFadeLabel: 'Atenuación de audio al pasar el ratón',
+      hoverAudioFadeDesc: 'Estando silenciado, al pasar el ratón sobre la barra de medios el sonido se amplifica gradualmente y al salir se atenúa. Desactivado por defecto.',
       clientMenuLocationLabel: 'Ubicación de ajustes',
       clientMenuLocationDesc: 'Elige dónde se muestra el botón de ajustes (Barra de navegación, Menú lateral o Ambos).',
       clientMenuLocationMobileLabel: 'Ubicación de ajustes (Móvil)',
@@ -299,6 +306,8 @@
       libraryFilterHint: 'Nota: Estos filtros solo se aplican cuando se obtienen elementos aleatorios o recientes. No afectan a las listas de reproducción personalizadas ni a las listas fijas de IDs de elementos.',
       onlyLocalTrailersLabel: 'Solo reproducir trailers locales',
       onlyLocalTrailersDesc: 'No reproducir trailers remotos/YouTube.',
+      randomTrailerStartLabel: 'Posición de inicio aleatoria del tráiler',
+      randomTrailerStartDesc: 'Inicia cada tráiler de fondo en un momento aleatorio en lugar del principio (solo activo si "Esperar a que termine el tráiler" está desactivado). Activado por defecto en la barra de medios; desactívalo para empezar siempre desde el principio.',
       yoYoProgressBarLabel: 'Barra de progreso Yo-Yo',
       yoYoProgressBarDesc: 'Vaciar la barra de progreso de izquierda a derecha en diapositivas alternas en lugar de reiniciar.'
     },
@@ -324,6 +333,8 @@
       mobileModeDesc: 'Hauteur de la barre multimédia sur les appareils mobiles (portrait).',
       defaultTrailerVolumeLabel: 'Volume par défaut de la bande-annonce',
       defaultTrailerVolumeDesc: 'Définir le volume par défaut de la bande-annonce (en %).',
+      hoverAudioFadeLabel: 'Fondu audio au survol',
+      hoverAudioFadeDesc: 'Lorsque le son est coupé, survolez la barre multimédia pour faire monter le son en fondu et quittez pour le réduire. Désactivé par défaut.',
       clientMenuLocationLabel: 'Emplacement des paramètres',
       clientMenuLocationDesc: 'Choisissez où afficher le bouton des paramètres (Barre de navigation, Menu latéral ou Les deux).',
       clientMenuLocationMobileLabel: 'Emplacement des paramètres (Mobile)',
@@ -360,6 +371,8 @@
       libraryFilterHint: 'Remarque : ces filtres ne s\'appliquent que lors de la récupération d\'éléments aléatoires ou récents. Ils n\'affectent pas les listes de lecture personnalisées ni les listes fixes d\'identifiants d\'éléments.',
       onlyLocalTrailersLabel: 'Ne lire que les bandes-annonces locales',
       onlyLocalTrailersDesc: 'Ne pas lire les bandes-annonces distantes/YouTube.',
+      randomTrailerStartLabel: 'Position de départ aléatoire de la bande-annonce',
+      randomTrailerStartDesc: 'Démarre chaque bande-annonce en arrière-plan à un moment aléatoire au lieu du début (actif uniquement si "Attendre la fin de la bande-annonce" est désactivé). Activé par défaut pour la barre multimédia ; désactivez pour toujours démarrer du début.',
       yoYoProgressBarLabel: 'Barre de progression Yo-Yo',
       yoYoProgressBarDesc: 'Vider la barre de progression de gauche à droite sur les diapositives alternées au lieu de réinitialiser.'
     },
@@ -385,6 +398,8 @@
       mobileModeDesc: 'Altezza della barra multimediale sui dispositivi mobili in verticale.',
       defaultTrailerVolumeLabel: 'Volume predefinito del trailer',
       defaultTrailerVolumeDesc: 'Imposta il volume predefinito per il trailer (in %).',
+      hoverAudioFadeLabel: 'Dissolvenza audio al passaggio del mouse',
+      hoverAudioFadeDesc: 'Quando il volume è disattivato, passa il mouse sulla barra multimediale per sfumare l\'audio in ingresso e esci per sfumarlo in uscita. Disattivato per impostazione predefinita.',
       clientMenuLocationLabel: 'Posizione impostazioni',
       clientMenuLocationDesc: 'Scegli dove mostrare il pulsante delle impostazioni (Barra di navigazione, Menu laterale o Entrambi).',
       clientMenuLocationMobileLabel: 'Posizione impostazioni (Mobile)',
@@ -421,6 +436,8 @@
       libraryFilterHint: 'Nota: questi filtri si applicano solo quando si recuperano elementi casuali o recenti. Non influiscono sulle playlist personalizzate o sugli elenchi fissi di ID elemento.',
       onlyLocalTrailersLabel: 'Riproduci solo trailer locali',
       onlyLocalTrailersDesc: 'Non riprodurre trailer remoti/YouTube.',
+      randomTrailerStartLabel: 'Posizione di avvio casuale del trailer',
+      randomTrailerStartDesc: 'Avvia ciascun trailer in background in un punto casuale anziché dall\'inizio (attivo solo se "Attendi fine trailer" è disattivato). Attivo per impostazione predefinita per la barra multimediale; disattiva per iniziare sempre dall\'inizio.',
       yoYoProgressBarLabel: 'Barra di avanzamento Yo-Yo',
       yoYoProgressBarDesc: 'Svuota la barra di avanzamento da sinistra a destra nelle diapositive alternate invece di ripristinare.'
     }
@@ -453,12 +470,14 @@
       videoPlayers: {},
       sponsorBlockInterval: null,
       isMuted: CONFIG.startMuted,
-      hoverAudioEngaged: false,
-      volumeFadeToken: 0,
       customTrailerUrls: {},
       ytPromise: null,
       autoplayTimeouts: [],
       playSignals: {},
+      hoverAudioEngaged: false,
+      volumeFadeToken: 0,
+      hasUserInteracted: false,
+      trailerStartByItem: {},
       failsafeTimeout: null,
       isVideoPlaying: false,
     },
@@ -515,13 +534,18 @@
 
   const isUserLoggedIn = () => {
     try {
-      return (
-        window.ApiClient &&
-        window.ApiClient._currentUser &&
-        window.ApiClient._currentUser.Id &&
-        window.ApiClient._serverInfo &&
-        window.ApiClient._serverInfo.AccessToken
-      );
+      const apiClient = window.ApiClient;
+      if (!apiClient) return false;
+
+      if (typeof apiClient.isLoggedIn === 'function') {
+        const loggedIn = apiClient.isLoggedIn();
+        if (typeof loggedIn === 'boolean') return loggedIn;
+      }
+
+      const userId = (typeof apiClient.getCurrentUserId === 'function' ? apiClient.getCurrentUserId() : null) || (apiClient._currentUser ? apiClient._currentUser.Id : null);
+      const token = (typeof apiClient.accessToken === 'function' ? apiClient.accessToken() : null) || (apiClient._serverInfo ? apiClient._serverInfo.AccessToken : null);
+
+      return !!(userId && token);
     } catch (error) {
       console.error("🎬 Media Bar:", "Error checking login status:", error);
       return false;
@@ -549,17 +573,39 @@
 
     try {
       const apiClient = window.ApiClient;
+      const getVal = (fnName, propName, fallback) => {
+        try {
+          if (typeof apiClient[fnName] === 'function') {
+            const v = apiClient[fnName]();
+            if (v != null && v !== '') return v;
+          }
+        } catch (e) { }
+        if (propName && apiClient[propName] != null) return apiClient[propName];
+        if (propName === '_serverInfo' && apiClient._serverInfo) {
+          return apiClient._serverInfo.AccessToken || apiClient._serverInfo.Id || fallback;
+        }
+        return fallback || "Not Found";
+      };
+
       STATE.jellyfinData = {
-        userId: apiClient.getCurrentUserId() || "Not Found",
-        appName: apiClient._appName || "Not Found",
-        appVersion: apiClient._appVersion || "Not Found",
-        deviceName: apiClient._deviceName || "Not Found",
-        deviceId: apiClient._deviceId || "Not Found",
-        accessToken: apiClient._serverInfo.AccessToken || "Not Found",
-        serverId: apiClient._serverInfo.Id || "Not Found",
-        serverAddress: apiClient._serverAddress || "Not Found",
+        userId: getVal('getCurrentUserId', '_currentUser', 'Not Found'),
+        appName: getVal('appName', '_appName', 'Jellyfin Web'),
+        appVersion: getVal('appVersion', '_appVersion', '10.10.0'),
+        deviceName: getVal('deviceName', '_deviceName', 'Browser'),
+        deviceId: getVal('deviceId', '_deviceId', 'browser'),
+        accessToken: getVal('accessToken', '_serverInfo', 'Not Found'),
+        serverId: getVal('serverId', '_serverInfo', 'Not Found'),
+        serverAddress: getVal('serverAddress', '_serverAddress', window.location.origin),
         pluginVersion: PLUGIN_VERSION,
       };
+
+      try {
+        const appVer = STATE.jellyfinData.appVersion || '';
+        const majorVer = parseInt(appVer.split('.')[0], 10);
+        if (appVer.startsWith('12.') || majorVer >= 12) {
+          document.body.classList.add('jellyfin-v12');
+        }
+      } catch (e) { }
 
       if (callback && typeof callback === "function") {
         callback();
@@ -798,12 +844,7 @@
         return;
       }
 
-      if (
-        window.ApiClient._currentUser &&
-        window.ApiClient._currentUser.Id &&
-        window.ApiClient._serverInfo &&
-        window.ApiClient._serverInfo.AccessToken
-      ) {
+      if (isUserLoggedIn()) {
         console.log("🎬 Media Bar:",
           "🔓 User is fully logged in. Starting slideshow initialization..."
         );
@@ -984,6 +1025,9 @@
           element.innerHTML = value;
         } else if (key === "onclick" && typeof value === "function") {
           element.addEventListener("click", value);
+        } else if (key === "disablePictureInPicture" || key === "disablepictureinpicture") {
+          element.disablePictureInPicture = !!value;
+          if (value) element.setAttribute("disablepictureinpicture", "");
         } else {
           element.setAttribute(key, value);
         }
@@ -1186,8 +1230,13 @@
           src: url,
           controls: true,
           autoplay: true,
+          disablePictureInPicture: true,
+          controlsList: 'nodownload noplaybackrate nopip',
           className: 'video-modal-player'
         });
+        video.disablePictureInPicture = true;
+        video.setAttribute('disablepictureinpicture', '');
+        video.setAttribute('controlsList', 'nodownload noplaybackrate nopip');
         video.setAttribute('playsinline', '');
         contentContainer.appendChild(video);
         overlay.append(closeButton, contentContainer);
@@ -1247,10 +1296,10 @@
         }
       }
 
-      if (window.ApiClient && STATE.jellyfinData && STATE.jellyfinData.accessToken) {
+      if (isUserLoggedIn() && STATE.jellyfinData && STATE.jellyfinData.accessToken && STATE.jellyfinData.accessToken !== "Not Found") {
         try {
-          const userId = window.ApiClient.getCurrentUserId();
-          if (userId) {
+          const userId = (typeof window.ApiClient.getCurrentUserId === 'function' ? window.ApiClient.getCurrentUserId() : null) || (STATE.jellyfinData ? STATE.jellyfinData.userId : null);
+          if (userId && userId !== "Not Found") {
             const userUrl = `${STATE.jellyfinData.serverAddress}/Users/${userId}`;
             const userResponse = await fetch(userUrl, {
               headers: ApiUtils.getAuthHeaders(),
@@ -1267,7 +1316,7 @@
         }
       }
 
-      if (!locale && window.ApiClient && (STATE.jellyfinData && STATE.jellyfinData.accessToken)) {
+      if (!locale && isUserLoggedIn() && STATE.jellyfinData && STATE.jellyfinData.accessToken && STATE.jellyfinData.accessToken !== "Not Found") {
         try {
           const configUrl = `${STATE.jellyfinData.serverAddress}/System/Configuration`;
           const configResponse = await fetch(configUrl, {
@@ -1294,10 +1343,16 @@
 
       // Convert 3-letter country codes to 2-letter if necessary
       if (locale.length === 3) {
-        const countriesData = await window.ApiClient.getCountries();
-        const countryData = Object.values(countriesData).find(countryData => countryData.ThreeLetterISORegionName === locale.toUpperCase());
-        if (countryData) {
-          locale = countryData.TwoLetterISORegionName.toLowerCase();
+        try {
+          if (window.ApiClient && typeof window.ApiClient.getCountries === 'function') {
+            const countriesData = await window.ApiClient.getCountries();
+            const countryData = Object.values(countriesData).find(countryData => countryData.ThreeLetterISORegionName === locale.toUpperCase());
+            if (countryData && countryData.TwoLetterISORegionName) {
+              locale = countryData.TwoLetterISORegionName.toLowerCase();
+            }
+          }
+        } catch (e) {
+          console.warn("🎬 Media Bar:", "Could not fetch countries data from ApiClient:", e);
         }
       }
 
@@ -2498,21 +2553,23 @@
       const itemId = item.Id;
       const serverAddress = STATE.jellyfinData.serverAddress;
 
-      const slide = SlideUtils.createElement("a", {
+      const slide = SlideUtils.createElement("div", {
         className: "slide",
-        target: "_top",
-        rel: "noreferrer",
         tabIndex: 0,
         "data-item-id": itemId,
         onclick: (e) => {
-          // Prevent navigation if clicking on buttons or arrows
-          if (e.target.closest('button') || e.target.closest('.arrow')) return;
+          // Prevent navigation if clicking on buttons, links, or arrows
+          if (e.target.closest('button') || e.target.closest('a') || e.target.closest('.arrow')) return;
 
           // On desktop/tablets, detail navigation is handled strictly by the details button.
           // Full slide clicking is only enabled for compact mobile modes (16:9 and 4:3) where the details button is hidden.
           const isMobileLayout = document.body.classList.contains("media-bar-mobile-16-9") ||
             document.body.classList.contains("media-bar-mobile-4-3");
-          if (!isMobileLayout) return;
+          if (!isMobileLayout) {
+            e.preventDefault();
+            e.stopPropagation();
+            return;
+          }
 
           e.preventDefault();
           e.stopPropagation();
@@ -2710,6 +2767,15 @@
                     }
                   }
 
+                  const endOffset = getTrailerEndOffsetSeconds();
+                  if (duration && endOffset > 0 && duration > endOffset) {
+                    const offsetEnd = Math.floor(duration - endOffset);
+                    if (endTime === undefined || offsetEnd < endTime) {
+                      endTime = offsetEnd;
+                      console.info("🎬 Media Bar:", `Trailer end offset applied for video ${videoId}: ending at ${endTime}s`);
+                    }
+                  }
+
                   // Store start/end time, videoId, and segments for later use
                   event.target._startTime = playerVars.start || 0;
                   event.target._endTime = endTime;
@@ -2730,12 +2796,13 @@
                   const isVideoPlayerOpen = document.querySelector('.videoPlayerContainer') || document.querySelector('.youtubePlayerContainer');
 
                   if (slide && slide.classList.contains('active') && STATE.slideshow.playSignals[itemId] === true && !document.hidden && (!isVideoPlayerOpen || isVideoPlayerOpen.classList.contains('hide'))) {
-                    if (endTime !== undefined && typeof event.target.loadVideoById === 'function') {
-                      event.target.loadVideoById({
+                    if (typeof event.target.loadVideoById === 'function') {
+                      const loadObj = {
                         videoId: videoId,
-                        startSeconds: pickRandomTrailerStartSeconds(event.target._startTime || 0, event.target._endTime, true, itemId),
-                        endSeconds: endTime
-                      });
+                        startSeconds: pickRandomTrailerStartSeconds(event.target._startTime || 0, event.target._endTime, true, itemId)
+                      };
+                      if (endTime !== undefined && endTime > 0) loadObj.endSeconds = endTime;
+                      event.target.loadVideoById(loadObj);
                     } else {
                       event.target.playVideo();
                     }
@@ -2752,12 +2819,13 @@
                         event.target.getPlayerState() !== YT.PlayerState.BUFFERING) {
                         console.warn("🎬 Media Bar:", `Autoplay blocked for ${itemId}, attempting muted fallback`);
                         event.target.mute();
-                        if (endTime !== undefined && typeof event.target.loadVideoById === 'function') {
-                          event.target.loadVideoById({
+                        if (typeof event.target.loadVideoById === 'function') {
+                          const loadObj = {
                             videoId: videoId,
-                            startSeconds: pickRandomTrailerStartSeconds(event.target._startTime || 0, event.target._endTime, true, itemId),
-                            endSeconds: endTime
-                          });
+                            startSeconds: pickRandomTrailerStartSeconds(event.target._startTime || 0, event.target._endTime, true, itemId)
+                          };
+                          if (endTime !== undefined && endTime > 0) loadObj.endSeconds = endTime;
+                          event.target.loadVideoById(loadObj);
                         } else {
                           event.target.playVideo();
                         }
@@ -2798,6 +2866,24 @@
                     STATE.slideshow.isVideoPlaying = true;
                     if (getEffectiveWaitForTrailer() && STATE.slideshow.slideInterval) {
                       STATE.slideshow.slideInterval.stop();
+                    }
+
+                    const dur = typeof event.target.getDuration === 'function' ? event.target.getDuration() : 0;
+                    if (dur > 5 && getEffectiveRandomTrailerStart() && isActive) {
+                      if (!event.target._endTime) {
+                        const endOffset = getTrailerEndOffsetSeconds();
+                        event.target._endTime = (endOffset > 0 && dur > endOffset) ? (dur - endOffset) : dur;
+                      }
+                      if (!event.target._hasSeekedRandomStart) {
+                        event.target._hasSeekedRandomStart = true;
+                        const targetStart = pickRandomTrailerStartSeconds(event.target._startTime || 0, event.target._endTime, false, itemId);
+                        if (targetStart > 2 && Math.abs((event.target.getCurrentTime() || 0) - targetStart) > 4) {
+                          console.log("🎬 Media Bar:", `Seeking YouTube trailer ${itemId} to random start position: ${targetStart.toFixed(1)}s (duration: ${dur.toFixed(1)}s)`);
+                          try {
+                            event.target.seekTo(targetStart, true);
+                          } catch (e) { }
+                        }
+                      }
                     }
 
                     // Start progress tracking loop for active YouTube trailer
@@ -2854,6 +2940,7 @@
             className: "backdrop video-backdrop",
             preload: "none",
             disablePictureInPicture: true,
+            controlsList: "nodownload noplaybackrate nopip",
             "data-src": videoSrc,
             style: "object-fit: cover; object-position: center center; width: 100%; height: 100%; position: absolute; top: 0; left: 0; pointer-events: none; opacity: 0; transition: opacity 1.2s ease-in-out;"
           };
@@ -2862,22 +2949,23 @@
           videoAttributes.playsinline = "";
 
           videoBackdrop = SlideUtils.createElement("video", videoAttributes);
+          videoBackdrop.disablePictureInPicture = true;
+          videoBackdrop.setAttribute('disablepictureinpicture', '');
+          videoBackdrop.setAttribute('controlsList', 'nodownload noplaybackrate nopip');
           videoBackdrop.volume = getEffectiveTrailerVolume() / 100;
 
           STATE.slideshow.videoPlayers[itemId] = videoBackdrop;
-
-          // Seek to the configured start offset as soon as the duration is known,
-          // including after the src is re-attached when revisiting a slide
-          videoBackdrop.addEventListener('loadedmetadata', (event) => {
-            resetLocalVideoToStart(event.target);
-          });
 
           videoBackdrop.addEventListener('play', (event) => {
             const slide = document.querySelector(`.slide[data-item-id="${itemId}"]`);
             if (!slide || !slide.classList.contains('active')) {
               console.log("🎬 Media Bar:", `Local video ${itemId} started playing but slide is not active, pausing.`);
               event.target.pause();
-              resetLocalVideoToStart(event.target);
+              try {
+                if (event.target.currentTime > 0) {
+                  event.target.currentTime = 0;
+                }
+              } catch (e) { }
               return;
             }
 
@@ -2916,13 +3004,28 @@
             const slide = video.closest('.slide');
             if (!slide || !slide.classList.contains('active')) return;
 
-            if (video.duration) {
-              const progress = video.currentTime / video.duration;
+            if (video.duration && video.duration > 0) {
+              const startOffset = video._startOffset || 0;
+              const endOffset = getTrailerEndOffsetSeconds();
+              const effectiveEnd = (endOffset > 0 && video.duration > endOffset) ? (video.duration - endOffset) : video.duration;
+
+              if (video.currentTime >= effectiveEnd - 0.25) {
+                video.pause();
+                if (STATE.slideshow.slideInterval && !STATE.slideshow.isPaused) {
+                  STATE.slideshow.slideInterval.next();
+                }
+                return;
+              }
+
+              const playableDuration = Math.max(0.1, effectiveEnd - startOffset);
+              const elapsed = Math.max(0, video.currentTime - startOffset);
+              const progress = Math.max(0, Math.min(1, elapsed / playableDuration));
               const fill = document.querySelector('.media-bar-progress-fill');
               if (fill) {
                 const bar = fill.closest('.media-bar-progress-bar');
                 if (bar) {
                   bar.classList.remove('animating');
+                  fill.style.animation = 'none';
                   const isReverse = bar.classList.contains('reverse-progress');
                   const displayProgress = isReverse ? (1 - progress) : progress;
                   fill.style.transform = `scaleX(${displayProgress})`;
@@ -3380,6 +3483,23 @@
 
           if (totalDuration <= 0) return;
 
+          if (endTime && currentTime >= endTime - 0.3) {
+            this.stopYouTubeProgressLoop();
+            if (typeof player.pauseVideo === 'function') {
+              try { player.pauseVideo(); } catch (e) { }
+            }
+            const activeSlide = document.querySelector('.slide.active');
+            if (activeSlide) {
+              STATE.slideshow.isVideoPlaying = false;
+              if (player._wrapperDiv) {
+                player._wrapperDiv.style.transition = "none";
+                player._wrapperDiv.style.opacity = "0";
+              }
+              SlideshowManager.nextSlide();
+            }
+            return;
+          }
+
           const currentProgress = currentTime - startTime;
           const progressFraction = Math.max(0, Math.min(1, currentProgress / totalDuration));
 
@@ -3682,8 +3802,11 @@
               videoBackdrop.src = lazySrc;
               videoBackdrop.load(); // Force pre-buffering
             } else {
-              // Random or fixed trailer start offset for this slide activation
-              applyHtml5TrailerStartOffset(videoBackdrop, currentItemId, true);
+              try {
+                if (videoBackdrop.currentTime > 0) {
+                  videoBackdrop.currentTime = 0;
+                }
+              } catch (e) { }
             }
 
             videoBackdrop.muted = STATE.slideshow.isMuted;
@@ -3696,11 +3819,12 @@
             if (CONFIG.backdropVideoDelay > 0) {
               if (player && typeof player.cueVideoById === 'function' && player._videoId) {
                 // Use cueVideoById to buffer video without auto-playing it
-                player.cueVideoById({
+                const cueObj = {
                   videoId: player._videoId,
-                  startSeconds: pickRandomTrailerStartSeconds(player._startTime || 0, player._endTime, true, currentItemId),
-                  endSeconds: player._endTime
-                });
+                  startSeconds: pickRandomTrailerStartSeconds(player._startTime || 0, player._endTime, true, currentItemId)
+                };
+                if (player._endTime !== undefined && player._endTime > 0) cueObj.endSeconds = player._endTime;
+                player.cueVideoById(cueObj);
 
                 if (STATE.slideshow.isMuted) {
                   player.mute();
@@ -3754,11 +3878,12 @@
 
               if (CONFIG.backdropVideoDelay === 0 && player && typeof player.loadVideoById === 'function' && player._videoId) {
                 // Zero delay: Natively load and play immediately to preserve Autoplay tokens
-                player.loadVideoById({
+                const loadObj = {
                   videoId: player._videoId,
-                  startSeconds: pickRandomTrailerStartSeconds(player._startTime || 0, player._endTime, true, currentItemId),
-                  endSeconds: player._endTime
-                });
+                  startSeconds: pickRandomTrailerStartSeconds(player._startTime || 0, player._endTime, true, currentItemId)
+                };
+                if (player._endTime !== undefined && player._endTime > 0) loadObj.endSeconds = player._endTime;
+                player.loadVideoById(loadObj);
 
                 if (STATE.slideshow.isMuted) {
                   player.mute();
@@ -3780,7 +3905,16 @@
                     player.getPlayerState() !== YT.PlayerState.BUFFERING) {
                     console.log("🎬 Media Bar:", "YouTube didn't start playback, retrying muted...");
                     player.mute();
-                    player.playVideo();
+                    if (typeof player.loadVideoById === 'function' && player._videoId) {
+                      const loadObj = {
+                        videoId: player._videoId,
+                        startSeconds: pickRandomTrailerStartSeconds(player._startTime || 0, player._endTime, false, currentItemId)
+                      };
+                      if (player._endTime !== undefined && player._endTime > 0) loadObj.endSeconds = player._endTime;
+                      player.loadVideoById(loadObj);
+                    } else {
+                      player.playVideo();
+                    }
                   }
                 }, 1000);
               }
@@ -4110,9 +4244,6 @@
     toggleMute() {
       STATE.slideshow.isMuted = !STATE.slideshow.isMuted;
       const isUnmuting = !STATE.slideshow.isMuted;
-      // Manual mute control cancels ephemeral hover-audio session
-      STATE.slideshow.hoverAudioEngaged = false;
-      STATE.slideshow.volumeFadeToken++;
       const muteButton = document.querySelector('.mute-button');
 
       const updateIcon = () => {
@@ -5036,16 +5167,20 @@
     createIcon() {
       const button = document.createElement('button');
       button.type = 'button';
-      button.className = 'paper-icon-button-light headerButton media-bar-settings-button';
+
+      const isV12 = !!(document.getElementById('root')
+        || document.querySelector('.appHeader')
+        || document.querySelector('[class*="appHeader"]')
+        || document.body.classList.contains('jellyfin-v12'));
+
+      if (isV12) {
+        button.className = 'MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeLarge headerButton media-bar-settings-button';
+      } else {
+        button.className = 'headerSyncButton syncButton headerButton headerButtonRight paper-icon-button-light media-bar-settings-button';
+      }
+
       button.title = 'Media Bar Settings';
-      // button.innerHTML = '<span class="material-icons">tune</span>';
-
-      // button.innerHTML = `<img src="${STATE.jellyfinData.serverAddress}/MediaBarEnhanced/Resources/assets/logo_SW.svg" style="width: 24px; height: 24px; vertical-align: middle;">`;
-      // currently not optimal, as it's egg-shaped due to the svg format... but if it's square, it's very small...
-      // button.innerHTML = `<img src="${STATE.jellyfinData.serverAddress}/MediaBarEnhanced/Resources/assets/logo_SW.svg" draggable="false" style="width: 52px; height: 24px; vertical-align: middle; pointer-events: none;">`;
-      // button.innerHTML = `<img src="${STATE.jellyfinData.serverAddress}/MediaBarEnhanced/Resources/assets/logo_SW_SHORT.svg" draggable="false" style="width: 41px; height: 24px; vertical-align: middle; pointer-events: none;">`;
       button.innerHTML = `<img src="${STATE.jellyfinData.serverAddress}/MediaBarEnhanced/Resources/assets/logo_SW_MINIMAL.svg" draggable="false" style="width: 24px; height: 24px; vertical-align: middle; pointer-events: none;">`;
-
       button.style.verticalAlign = 'middle';
 
       button.addEventListener('click', (e) => {
@@ -5060,106 +5195,301 @@
       const menuLocation = isMobile
         ? this.getSetting('menuLocationMobile', CONFIG.clientMenuLocationMobile)
         : this.getSetting('menuLocation', CONFIG.clientMenuLocation);
-      let navbarInjected = false;
       let debounceTimer = null;
 
       const tryInject = () => {
-        // 1. Inject to Navbar if "Navbar" or "Both" (skip once injected)
-        if (!navbarInjected && (menuLocation === 'Navbar' || menuLocation === 'Both')) {
-          const headerRight = document.querySelector('.headerRight');
-          if (headerRight && !headerRight.querySelector('.media-bar-settings-button')) {
-            const icon = this.createIcon();
-            headerRight.prepend(icon);
-            navbarInjected = true;
+        const header = document.querySelector('.skinHeader')
+          || document.querySelector('[class*="skinHeader"]')
+          || document.querySelector('.appHeader')
+          || document.querySelector('[class*="appHeader"]')
+          || document.querySelector('header');
+
+        let targetButton = document.querySelector('[aria-controls="app-sync-play-menu"]');
+
+        if (!targetButton && header) {
+          targetButton = header.querySelector('.headerUserButton')
+            || header.querySelector('[class*="headerUserButton"]')
+            || header.querySelector('.btnMyUser')
+            || header.querySelector('[class*="btnMyUser"]')
+            || header.querySelector('.headerButtonRight')
+            || header.querySelector('[class*="headerButtonRight"]');
+          if (!targetButton) {
+            const candidates = Array.from(header.querySelectorAll('button, a, [role="button"]')).filter(el => {
+              const style = window.getComputedStyle(el);
+              return style.display !== 'none' && style.visibility !== 'hidden';
+            });
+            if (candidates.length > 0) {
+              targetButton = candidates[candidates.length - 1];
+            }
           }
         }
 
-        // 2. Inject to Sidebar if "Sidebar" or "Both"
-        if (menuLocation === 'Sidebar' || menuLocation === 'Both') {
-          const containers = document.querySelectorAll('.sidebarLinks, .mainDrawer-scrollContainer');
-          containers.forEach(container => {
-            // Prevent injecting directly into the scroll container if a nested sidebarLinks div exists
-            if (container.classList.contains('mainDrawer-scrollContainer') && container.querySelector('.sidebarLinks')) {
-              return;
+        const headerRight = targetButton?.parentNode
+          || document.querySelector('.headerRight')
+          || document.querySelector('[class*="headerRight"]')
+          || document.querySelector('.headerButtonRight')?.parentNode
+          || document.querySelector('[class*="headerButtonRight"]')?.parentNode;
+
+        const shouldInjectNavbar = menuLocation === 'Navbar' || menuLocation === 'Navbar+Sidebar' || menuLocation === 'Navbar+UserMenu' || menuLocation === 'All' || menuLocation === 'Both';
+        const shouldInjectSidebar = menuLocation === 'Sidebar' || menuLocation === 'Navbar+Sidebar' || menuLocation === 'All' || menuLocation === 'Both';
+        const shouldInjectUserMenu = menuLocation === 'UserMenu' || menuLocation === 'Navbar+UserMenu' || menuLocation === 'All' || menuLocation === 'Both';
+
+        // 1. Inject to Navbar if "Navbar", "Both" or "All"
+        if (shouldInjectNavbar) {
+          if (headerRight && !headerRight.querySelector('.media-bar-settings-button')) {
+            const icon = this.createIcon();
+            const isV12 = !!(document.getElementById('root')
+              || document.querySelector('.appHeader')
+              || document.querySelector('[class*="appHeader"]')
+              || document.body.classList.contains('jellyfin-v12'));
+            if (isV12 && targetButton && targetButton.parentNode === headerRight) {
+              headerRight.insertBefore(icon, targetButton);
+            } else {
+              headerRight.prepend(icon);
             }
-
-            if (!container.querySelector('.media-bar-sidebar-settings-link')) {
-              const customItems = Array.from(container.querySelectorAll('[data-plugin-sidebar-priority]'));
-              const nextElement = customItems.find(el => {
-                const p = parseInt(el.getAttribute('data-plugin-sidebar-priority'), 10);
-                return p > 10;
-              });
-
-              // Add sidebar section header if not present
-              let header = container.querySelector('.media-bar-sidebar-header');
-              if (!header) {
-                header = document.createElement('h3');
-                header.className = 'sidebarHeader media-bar-sidebar-header';
-                header.textContent = 'Media Bar';
-                header.setAttribute('data-plugin-sidebar-priority', '10');
-                if (nextElement) {
-                  container.insertBefore(header, nextElement);
-                } else {
-                  container.appendChild(header);
-                }
-              }
-
-              const link = document.createElement('a');
-              link.className = 'sidebarLink navMenuOption media-bar-sidebar-settings-link';
-              link.href = '#';
-              link.setAttribute('data-plugin-sidebar-priority', '10');
-
-              // Add logo icon
-              const logoImg = document.createElement('img');
-              logoImg.className = 'sidebarLinkIcon navMenuOptionIcon';
-              logoImg.src = `${STATE.jellyfinData.serverAddress}/MediaBarEnhanced/Resources/assets/logo_SW_MINIMAL.svg`;
-              logoImg.draggable = false;
-              Object.assign(logoImg.style, {
-                width: '24px',
-                height: '24px',
-                verticalAlign: 'middle',
-                marginRight: '1.2em',
-                pointerEvents: 'none'
-              });
-
-              // Add text
-              const textSpan = document.createElement('span');
-              textSpan.className = 'sidebarLinkText navMenuOptionText';
-
-              let locale = LocalizationUtils.cachedLocale || 'en';
-              locale = locale.split('-')[0].toLowerCase();
-              const t = CLIENT_MENU_TRANSLATIONS[locale] ? CLIENT_MENU_TRANSLATIONS[locale] : CLIENT_MENU_TRANSLATIONS['en'];
-
-              // Clean up name to "Settings" or local equivalent since it sits under the header
-              let linkText = t.title;
-              if (linkText.includes('Media Bar ')) {
-                linkText = linkText.replace('Media Bar ', '');
-              } else if (linkText.includes(' de Media Bar')) {
-                linkText = linkText.replace(' de Media Bar', '');
-              } else if (linkText.includes(' Media Bar')) {
-                linkText = linkText.replace(' Media Bar', '');
-              }
-              textSpan.textContent = linkText;
-
-              link.appendChild(logoImg);
-              link.appendChild(textSpan);
-
-              link.addEventListener('click', (e) => {
-                e.preventDefault();
-                this.toggleSettingsPopup(link);
-              });
-
-              if (nextElement) {
-                container.insertBefore(link, nextElement);
-              } else {
-                container.appendChild(link);
-              }
-            }
-          });
+          }
         }
 
-        // 3. Ensure Media Bar settings button is always immediately to the left of Seasonals settings button
-        const headerRight = document.querySelector('.headerRight');
+        // 2. Inject to Sidebar Drawer
+        if (shouldInjectSidebar) {
+          // 10.11.x Sidebar Drawer (targets .customMenuOptions / .sidebarLinks, which only exist in main user drawer like alt.js)
+          const container = document.querySelector('.mainDrawer .customMenuOptions, .mainDrawer .sidebarLinks, .mainDrawer-scrollContainer .sidebarLinks');
+          if (container && !container.querySelector('.media-bar-sidebar-settings-link')) {
+            if (container.classList.contains('customMenuOptions')) {
+              container.style.display = 'block';
+            }
+
+            let headerEl = container.querySelector('.media-bar-sidebar-header');
+            if (!headerEl && (container.classList.contains('customMenuOptions') || container.classList.contains('sidebarLinks'))) {
+              headerEl = document.createElement('h3');
+              headerEl.className = 'sidebarHeader media-bar-sidebar-header';
+              headerEl.textContent = 'Media Bar';
+            }
+
+            const link = document.createElement('a');
+            link.className = 'sidebarLink navMenuOption media-bar-sidebar-settings-link lnkMediaFolder';
+            link.href = '#';
+            link.setAttribute('is', 'emby-linkbutton');
+
+            // Add logo icon
+            const logoImg = document.createElement('img');
+            logoImg.className = 'sidebarLinkIcon navMenuOptionIcon';
+            logoImg.src = `${STATE.jellyfinData.serverAddress}/MediaBarEnhanced/Resources/assets/logo_SW_MINIMAL.svg`;
+            logoImg.draggable = false;
+            Object.assign(logoImg.style, {
+              width: '24px',
+              height: '24px',
+              verticalAlign: 'middle',
+              marginRight: '1.2em',
+              pointerEvents: 'none'
+            });
+
+            // Add text
+            const textSpan = document.createElement('span');
+            textSpan.className = 'sidebarLinkText navMenuOptionText';
+            let locale = LocalizationUtils.cachedLocale || 'en';
+            locale = locale.split('-')[0].toLowerCase();
+            const t = CLIENT_MENU_TRANSLATIONS[locale] ? CLIENT_MENU_TRANSLATIONS[locale] : CLIENT_MENU_TRANSLATIONS['en'];
+            textSpan.textContent = t.title;
+
+            link.appendChild(logoImg);
+            link.appendChild(textSpan);
+
+            link.addEventListener('click', (e) => {
+              e.preventDefault();
+              this.toggleSettingsPopup(link);
+            });
+
+            const seasonalHeader = container.querySelector('.seasonal-sidebar-header');
+            if (seasonalHeader) {
+              container.insertBefore(headerEl, seasonalHeader);
+              container.insertBefore(link, seasonalHeader);
+            } else {
+              container.appendChild(headerEl);
+              container.appendChild(link);
+            }
+          }
+
+          // Jellyfin v12 MUI Drawer
+          const isDashboard = window.location.href.includes('dashboard') || document.body.classList.contains('dashboardDocument');
+          const muiDrawer = document.querySelector('.MuiDrawer-paper');
+          if (muiDrawer && !isDashboard && !muiDrawer.querySelector('.media-bar-sidebar-settings-link')) {
+            let locale = LocalizationUtils.cachedLocale || 'en';
+            locale = locale.split('-')[0].toLowerCase();
+            const t = CLIENT_MENU_TRANSLATIONS[locale] ? CLIENT_MENU_TRANSLATIONS[locale] : CLIENT_MENU_TRANSLATIONS['en'];
+
+            const muiList = muiDrawer.querySelector('ul.MuiList-root, .MuiList-root');
+            if (muiList) {
+              const header = document.createElement('div');
+              header.className = 'media-bar-sidebar-header';
+              header.style.padding = '16px 16px 8px 16px';
+              header.style.fontWeight = '500';
+              header.style.fontSize = '0.85rem';
+              header.style.letterSpacing = '0.04em';
+              header.style.opacity = '0.7';
+              header.textContent = 'Media Bar';
+
+              const li = document.createElement('li');
+              li.className = 'MuiListItem-root media-bar-sidebar-settings-link';
+              li.style.listStyle = 'none';
+              li.innerHTML = `
+                <a class="MuiButtonBase-root MuiListItemButton-root MuiListItemButton-gutters" href="#" style="width: 100%; display: flex; align-items: center; text-decoration: none; color: inherit; padding: 8px 16px;">
+                  <div class="MuiListItemIcon-root" style="min-width: 36px; display: inline-flex; align-items: center;">
+                    <img src="${STATE.jellyfinData.serverAddress}/MediaBarEnhanced/Resources/assets/logo_SW_MINIMAL.svg" style="width: 20px; height: 20px; vertical-align: middle; pointer-events: none;" />
+                  </div>
+                  <div class="MuiListItemText-root">
+                    <span class="MuiTypography-root MuiTypography-body1">${t.title}</span>
+                  </div>
+                </a>
+              `;
+
+              li.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                this.toggleSettingsPopup(li);
+              });
+
+              const seasonalItem = muiList.querySelector('.seasonal-sidebar-header, .seasonal-sidebar-settings-link');
+              if (seasonalItem) {
+                muiList.insertBefore(header, seasonalItem);
+                muiList.insertBefore(li, seasonalItem);
+              } else {
+                muiList.appendChild(header);
+                muiList.appendChild(li);
+              }
+            }
+          }
+        }
+
+        // 3. Inject to User Profile Menu
+        if (shouldInjectUserMenu) {
+          let locale = LocalizationUtils.cachedLocale || 'en';
+          locale = locale.split('-')[0].toLowerCase();
+          const t = CLIENT_MENU_TRANSLATIONS[locale] ? CLIENT_MENU_TRANSLATIONS[locale] : CLIENT_MENU_TRANSLATIONS['en'];
+
+          // A) 10.11.x Sidebar Drawer
+          const drawerUserOptions = document.querySelector('.mainDrawer .userMenuOptions, .mainDrawer-scrollContainer .userMenuOptions');
+          if (drawerUserOptions && !drawerUserOptions.querySelector('.media-bar-usermenu-drawer-link')) {
+            const link = document.createElement('a');
+            link.className = 'sidebarLink navMenuOption media-bar-usermenu-drawer-link lnkMediaFolder';
+            link.href = '#';
+            link.setAttribute('is', 'emby-linkbutton');
+
+            const logoImg = document.createElement('img');
+            logoImg.className = 'sidebarLinkIcon navMenuOptionIcon';
+            logoImg.src = `${STATE.jellyfinData.serverAddress}/MediaBarEnhanced/Resources/assets/logo_SW_MINIMAL.svg`;
+            logoImg.draggable = false;
+            Object.assign(logoImg.style, {
+              width: '24px',
+              height: '24px',
+              verticalAlign: 'middle',
+              marginRight: '1.2em',
+              pointerEvents: 'none'
+            });
+
+            const textSpan = document.createElement('span');
+            textSpan.className = 'sidebarLinkText navMenuOptionText';
+            textSpan.textContent = t.title;
+
+            link.appendChild(logoImg);
+            link.appendChild(textSpan);
+
+            link.addEventListener('click', (e) => {
+              e.preventDefault();
+              this.toggleSettingsPopup(link);
+            });
+
+            const btnSettings = drawerUserOptions.querySelector('.btnSettings, [data-itemid="settings"]');
+            const btnLogout = drawerUserOptions.querySelector('.btnLogout, [data-itemid="logout"]');
+            if (btnSettings && btnSettings.nextSibling) {
+              drawerUserOptions.insertBefore(link, btnSettings.nextSibling);
+            } else if (btnLogout) {
+              drawerUserOptions.insertBefore(link, btnLogout);
+            } else {
+              drawerUserOptions.appendChild(link);
+            }
+          }
+
+          // B) Profile Picture Popup Menu
+          const muiUserMenu = document.querySelector('#app-user-menu .MuiMenu-list')
+            || document.querySelector('#app-user-menu ul')
+            || document.querySelector('.MuiMenu-paper .MuiMenu-list')
+            || document.querySelector('.MuiMenu-paper ul')
+            || document.querySelector('.MuiPopover-paper ul')
+            || document.querySelector('.MuiModal-root ul')
+            || document.querySelector('div[role="presentation"] ul')
+            || document.querySelector('[role="menu"]')
+            || document.querySelector('.actionSheetScroller');
+
+          if (muiUserMenu && !muiUserMenu.querySelector('.media-bar-usermenu-item')) {
+            const li = document.createElement('li');
+            li.className = 'MuiButtonBase-root MuiMenuItem-root MuiMenuItem-gutters media-bar-usermenu-item';
+            li.setAttribute('role', 'menuitem');
+            li.setAttribute('tabindex', '-1');
+            li.style.cssText = 'display: flex !important; align-items: center !important; width: 100% !important; box-sizing: border-box !important; padding: 6px 16px !important; cursor: pointer !important; white-space: nowrap !important; min-height: 36px !important; margin: 0 !important;';
+
+            li.innerHTML = `
+              <div class="MuiListItemIcon-root" style="min-width: 36px !important; width: 36px !important; display: inline-flex !important; align-items: center !important; justify-content: flex-start !important; flex-shrink: 0 !important; margin-right: 0 !important;">
+                <img src="${STATE.jellyfinData.serverAddress}/MediaBarEnhanced/Resources/assets/logo_SW_MINIMAL.svg" style="width: 20px !important; height: 20px !important; object-fit: contain !important; vertical-align: middle !important; pointer-events: none !important; margin: 0 !important;" />
+              </div>
+              <div class="MuiListItemText-root" style="flex: 1 1 auto !important; margin: 0 !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important;">
+                <span class="MuiTypography-root MuiTypography-body1" style="white-space: nowrap !important; font-size: 1rem !important; line-height: 1.5 !important; color: inherit !important; display: block !important;">${t.title}</span>
+              </div>
+            `;
+
+            li.addEventListener('click', (e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              this.toggleSettingsPopup(li);
+            });
+
+            // Position directly under Settings / mypreferences item
+            const settingsItem = Array.from(muiUserMenu.children).find(el => {
+              const txt = el.textContent || '';
+              const href = el.getAttribute('href') || el.querySelector('a')?.getAttribute('href') || '';
+              return href.includes('mypreferences') || txt.includes('Settings') || txt.includes('Einstellungen');
+            });
+
+            if (settingsItem && settingsItem.nextSibling) {
+              muiUserMenu.insertBefore(li, settingsItem.nextSibling);
+            } else {
+              muiUserMenu.appendChild(li);
+            }
+          }
+
+          // C) 10.11.x MyPreferences Menu Page
+          const prefMenuSection = document.querySelector('#myPreferencesMenuPage:not(.hide) .verticalSection, .myPreferencesMenuPage:not(.hide) .verticalSection');
+          if (prefMenuSection && !prefMenuSection.querySelector('.media-bar-prefpage-link')) {
+            const link = document.createElement('a');
+            link.id = 'mediaBarUserPrefsLink';
+            link.setAttribute('is', 'emby-linkbutton');
+            link.setAttribute('data-ripple', 'false');
+            link.href = '#';
+            link.className = 'listItem-border emby-button media-bar-prefpage-link';
+            link.style.display = 'block';
+            link.style.padding = '0';
+            link.style.margin = '0';
+
+            link.innerHTML = `
+              <div class="listItem" style="height: 53px; min-height: 53px; box-sizing: border-box;">
+                <img src="${STATE.jellyfinData.serverAddress}/MediaBarEnhanced/Resources/assets/logo_SW_MINIMAL.svg" class="listItemIcon listItemIcon-transparent" style="width: 24px; height: 24px; vertical-align: middle; pointer-events: none;" />
+                <div class="listItemBody">
+                  <div class="listItemBodyText">${t.title}</div>
+                </div>
+              </div>
+            `;
+
+            link.addEventListener('click', (e) => {
+              e.preventDefault();
+              this.toggleSettingsPopup(link);
+            });
+
+            // Insert into upper section (like Jellyfin Enhanced)
+            prefMenuSection.appendChild(link);
+          }
+        }
+
+        // 4. Ensure Media Bar settings button is always immediately to the left of Seasonals settings button
         if (headerRight) {
           const mbBtn = headerRight.querySelector('.media-bar-settings-button');
           const seasBtn = headerRight.querySelector('.seasonal-settings-button');
@@ -5170,6 +5500,7 @@
       };
 
       const observer = new MutationObserver(() => {
+        tryInject();
         if (debounceTimer) clearTimeout(debounceTimer);
         debounceTimer = setTimeout(tryInject, 150);
       });
@@ -5178,6 +5509,16 @@
         childList: true,
         subtree: true
       });
+
+      const handleUserAvatarTrigger = (e) => {
+        if (e.target && e.target.closest('.mainDrawerButton, [class*="mainDrawerButton"], .barsMenuButton, .headerUserButton, [class*="headerUserButton"], .btnMyUser, [class*="btnMyUser"], [aria-label*="UserMenu"], [aria-label*="Profile"], [aria-label*="Profil"], [aria-controls="app-user-menu"], .headerUserButtonImage, [class*="headerUserButtonImage"], [class*="UserAvatar"]')) {
+          setTimeout(tryInject, 50);
+          setTimeout(tryInject, 250);
+        }
+      };
+
+      document.addEventListener('click', handleUserAvatarTrigger);
+      document.addEventListener('touchstart', handleUserAvatarTrigger, { passive: true });
 
       // Initial injection attempt without waiting for mutations
       tryInject();
@@ -5190,19 +5531,21 @@
       const existingOverlay = document.querySelector('.media-bar-modal-overlay');
       if (existingOverlay) existingOverlay.remove();
 
-      const isSidebarLink = anchorElement && anchorElement.classList.contains('media-bar-sidebar-settings-link');
+      // Only the Navbar header icon opens as a dropdown; ALL other buttons open as a centered modal!
+      const isNavbarButton = anchorElement && anchorElement.classList.contains('media-bar-settings-button');
+      const isModal = !isNavbarButton;
 
       let overlay = null;
-      if (isSidebarLink) {
+      if (isModal) {
         overlay = document.createElement('div');
         overlay.className = 'media-bar-modal-overlay';
         document.body.appendChild(overlay);
       }
 
       const popup = document.createElement('div');
-      popup.className = `media-bar-settings-popup dialog ${isSidebarLink ? 'media-bar-modal' : 'media-bar-dropdown'}`;
+      popup.className = `media-bar-settings-popup dialog ${isModal ? 'media-bar-modal' : 'media-bar-dropdown'}`;
 
-      if (!isSidebarLink) {
+      if (!isModal) {
         const rect = anchorElement.getBoundingClientRect();
         let rightPos = window.innerWidth - rect.right;
         if (window.innerWidth < 450 || (window.innerWidth - rightPos) < 260) {
@@ -5376,7 +5719,10 @@
         <select id="mb-setting-menuLocation" class="media-bar-select">
             <option value="Navbar" ${menuLocationVal === 'Navbar' ? 'selected' : ''}>${t.optionMenuLocationNavbar || 'Navbar'}</option>
             <option value="Sidebar" ${menuLocationVal === 'Sidebar' ? 'selected' : ''}>${t.optionMenuLocationSidebar || 'Sidebar'}</option>
-            <option value="Both" ${menuLocationVal === 'Both' ? 'selected' : ''}>${t.optionMenuLocationBoth || 'Both'}</option>
+            <option value="UserMenu" ${menuLocationVal === 'UserMenu' ? 'selected' : ''}>${t.optionMenuLocationUserMenu || 'User Menu'}</option>
+            <option value="Navbar+Sidebar" ${menuLocationVal === 'Navbar+Sidebar' ? 'selected' : ''}>Navbar + Sidebar</option>
+            <option value="Navbar+UserMenu" ${menuLocationVal === 'Navbar+UserMenu' ? 'selected' : ''}>Navbar + User Menu</option>
+            <option value="All" ${menuLocationVal === 'All' || menuLocationVal === 'Both' ? 'selected' : ''}>${t.optionMenuLocationAll || 'All Locations (Everywhere)'}</option>
         </select>
     </div>
     `;
@@ -5391,7 +5737,10 @@
         <select id="mb-setting-menuLocationMobile" class="media-bar-select">
             <option value="Navbar" ${menuLocationMobileVal === 'Navbar' ? 'selected' : ''}>${t.optionMenuLocationNavbar || 'Navbar'}</option>
             <option value="Sidebar" ${menuLocationMobileVal === 'Sidebar' ? 'selected' : ''}>${t.optionMenuLocationSidebar || 'Sidebar'}</option>
-            <option value="Both" ${menuLocationMobileVal === 'Both' ? 'selected' : ''}>${t.optionMenuLocationBoth || 'Both'}</option>
+            <option value="UserMenu" ${menuLocationMobileVal === 'UserMenu' ? 'selected' : ''}>${t.optionMenuLocationUserMenu || 'User Menu'}</option>
+            <option value="Navbar+Sidebar" ${menuLocationMobileVal === 'Navbar+Sidebar' ? 'selected' : ''}>Navbar + Sidebar</option>
+            <option value="Navbar+UserMenu" ${menuLocationMobileVal === 'Navbar+UserMenu' ? 'selected' : ''}>Navbar + User Menu</option>
+            <option value="All" ${menuLocationMobileVal === 'All' || menuLocationMobileVal === 'Both' ? 'selected' : ''}>${t.optionMenuLocationAll || 'All Locations (Everywhere)'}</option>
         </select>
     </div>
     `;
@@ -5684,10 +6033,18 @@
    * @returns {number} Volume level 0-100
    */
 
-  /**
-   * Whether hover-to-fade audio is enabled (server + optional client override).
-   * Default false.
-   */
+  ['click', 'keydown', 'pointerdown', 'touchstart'].forEach(evt => {
+    try {
+      window.addEventListener(evt, () => {
+        STATE.slideshow.hasUserInteracted = true;
+      }, { capture: true, passive: true });
+    } catch (e) { }
+  });
+
+  function hasUserGesture() {
+    return !!STATE.slideshow.hasUserInteracted;
+  }
+
   function isHoverAudioFadeEnabled() {
     const v = MediaBarEnhancedSettingsManager.getSetting('hoverAudioFade', CONFIG.hoverAudioFade);
     return v === true || v === 'true' || v === 1 || v === '1';
@@ -5742,15 +6099,27 @@
         try {
           video.muted = false;
           video.volume = startHtml5;
-          video.play().catch(() => {});
-        } catch (e) {}
+          setTimeout(() => {
+            if (video.paused && !STATE.slideshow.isPaused) {
+              console.warn("🎬 Media Bar:", "Browser blocked unmuted hover audio, reverting to muted...");
+              video.muted = true;
+              video.play().catch(() => { });
+            }
+          }, 50);
+        } catch (e) { }
       }
       if (yt && typeof yt.unMute === 'function') {
         try {
           yt.unMute();
           if (typeof yt.setVolume === 'function') yt.setVolume(startYt);
-          if (typeof yt.playVideo === 'function') yt.playVideo();
-        } catch (e) {}
+          setTimeout(() => {
+            if (typeof yt.getPlayerState === 'function' && yt.getPlayerState() === 2 && !STATE.slideshow.isPaused) {
+              console.warn("🎬 Media Bar:", "YouTube blocked unmuted hover audio, reverting to muted...");
+              if (typeof yt.mute === 'function') yt.mute();
+              if (typeof yt.playVideo === 'function') yt.playVideo();
+            }
+          }, 150);
+        } catch (e) { }
       }
     }
 
@@ -5769,7 +6138,7 @@
             video.muted = true;
             video.volume = 0;
           }
-        } catch (e) {}
+        } catch (e) { }
       }
       if (yt && typeof yt.setVolume === 'function') {
         try {
@@ -5777,7 +6146,7 @@
           if (!toAudible && u >= 1 && typeof yt.mute === 'function') {
             yt.mute();
           }
-        } catch (e) {}
+        } catch (e) { }
       }
       if (u < 1) {
         requestAnimationFrame(step);
@@ -5793,29 +6162,22 @@
 
   function onMediaBarHoverAudioEnter() {
     if (!isHoverAudioFadeEnabled()) return;
-    // Only while sound is turned off (muted). If user unmuted via button, leave alone.
+    if (STATE.slideshow.isPaused) return;
     if (!STATE.slideshow.isMuted) return;
-    if (!STATE.slideshow.isVideoPlaying && !getCurrentTrailerPlayback().video && !getCurrentTrailerPlayback().yt) {
-      // still try — video may exist without flag
-    }
+    if (!hasUserGesture()) return;
+
+    const { video, yt } = getCurrentTrailerPlayback();
+    const isPlaying = (video && !video.paused) || (yt && typeof yt.getPlayerState === 'function' && yt.getPlayerState() === 1);
+    if (!isPlaying) return;
+
     fadeTrailerVolume(true);
   }
 
   function onMediaBarHoverAudioLeave() {
     if (!isHoverAudioFadeEnabled()) return;
-    // Only reverse if we engaged hover audio while muted
     if (!STATE.slideshow.isMuted) return;
-    if (!STATE.slideshow.hoverAudioEngaged && getCurrentTrailerPlayback().video && !getCurrentTrailerPlayback().video.muted) {
-      // engaged path missed flag — still fade out if audible while isMuted
-      fadeTrailerVolume(false);
-      return;
-    }
     if (!STATE.slideshow.hoverAudioEngaged) return;
     fadeTrailerVolume(false);
-  }
-
-  function getEffectiveTrailerVolume() {
-    return parseInt(MediaBarEnhancedSettingsManager.getSetting('defaultTrailerVolume', CONFIG.defaultTrailerVolume), 10);
   }
 
   /**
@@ -5823,8 +6185,15 @@
    * @returns {number} Offset in seconds, 0 when the feature is disabled
    */
   function getTrailerStartOffsetSeconds() {
-    const offsetMs = parseInt(CONFIG.trailerStartOffset, 10);
-    return offsetMs > 0 ? offsetMs / 1000 : 0;
+    const settingVal = MediaBarEnhancedSettingsManager.getSetting('trailerStartOffset', CONFIG.trailerStartOffset);
+    const offsetMs = parseInt(settingVal, 10);
+    return (offsetMs && offsetMs > 0) ? offsetMs / 1000 : 0;
+  }
+
+  function getTrailerEndOffsetSeconds() {
+    const settingVal = MediaBarEnhancedSettingsManager.getSetting('trailerEndOffset', CONFIG.trailerEndOffset);
+    const offsetMs = parseInt(settingVal, 10);
+    return (offsetMs && offsetMs > 0) ? offsetMs / 1000 : 0;
   }
 
   /**
@@ -5836,8 +6205,9 @@
   function resetLocalVideoToStart(video) {
     const offset = getTrailerStartOffsetSeconds();
     const target = (video.duration && offset >= video.duration) ? 0 : offset;
+    video._startOffset = target;
     try {
-      if (video.currentTime !== target) {
+      if (Math.abs((video.currentTime || 0) - target) > 0.4) {
         video.currentTime = target;
       }
     } catch (e) { }
@@ -5847,17 +6217,11 @@
    * Returns the effective value for waiting for trailer to end, respecting client-side overrides.
    * @returns {boolean} Whether to wait for the trailer to end
    */
-
-  /**
-   * Whether random in-trailer start offset is enabled (client override aware).
-   * Only active when "Wait for trailer to end" is disabled.
-   * @returns {boolean}
-   */
   function getEffectiveRandomTrailerStart() {
     if (getEffectiveWaitForTrailer()) {
       return false;
     }
-    const val = MediaBarEnhancedSettingsManager.getSetting('randomTrailerStart', CONFIG.randomTrailerStartOffset);
+    const val = MediaBarEnhancedSettingsManager.getSetting('randomTrailerStartOffset', CONFIG.randomTrailerStartOffset);
     return val === true || val === 'true' || val === 1 || val === '1';
   }
 
@@ -5889,6 +6253,33 @@
     let baseStart = Math.max(0, Number(rangeStart) || 0);
     let end = Number(rangeEnd);
 
+    if ((!Number.isFinite(end) || end <= 0) && itemId) {
+      if (STATE.slideshow.videoPlayers && STATE.slideshow.videoPlayers[itemId]) {
+        const yt = STATE.slideshow.videoPlayers[itemId];
+        if (yt && typeof yt.getDuration === 'function') {
+          const d = yt.getDuration();
+          if (d && Number.isFinite(d) && d > 0) {
+            end = d;
+            const endOffset = getTrailerEndOffsetSeconds();
+            if (endOffset > 0 && end > endOffset) {
+              end = end - endOffset;
+            }
+          }
+        }
+      }
+      if (!Number.isFinite(end) || end <= 0) {
+        const currentSlide = document.querySelector(`.slide[data-item-id="${itemId}"]`);
+        const video = currentSlide ? currentSlide.querySelector('video') : null;
+        if (video && video.duration && Number.isFinite(video.duration) && video.duration > 0) {
+          end = video.duration;
+          const endOffset = getTrailerEndOffsetSeconds();
+          if (endOffset > 0 && end > endOffset) {
+            end = end - endOffset;
+          }
+        }
+      }
+    }
+
     // Apply fixed offset if configured and valid for this trailer
     if (fixedOffset > 0 && (!Number.isFinite(end) || fixedOffset < end)) {
       baseStart = Math.max(baseStart, fixedOffset);
@@ -5910,8 +6301,11 @@
       return baseStart;
     }
 
-    let minP = clampTrailerStartPercent(CONFIG.randomTrailerStartMinPercent, 10) / 100;
-    let maxP = clampTrailerStartPercent(CONFIG.randomTrailerStartMaxPercent, 75) / 100;
+    const minSetting = MediaBarEnhancedSettingsManager.getSetting('randomTrailerStartMinPercent', CONFIG.randomTrailerStartMinPercent);
+    const maxSetting = MediaBarEnhancedSettingsManager.getSetting('randomTrailerStartMaxPercent', CONFIG.randomTrailerStartMaxPercent);
+
+    let minP = clampTrailerStartPercent(minSetting, 10) / 100;
+    let maxP = clampTrailerStartPercent(maxSetting, 75) / 100;
     if (minP > maxP) {
       const tmp = minP;
       minP = maxP;
@@ -5928,12 +6322,12 @@
       STATE.slideshow.trailerStartByItem = {};
     }
 
-    if (!forceNew && itemId && STATE.slideshow.trailerStartByItem[itemId] != null) {
+    if (!forceNew && itemId && STATE.slideshow.trailerStartByItem[itemId] != null && STATE.slideshow.trailerStartByItem[itemId] > 0) {
       return STATE.slideshow.trailerStartByItem[itemId];
     }
 
     const t = lo + Math.random() * (hi - lo);
-    if (itemId) {
+    if (itemId && usableSpan > 5) {
       STATE.slideshow.trailerStartByItem[itemId] = t;
     }
     return t;
@@ -5952,6 +6346,7 @@
         const duration = video.duration;
         if (!duration || !Number.isFinite(duration) || duration < 1) return;
         const t = pickRandomTrailerStartSeconds(0, duration, forceNew, itemId);
+        video._startOffset = t;
         if (Math.abs((video.currentTime || 0) - t) > 0.4) {
           video.currentTime = t;
         }
@@ -5969,6 +6364,14 @@
     }
   }
 
+  function getEffectiveTrailerVolume() {
+    return parseInt(MediaBarEnhancedSettingsManager.getSetting('defaultTrailerVolume', CONFIG.defaultTrailerVolume), 10);
+  }
+
+  /**
+   * Returns the effective value for waiting for trailer to end, respecting client-side overrides.
+   * @returns {boolean} Whether to wait for the trailer to end
+   */
   function getEffectiveWaitForTrailer() {
     return MediaBarEnhancedSettingsManager.getSetting('waitForTrailer', CONFIG.waitForTrailerToEnd);
   }

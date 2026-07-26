@@ -112,9 +112,12 @@
                                     <select is="emby-select" id="ClientMenuLocation" name="ClientMenuLocation"
                                         class="selectLayout emby-select-withcolor emby-select"
                                         style="width: 100%; -webkit-appearance: menulist; appearance: menulist;">
-                                        <option value="Navbar">Navbar (Gear Icon in Header)</option>
-                                        <option value="Sidebar">Sidebar (Item in Navigation Drawer)</option>
-                                        <option value="Both">Both Navbar &amp; Sidebar</option>
+                                        <option value="Navbar">Navbar (Header Button)</option>
+                                        <option value="Sidebar">Sidebar (Navigation Drawer)</option>
+                                        <option value="UserMenu">User Menu (Profile Popup)</option>
+                                        <option value="Navbar+Sidebar">Navbar + Sidebar</option>
+                                        <option value="Navbar+UserMenu">Navbar + User Menu</option>
+                                        <option value="All">All Locations (Everywhere)</option>
                                     </select>
                                     <div class="fieldDescription">Choose where the client-side settings menu can be
                                         accessed.</div>
@@ -126,9 +129,12 @@
                                         name="ClientMenuLocationMobile"
                                         class="selectLayout emby-select-withcolor emby-select"
                                         style="width: 100%; -webkit-appearance: menulist; appearance: menulist;">
-                                        <option value="Navbar">Navbar (Gear Icon in Header)</option>
-                                        <option value="Sidebar">Sidebar (Item in Navigation Drawer)</option>
-                                        <option value="Both">Both Navbar &amp; Sidebar</option>
+                                        <option value="Navbar">Navbar (Header Button)</option>
+                                        <option value="Sidebar">Sidebar (Navigation Drawer)</option>
+                                        <option value="UserMenu">User Menu (Profile Popup)</option>
+                                        <option value="Navbar+Sidebar">Navbar + Sidebar</option>
+                                        <option value="Navbar+UserMenu">Navbar + User Menu</option>
+                                        <option value="All">All Locations (Everywhere)</option>
                                     </select>
                                     <div class="fieldDescription">Choose where the client-side settings menu can be
                                         accessed on mobile devices.</div>
@@ -224,25 +230,6 @@
                                         <div class="fieldDescription">Start trailer video playback muted. Autoplay might
                                             fail if unmuted.</div>
                                     </div>
-                                    <div class="checkboxContainer checkboxContainer-withDescription"
-                                        id="HoverAudioFadeContainer">
-                                        <label>
-                                            <input is="emby-checkbox" type="checkbox" id="HoverAudioFade"
-                                                name="HoverAudioFade" />
-                                            <span>Hover Audio Fade</span>
-                                        </label>
-                                        <div class="fieldDescription">While muted, hover the media bar to fade sound in;
-                                            leave to fade out. Off by default. Does not change the mute button state.</div>
-                                    </div>
-                                    <div class="inputContainer" id="HoverAudioFadeMsContainer">
-                                        <label class="inputLabel inputLabelUnfocused" for="HoverAudioFadeMs">Hover Audio
-                                            Fade Duration (ms)</label>
-                                        <input is="emby-input" type="number" id="HoverAudioFadeMs"
-                                            name="HoverAudioFadeMs" min="50" max="3000" step="50" />
-                                        <div class="fieldDescription">How long the volume fade takes on hover in/out
-                                            (default 400).</div>
-                                    </div>
-
                                     <div class="checkboxContainer checkboxContainer-withDescription">
                                         <label>
                                             <input is="emby-checkbox" type="checkbox" id="RandomizeThemeVideos"
@@ -254,15 +241,6 @@
                                     </div>
                                     <div class="checkboxContainer checkboxContainer-withDescription">
                                         <label>
-                                            <input is="emby-checkbox" type="checkbox" id="UseSponsorBlock"
-                                                name="UseSponsorBlock" />
-                                            <span>Use SponsorBlock</span>
-                                        </label>
-                                        <div class="fieldDescription">Skip intro/outro segments in YouTube trailers (if
-                                            data is available).</div>
-                                    </div>
-                                    <div class="checkboxContainer checkboxContainer-withDescription">
-                                        <label>
                                             <input is="emby-checkbox" type="checkbox" id="RandomizeLocalTrailers"
                                                 name="RandomizeLocalTrailers" />
                                             <span>Randomize Local Trailer</span>
@@ -270,6 +248,31 @@
                                         <div class="fieldDescription">Select a random local trailer if multiple exist.
                                         </div>
                                     </div>
+                                </div>
+
+                                <div class="grid-2" style="margin-top: 1.5em; align-items: start;">
+                                    <div class="checkboxContainer checkboxContainer-withDescription"
+                                        id="HoverAudioFadeContainer">
+                                        <label>
+                                            <input is="emby-checkbox" type="checkbox" id="HoverAudioFade"
+                                                name="HoverAudioFade" />
+                                            <span>Hover Audio Fade</span>
+                                        </label>
+                                        <div class="fieldDescription">While muted, hover the media bar to fade sound in;
+                                            leave to fade out. Off by default. Does not change the mute button state.
+                                        </div>
+                                    </div>
+                                    <div class="inputContainer" id="HoverAudioFadeMsContainer">
+                                        <label class="inputLabel inputLabelUnfocused" for="HoverAudioFadeMs">Hover Audio
+                                            Fade Duration (ms)</label>
+                                        <input is="emby-input" type="number" id="HoverAudioFadeMs"
+                                            name="HoverAudioFadeMs" min="50" max="3000" step="50" />
+                                        <div class="fieldDescription">How long the volume fade takes on hover in/out
+                                            (default 400).</div>
+                                    </div>
+                                </div>
+
+                                <div class="grid-2" style="margin-top: 1.5em; align-items: start;">
                                     <div class="checkboxContainer checkboxContainer-withDescription"
                                         id="RandomTrailerStartOffsetContainer">
                                         <label>
@@ -278,25 +281,41 @@
                                             <span>Random Trailer Start Position</span>
                                         </label>
                                         <div class="fieldDescription">Start each backdrop trailer at a random time
-                                            instead of the beginning. Only active when "Wait for trailer to end" is disabled (improves variety on short slideshow intervals).</div>
+                                            instead of the beginning. Only active when "Wait for trailer to end" is
+                                            disabled (improves variety on short slideshow intervals).</div>
                                     </div>
-                                    <div id="RandomTrailerStartRangeContainer"
-                                        style="margin: 0.5em 0 1.5em 2em; display: none;">
-                                        <div class="inputContainer" style="display:inline-block; width:45%; margin-right:4%;">
-                                            <label class="inputLabel inputLabelUnfocused" for="RandomTrailerStartMinPercent">Min start %</label>
+                                    <div id="RandomTrailerStartRangeContainer">
+                                        <div class="inputContainer"
+                                            style="display:inline-block; width:45%; margin-right:4%;">
+                                            <label class="inputLabel inputLabelUnfocused"
+                                                for="RandomTrailerStartMinPercent">Min start %</label>
                                             <input is="emby-input" type="number" id="RandomTrailerStartMinPercent"
                                                 name="RandomTrailerStartMinPercent" min="0" max="100" step="1" />
-                                            <div class="fieldDescription">Earliest start within usable trailer (default 10).</div>
+                                            <div class="fieldDescription">Earliest start within usable trailer (default
+                                                10).</div>
                                         </div>
                                         <div class="inputContainer" style="display:inline-block; width:45%;">
-                                            <label class="inputLabel inputLabelUnfocused" for="RandomTrailerStartMaxPercent">Max start %</label>
+                                            <label class="inputLabel inputLabelUnfocused"
+                                                for="RandomTrailerStartMaxPercent">Max start %</label>
                                             <input is="emby-input" type="number" id="RandomTrailerStartMaxPercent"
                                                 name="RandomTrailerStartMaxPercent" min="0" max="100" step="1" />
-                                            <div class="fieldDescription">Latest start within usable trailer (default 75).</div>
+                                            <div class="fieldDescription">Latest start within usable trailer (default
+                                                75).</div>
                                         </div>
                                     </div>
-                                    <div id="SponsorBlockCategoriesContainer"
-                                        style="margin: 0.5em 0 1.5em 2em; display: none;">
+                                </div>
+
+                                <div class="grid-2" style="margin-top: 1.5em; align-items: start;">
+                                    <div class="checkboxContainer checkboxContainer-withDescription">
+                                        <label>
+                                            <input is="emby-checkbox" type="checkbox" id="UseSponsorBlock"
+                                                name="UseSponsorBlock" />
+                                            <span>Use SponsorBlock</span>
+                                        </label>
+                                        <div class="fieldDescription">Skip intro/outro segments in YouTube trailers (if
+                                            data is available).</div>
+                                    </div>
+                                    <div id="SponsorBlockCategoriesContainer">
                                         <div style="font-weight: bold; margin-bottom: 0.5em; font-size: 0.95em;">
                                             SponsorBlock Categories to Skip:</div>
                                         <div id="sponsorblock-categories-list"
@@ -387,15 +406,24 @@
                                     </div>
                                 </div>
 
-                                <div class="grid-2">
+                                <div class="grid-2" style="margin-top: 1.5em; align-items: start;">
                                     <div class="inputContainer">
                                         <label class="inputLabel inputLabelUnfocused" for="TrailerStartOffset">Trailer
                                             Start Offset (ms)</label>
                                         <input is="emby-input" type="number" id="TrailerStartOffset"
                                             name="TrailerStartOffset" min="0" />
                                         <div class="fieldDescription">Skip the first part of every trailer, e.g. a
-                                            studio logo. YouTube trailers can only be skipped in whole seconds, and
-                                            SponsorBlock still wins if it skips further. Default is 0 (disabled).</div>
+                                            studio logo. YouTube trailers skip in whole seconds; SponsorBlock wins if it
+                                            skips further. Default is 0 (disabled).</div>
+                                    </div>
+                                    <div class="inputContainer">
+                                        <label class="inputLabel inputLabelUnfocused" for="TrailerEndOffset">Trailer
+                                            End Offset (ms)</label>
+                                        <input is="emby-input" type="number" id="TrailerEndOffset"
+                                            name="TrailerEndOffset" min="0" />
+                                        <div class="fieldDescription">Trim the end of every trailer, e.g. end credits.
+                                            YouTube trailers trim in whole seconds; SponsorBlock wins if it skips
+                                            further. Default is 0 (disabled).</div>
                                     </div>
                                 </div>
                             </div>
@@ -1222,13 +1250,9 @@
                 toggleSetting('RandomTrailerStartMaxPercent', isTrailerEnabled);
                 toggleSetting('BackdropVideoDelay', isTrailerEnabled);
                 toggleSetting('TrailerStartOffset', isTrailerEnabled);
+                toggleSetting('TrailerEndOffset', isTrailerEnabled);
 
-                var rts = page.querySelector('#RandomTrailerStartOffset');
-                var rtsRange = page.querySelector('#RandomTrailerStartRangeContainer');
-                if (rts && rtsRange) {
-                    var showRts = rts.checked && isTrailerEnabled;
-                    rtsRange.style.display = showRts ? 'block' : 'none';
-                }
+
 
 
                 // 3. Custom Media IDs and Seasonal settings are kept editable per user request!
@@ -1298,7 +1322,7 @@
                             'EnableCustomOverlay', 'CustomOverlayText', 'CustomOverlayImageUrl',
                             'CustomOverlayStyle', 'CustomOverlayImageStyle', 'CustomOverlayPriority',
                             'CustomOverlayPositionX', 'CustomOverlayPositionY', 'CustomOverlayScale',
-                            'BackdropVideoDelay', 'TrailerStartOffset', 'ConstrainPlotWidth', 'MobileCompactMode', 'DefaultTrailerVolume', 'HoverAudioFadeMs',
+                            'BackdropVideoDelay', 'TrailerStartOffset', 'TrailerEndOffset', 'ConstrainPlotWidth', 'MobileCompactMode', 'DefaultTrailerVolume', 'HoverAudioFadeMs',
                             'ClientMenuLocation', 'ClientMenuLocationMobile', 'CustomPlaylists', 'TransitionEffect',
                             'ShowProgressBar', 'ProgressBarLocation', 'ExcludedLibraries', 'YoYoProgressBar'
                         ];
@@ -1329,20 +1353,7 @@
                                 cb.checked = categoriesList.indexOf(cat) !== -1;
                             });
 
-                            var useSB = page.querySelector('#UseSponsorBlock');
-                            var container = page.querySelector('#SponsorBlockCategoriesContainer');
-                            if (container && useSB) {
-                                container.style.display = useSB.checked ? 'block' : 'none';
 
-                                // Clean up existing listener to avoid duplicates
-                                if (useSB._hasSBListener) {
-                                    useSB.removeEventListener('change', useSB._hasSBListener);
-                                }
-                                useSB._hasSBListener = function () {
-                                    container.style.display = useSB.checked ? 'block' : 'none';
-                                };
-                                useSB.addEventListener('change', useSB._hasSBListener);
-                            }
                         })();
 
                         // Load and render admin libraries checkboxes
@@ -1653,7 +1664,7 @@
                         'EnableCustomOverlay', 'CustomOverlayText', 'CustomOverlayImageUrl',
                         'CustomOverlayStyle', 'CustomOverlayImageStyle', 'CustomOverlayPriority',
                         'CustomOverlayPositionX', 'CustomOverlayPositionY', 'CustomOverlayScale',
-                        'BackdropVideoDelay', 'TrailerStartOffset', 'ConstrainPlotWidth', 'MobileCompactMode', 'DefaultTrailerVolume', 'HoverAudioFadeMs',
+                        'BackdropVideoDelay', 'TrailerStartOffset', 'TrailerEndOffset', 'ConstrainPlotWidth', 'MobileCompactMode', 'DefaultTrailerVolume', 'HoverAudioFadeMs',
                         'ClientMenuLocation', 'ClientMenuLocationMobile', 'CustomPlaylists', 'TransitionEffect',
                         'ShowProgressBar', 'ProgressBarLocation', 'ExcludedLibraries', 'YoYoProgressBar'
                     ];
@@ -1678,6 +1689,7 @@
                         'HoverAudioFadeMs': 400,
                         'BackdropVideoDelay': 0,
                         'TrailerStartOffset': 0,
+                        'TrailerEndOffset': 0,
                         'CustomOverlayPositionX': 0,
                         'CustomOverlayPositionY': 0,
                         'CustomOverlayScale': 100
