@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Jellyfin Slideshow by M0RPH3US v4.0.1
  * Modified by CodeDevMLH
  * 
@@ -60,16 +60,11 @@
     sponsorBlockCategories: "intro,outro,preview",
     preferLocalTrailers: false,
     randomizeLocalTrailers: false,
-    randomTrailerStartOffset: true,
-    randomTrailerStartMinPercent: 10,
-    randomTrailerStartMaxPercent: 75,
     preferLocalBackdrops: false,
     randomizeThemeVideos: false,
     includeWatchedContent: false,
     waitForTrailerToEnd: true,
     startMuted: true,
-    hoverAudioFade: false,
-    hoverAudioFadeMs: 400,
     defaultTrailerVolume: 40,
     fullWidthVideo: true,
     enableMobileVideo: false,
@@ -88,6 +83,12 @@
     customOverlayScale: 100,
     backdropVideoDelay: 0,
     trailerStartOffset: 0,
+    trailerEndOffset: 0,
+    randomTrailerStartOffset: true,
+    randomTrailerStartMinPercent: 10,
+    randomTrailerStartMaxPercent: 75,
+    hoverAudioFade: false,
+    hoverAudioFadeMs: 400,
     constrainPlotWidth: false,
     enableCustomMediaIds: true,
     enableSeasonalContent: false,
@@ -176,7 +177,7 @@
       onlyLocalTrailersLabel: 'Only Play Local Trailers',
       onlyLocalTrailersDesc: 'Do not play remote (YouTube) trailers.',
       randomTrailerStartLabel: 'Random Trailer Start Position',
-      randomTrailerStartDesc: 'Start each backdrop trailer at a random time instead of the beginning. On by default for the media bar; turn off to always start from the beginning.',
+      randomTrailerStartDesc: 'Start each backdrop trailer at a random time instead of the beginning (only active when "Wait For Trailer To End" is disabled). On by default for the media bar; turn off to always start from the beginning.',
       yoYoProgressBarLabel: 'Yo-Yo Progress Bar',
       yoYoProgressBarDesc: 'Empty progress bar from left to right on alternating slides instead of resetting.'
     },
@@ -227,6 +228,8 @@
       mobileModeDesc: 'Höhe der Media Bar auf mobilen Geräten im Hochformat.',
       defaultTrailerVolumeLabel: 'Standard-Lautstärke',
       defaultTrailerVolumeDesc: 'Standard-Lautstärke für die Trailer-Wiedergabe (in %).',
+      hoverAudioFadeLabel: 'Hover Audio Fade',
+      hoverAudioFadeDesc: 'Im stummgeschalteten Zustand wird der Ton beim Drüberfahren mit der Maus sanft eingeblendet und beim Verlassen wieder ausgeblendet. Standardmäßig deaktiviert.',
       clientMenuLocationLabel: 'Ort der Einstellungen',
       clientMenuLocationDesc: 'Wähle aus, wo das Einstellungs-Symbol angezeigt wird (Kopfzeile, Seitenleiste oder Beide).',
       clientMenuLocationMobileLabel: 'Ort der Einstellungen (Mobil)',
@@ -238,6 +241,8 @@
       libraryFilterHint: 'Hinweis: Diese Filter gelten nur für zufällige oder kürzlich hinzugefügte Medien. Sie haben keinen Einfluss auf feste Wiedergabelisten oder manuell angegebene Element-IDs.',
       onlyLocalTrailersLabel: 'Nur lokale Trailer abspielen',
       onlyLocalTrailersDesc: 'Keine Online-/YouTube-Trailer abspielen.',
+      randomTrailerStartLabel: 'Zufällige Trailer-Startposition',
+      randomTrailerStartDesc: 'Startet jeden Hintergrund-Trailer an einer zufälligen Position statt am Anfang (greift nur, wenn "Auf Trailer-Ende warten" deaktiviert ist). Für die Media Bar standardmäßig aktiv; deaktivieren, um immer am Anfang zu starten.',
       yoYoProgressBarLabel: 'Yo-Yo-Ladebalken',
       yoYoProgressBarDesc: 'Ladebalken bei abwechselnden Folien von links nach rechts leeren anstatt zurückzuspringen.'
     },
@@ -263,6 +268,8 @@
       mobileModeDesc: 'Altura de la barra de medios en dispositivos móviles (vertical).',
       defaultTrailerVolumeLabel: 'Volumen predeterminado del tráiler',
       defaultTrailerVolumeDesc: 'Ajustar el volumen predeterminado del tráiler (en %).',
+      hoverAudioFadeLabel: 'Atenuación de audio al pasar el ratón',
+      hoverAudioFadeDesc: 'Estando silenciado, al pasar el ratón sobre la barra de medios el sonido se amplifica gradualmente y al salir se atenúa. Desactivado por defecto.',
       clientMenuLocationLabel: 'Ubicación de ajustes',
       clientMenuLocationDesc: 'Elige dónde se muestra el botón de ajustes (Barra de navegación, Menú lateral o Ambos).',
       clientMenuLocationMobileLabel: 'Ubicación de ajustes (Móvil)',
@@ -299,6 +306,8 @@
       libraryFilterHint: 'Nota: Estos filtros solo se aplican cuando se obtienen elementos aleatorios o recientes. No afectan a las listas de reproducción personalizadas ni a las listas fijas de IDs de elementos.',
       onlyLocalTrailersLabel: 'Solo reproducir trailers locales',
       onlyLocalTrailersDesc: 'No reproducir trailers remotos/YouTube.',
+      randomTrailerStartLabel: 'Posición de inicio aleatoria del tráiler',
+      randomTrailerStartDesc: 'Inicia cada tráiler de fondo en un momento aleatorio en lugar del principio (solo activo si "Esperar a que termine el tráiler" está desactivado). Activado por defecto en la barra de medios; desactívalo para empezar siempre desde el principio.',
       yoYoProgressBarLabel: 'Barra de progreso Yo-Yo',
       yoYoProgressBarDesc: 'Vaciar la barra de progreso de izquierda a derecha en diapositivas alternas en lugar de reiniciar.'
     },
@@ -324,6 +333,8 @@
       mobileModeDesc: 'Hauteur de la barre multimédia sur les appareils mobiles (portrait).',
       defaultTrailerVolumeLabel: 'Volume par défaut de la bande-annonce',
       defaultTrailerVolumeDesc: 'Définir le volume par défaut de la bande-annonce (en %).',
+      hoverAudioFadeLabel: 'Fondu audio au survol',
+      hoverAudioFadeDesc: 'Lorsque le son est coupé, survolez la barre multimédia pour faire monter le son en fondu et quittez pour le réduire. Désactivé par défaut.',
       clientMenuLocationLabel: 'Emplacement des paramètres',
       clientMenuLocationDesc: 'Choisissez où afficher le bouton des paramètres (Barre de navigation, Menu latéral ou Les deux).',
       clientMenuLocationMobileLabel: 'Emplacement des paramètres (Mobile)',
@@ -360,6 +371,8 @@
       libraryFilterHint: 'Remarque : ces filtres ne s\'appliquent que lors de la récupération d\'éléments aléatoires ou récents. Ils n\'affectent pas les listes de lecture personnalisées ni les listes fixes d\'identifiants d\'éléments.',
       onlyLocalTrailersLabel: 'Ne lire que les bandes-annonces locales',
       onlyLocalTrailersDesc: 'Ne pas lire les bandes-annonces distantes/YouTube.',
+      randomTrailerStartLabel: 'Position de départ aléatoire de la bande-annonce',
+      randomTrailerStartDesc: 'Démarre chaque bande-annonce en arrière-plan à un moment aléatoire au lieu du début (actif uniquement si "Attendre la fin de la bande-annonce" est désactivé). Activé par défaut pour la barre multimédia ; désactivez pour toujours démarrer du début.',
       yoYoProgressBarLabel: 'Barre de progression Yo-Yo',
       yoYoProgressBarDesc: 'Vider la barre de progression de gauche à droite sur les diapositives alternées au lieu de réinitialiser.'
     },
@@ -385,6 +398,8 @@
       mobileModeDesc: 'Altezza della barra multimediale sui dispositivi mobili in verticale.',
       defaultTrailerVolumeLabel: 'Volume predefinito del trailer',
       defaultTrailerVolumeDesc: 'Imposta il volume predefinito per il trailer (in %).',
+      hoverAudioFadeLabel: 'Dissolvenza audio al passaggio del mouse',
+      hoverAudioFadeDesc: 'Quando il volume è disattivato, passa il mouse sulla barra multimediale per sfumare l\'audio in ingresso e esci per sfumarlo in uscita. Disattivato per impostazione predefinita.',
       clientMenuLocationLabel: 'Posizione impostazioni',
       clientMenuLocationDesc: 'Scegli dove mostrare il pulsante delle impostazioni (Barra di navigazione, Menu laterale o Entrambi).',
       clientMenuLocationMobileLabel: 'Posizione impostazioni (Mobile)',
@@ -421,6 +436,8 @@
       libraryFilterHint: 'Nota: questi filtri si applicano solo quando si recuperano elementi casuali o recenti. Non influiscono sulle playlist personalizzate o sugli elenchi fissi di ID elemento.',
       onlyLocalTrailersLabel: 'Riproduci solo trailer locali',
       onlyLocalTrailersDesc: 'Non riprodurre trailer remoti/YouTube.',
+      randomTrailerStartLabel: 'Posizione di avvio casuale del trailer',
+      randomTrailerStartDesc: 'Avvia ciascun trailer in background in un punto casuale anziché dall\'inizio (attivo solo se "Attendi fine trailer" è disattivato). Attivo per impostazione predefinita per la barra multimediale; disattiva per iniziare sempre dall\'inizio.',
       yoYoProgressBarLabel: 'Barra di avanzamento Yo-Yo',
       yoYoProgressBarDesc: 'Svuota la barra di avanzamento da sinistra a destra nelle diapositive alternate invece di ripristinare.'
     }
@@ -453,12 +470,14 @@
       videoPlayers: {},
       sponsorBlockInterval: null,
       isMuted: CONFIG.startMuted,
-      hoverAudioEngaged: false,
-      volumeFadeToken: 0,
       customTrailerUrls: {},
       ytPromise: null,
       autoplayTimeouts: [],
       playSignals: {},
+      hoverAudioEngaged: false,
+      volumeFadeToken: 0,
+      hasUserInteracted: false,
+      trailerStartByItem: {},
       failsafeTimeout: null,
       isVideoPlaying: false,
     },
@@ -515,13 +534,18 @@
 
   const isUserLoggedIn = () => {
     try {
-      return (
-        window.ApiClient &&
-        window.ApiClient._currentUser &&
-        window.ApiClient._currentUser.Id &&
-        window.ApiClient._serverInfo &&
-        window.ApiClient._serverInfo.AccessToken
-      );
+      const apiClient = window.ApiClient;
+      if (!apiClient) return false;
+
+      if (typeof apiClient.isLoggedIn === 'function') {
+        const loggedIn = apiClient.isLoggedIn();
+        if (typeof loggedIn === 'boolean') return loggedIn;
+      }
+
+      const userId = (typeof apiClient.getCurrentUserId === 'function' ? apiClient.getCurrentUserId() : null) || (apiClient._currentUser ? apiClient._currentUser.Id : null);
+      const token = (typeof apiClient.accessToken === 'function' ? apiClient.accessToken() : null) || (apiClient._serverInfo ? apiClient._serverInfo.AccessToken : null);
+
+      return !!(userId && token);
     } catch (error) {
       console.error("🎬 Media Bar:", "Error checking login status:", error);
       return false;
@@ -549,15 +573,29 @@
 
     try {
       const apiClient = window.ApiClient;
+      const getVal = (fnName, propName, fallback) => {
+        try {
+          if (typeof apiClient[fnName] === 'function') {
+            const v = apiClient[fnName]();
+            if (v != null && v !== '') return v;
+          }
+        } catch (e) { }
+        if (propName && apiClient[propName] != null) return apiClient[propName];
+        if (propName === '_serverInfo' && apiClient._serverInfo) {
+          return apiClient._serverInfo.AccessToken || apiClient._serverInfo.Id || fallback;
+        }
+        return fallback || "Not Found";
+      };
+
       STATE.jellyfinData = {
-        userId: apiClient.getCurrentUserId() || "Not Found",
-        appName: apiClient._appName || "Not Found",
-        appVersion: apiClient._appVersion || "Not Found",
-        deviceName: apiClient._deviceName || "Not Found",
-        deviceId: apiClient._deviceId || "Not Found",
-        accessToken: apiClient._serverInfo.AccessToken || "Not Found",
-        serverId: apiClient._serverInfo.Id || "Not Found",
-        serverAddress: apiClient._serverAddress || "Not Found",
+        userId: getVal('getCurrentUserId', '_currentUser', 'Not Found'),
+        appName: getVal('appName', '_appName', 'Jellyfin Web'),
+        appVersion: getVal('appVersion', '_appVersion', '10.9.0'),
+        deviceName: getVal('deviceName', '_deviceName', 'Browser'),
+        deviceId: getVal('deviceId', '_deviceId', 'browser'),
+        accessToken: getVal('accessToken', '_serverInfo', 'Not Found'),
+        serverId: getVal('serverId', '_serverInfo', 'Not Found'),
+        serverAddress: getVal('serverAddress', '_serverAddress', window.location.origin),
         pluginVersion: PLUGIN_VERSION,
       };
 
@@ -798,12 +836,7 @@
         return;
       }
 
-      if (
-        window.ApiClient._currentUser &&
-        window.ApiClient._currentUser.Id &&
-        window.ApiClient._serverInfo &&
-        window.ApiClient._serverInfo.AccessToken
-      ) {
+      if (isUserLoggedIn()) {
         console.log("🎬 Media Bar:",
           "🔓 User is fully logged in. Starting slideshow initialization..."
         );
@@ -1247,10 +1280,10 @@
         }
       }
 
-      if (window.ApiClient && STATE.jellyfinData && STATE.jellyfinData.accessToken) {
+      if (isUserLoggedIn() && STATE.jellyfinData && STATE.jellyfinData.accessToken && STATE.jellyfinData.accessToken !== "Not Found") {
         try {
-          const userId = window.ApiClient.getCurrentUserId();
-          if (userId) {
+          const userId = (typeof window.ApiClient.getCurrentUserId === 'function' ? window.ApiClient.getCurrentUserId() : null) || (STATE.jellyfinData ? STATE.jellyfinData.userId : null);
+          if (userId && userId !== "Not Found") {
             const userUrl = `${STATE.jellyfinData.serverAddress}/Users/${userId}`;
             const userResponse = await fetch(userUrl, {
               headers: ApiUtils.getAuthHeaders(),
@@ -1267,7 +1300,7 @@
         }
       }
 
-      if (!locale && window.ApiClient && (STATE.jellyfinData && STATE.jellyfinData.accessToken)) {
+      if (!locale && isUserLoggedIn() && STATE.jellyfinData && STATE.jellyfinData.accessToken && STATE.jellyfinData.accessToken !== "Not Found") {
         try {
           const configUrl = `${STATE.jellyfinData.serverAddress}/System/Configuration`;
           const configResponse = await fetch(configUrl, {
@@ -1294,10 +1327,16 @@
 
       // Convert 3-letter country codes to 2-letter if necessary
       if (locale.length === 3) {
-        const countriesData = await window.ApiClient.getCountries();
-        const countryData = Object.values(countriesData).find(countryData => countryData.ThreeLetterISORegionName === locale.toUpperCase());
-        if (countryData) {
-          locale = countryData.TwoLetterISORegionName.toLowerCase();
+        try {
+          if (window.ApiClient && typeof window.ApiClient.getCountries === 'function') {
+            const countriesData = await window.ApiClient.getCountries();
+            const countryData = Object.values(countriesData).find(countryData => countryData.ThreeLetterISORegionName === locale.toUpperCase());
+            if (countryData && countryData.TwoLetterISORegionName) {
+              locale = countryData.TwoLetterISORegionName.toLowerCase();
+            }
+          }
+        } catch (e) {
+          console.warn("🎬 Media Bar:", "Could not fetch countries data from ApiClient:", e);
         }
       }
 
@@ -2710,6 +2749,15 @@
                     }
                   }
 
+                  const endOffset = getTrailerEndOffsetSeconds();
+                  if (duration && endOffset > 0 && duration > endOffset) {
+                    const offsetEnd = Math.floor(duration - endOffset);
+                    if (endTime === undefined || offsetEnd < endTime) {
+                      endTime = offsetEnd;
+                      console.info("🎬 Media Bar:", `Trailer end offset applied for video ${videoId}: ending at ${endTime}s`);
+                    }
+                  }
+
                   // Store start/end time, videoId, and segments for later use
                   event.target._startTime = playerVars.start || 0;
                   event.target._endTime = endTime;
@@ -2730,12 +2778,13 @@
                   const isVideoPlayerOpen = document.querySelector('.videoPlayerContainer') || document.querySelector('.youtubePlayerContainer');
 
                   if (slide && slide.classList.contains('active') && STATE.slideshow.playSignals[itemId] === true && !document.hidden && (!isVideoPlayerOpen || isVideoPlayerOpen.classList.contains('hide'))) {
-                    if (endTime !== undefined && typeof event.target.loadVideoById === 'function') {
-                      event.target.loadVideoById({
+                    if (typeof event.target.loadVideoById === 'function') {
+                      const loadObj = {
                         videoId: videoId,
-                        startSeconds: pickRandomTrailerStartSeconds(event.target._startTime || 0, event.target._endTime, true, itemId),
-                        endSeconds: endTime
-                      });
+                        startSeconds: pickRandomTrailerStartSeconds(event.target._startTime || 0, event.target._endTime, true, itemId)
+                      };
+                      if (endTime !== undefined && endTime > 0) loadObj.endSeconds = endTime;
+                      event.target.loadVideoById(loadObj);
                     } else {
                       event.target.playVideo();
                     }
@@ -2752,12 +2801,13 @@
                         event.target.getPlayerState() !== YT.PlayerState.BUFFERING) {
                         console.warn("🎬 Media Bar:", `Autoplay blocked for ${itemId}, attempting muted fallback`);
                         event.target.mute();
-                        if (endTime !== undefined && typeof event.target.loadVideoById === 'function') {
-                          event.target.loadVideoById({
+                        if (typeof event.target.loadVideoById === 'function') {
+                          const loadObj = {
                             videoId: videoId,
-                            startSeconds: pickRandomTrailerStartSeconds(event.target._startTime || 0, event.target._endTime, true, itemId),
-                            endSeconds: endTime
-                          });
+                            startSeconds: pickRandomTrailerStartSeconds(event.target._startTime || 0, event.target._endTime, true, itemId)
+                          };
+                          if (endTime !== undefined && endTime > 0) loadObj.endSeconds = endTime;
+                          event.target.loadVideoById(loadObj);
                         } else {
                           event.target.playVideo();
                         }
@@ -2798,6 +2848,24 @@
                     STATE.slideshow.isVideoPlaying = true;
                     if (getEffectiveWaitForTrailer() && STATE.slideshow.slideInterval) {
                       STATE.slideshow.slideInterval.stop();
+                    }
+
+                    const dur = typeof event.target.getDuration === 'function' ? event.target.getDuration() : 0;
+                    if (dur > 5 && getEffectiveRandomTrailerStart() && isActive) {
+                      if (!event.target._endTime) {
+                        const endOffset = getTrailerEndOffsetSeconds();
+                        event.target._endTime = (endOffset > 0 && dur > endOffset) ? (dur - endOffset) : dur;
+                      }
+                      if (!event.target._hasSeekedRandomStart) {
+                        event.target._hasSeekedRandomStart = true;
+                        const targetStart = pickRandomTrailerStartSeconds(event.target._startTime || 0, event.target._endTime, false, itemId);
+                        if (targetStart > 2 && Math.abs((event.target.getCurrentTime() || 0) - targetStart) > 4) {
+                          console.log("🎬 Media Bar:", `Seeking YouTube trailer ${itemId} to random start position: ${targetStart.toFixed(1)}s (duration: ${dur.toFixed(1)}s)`);
+                          try {
+                            event.target.seekTo(targetStart, true);
+                          } catch (e) { }
+                        }
+                      }
                     }
 
                     // Start progress tracking loop for active YouTube trailer
@@ -2866,18 +2934,16 @@
 
           STATE.slideshow.videoPlayers[itemId] = videoBackdrop;
 
-          // Seek to the configured start offset as soon as the duration is known,
-          // including after the src is re-attached when revisiting a slide
-          videoBackdrop.addEventListener('loadedmetadata', (event) => {
-            resetLocalVideoToStart(event.target);
-          });
-
           videoBackdrop.addEventListener('play', (event) => {
             const slide = document.querySelector(`.slide[data-item-id="${itemId}"]`);
             if (!slide || !slide.classList.contains('active')) {
               console.log("🎬 Media Bar:", `Local video ${itemId} started playing but slide is not active, pausing.`);
               event.target.pause();
-              resetLocalVideoToStart(event.target);
+              try {
+                if (event.target.currentTime > 0) {
+                  event.target.currentTime = 0;
+                }
+              } catch (e) { }
               return;
             }
 
@@ -2916,13 +2982,28 @@
             const slide = video.closest('.slide');
             if (!slide || !slide.classList.contains('active')) return;
 
-            if (video.duration) {
-              const progress = video.currentTime / video.duration;
+            if (video.duration && video.duration > 0) {
+              const startOffset = video._startOffset || 0;
+              const endOffset = getTrailerEndOffsetSeconds();
+              const effectiveEnd = (endOffset > 0 && video.duration > endOffset) ? (video.duration - endOffset) : video.duration;
+
+              if (video.currentTime >= effectiveEnd - 0.25) {
+                video.pause();
+                if (STATE.slideshow.slideInterval && !STATE.slideshow.isPaused) {
+                  STATE.slideshow.slideInterval.next();
+                }
+                return;
+              }
+
+              const playableDuration = Math.max(0.1, effectiveEnd - startOffset);
+              const elapsed = Math.max(0, video.currentTime - startOffset);
+              const progress = Math.max(0, Math.min(1, elapsed / playableDuration));
               const fill = document.querySelector('.media-bar-progress-fill');
               if (fill) {
                 const bar = fill.closest('.media-bar-progress-bar');
                 if (bar) {
                   bar.classList.remove('animating');
+                  fill.style.animation = 'none';
                   const isReverse = bar.classList.contains('reverse-progress');
                   const displayProgress = isReverse ? (1 - progress) : progress;
                   fill.style.transform = `scaleX(${displayProgress})`;
@@ -3380,6 +3461,23 @@
 
           if (totalDuration <= 0) return;
 
+          if (endTime && currentTime >= endTime - 0.3) {
+            this.stopYouTubeProgressLoop();
+            if (typeof player.pauseVideo === 'function') {
+              try { player.pauseVideo(); } catch (e) { }
+            }
+            const activeSlide = document.querySelector('.slide.active');
+            if (activeSlide) {
+              STATE.slideshow.isVideoPlaying = false;
+              if (player._wrapperDiv) {
+                player._wrapperDiv.style.transition = "none";
+                player._wrapperDiv.style.opacity = "0";
+              }
+              SlideshowManager.nextSlide();
+            }
+            return;
+          }
+
           const currentProgress = currentTime - startTime;
           const progressFraction = Math.max(0, Math.min(1, currentProgress / totalDuration));
 
@@ -3682,8 +3780,11 @@
               videoBackdrop.src = lazySrc;
               videoBackdrop.load(); // Force pre-buffering
             } else {
-              // Random or fixed trailer start offset for this slide activation
-              applyHtml5TrailerStartOffset(videoBackdrop, currentItemId, true);
+              try {
+                if (videoBackdrop.currentTime > 0) {
+                  videoBackdrop.currentTime = 0;
+                }
+              } catch (e) { }
             }
 
             videoBackdrop.muted = STATE.slideshow.isMuted;
@@ -3696,11 +3797,12 @@
             if (CONFIG.backdropVideoDelay > 0) {
               if (player && typeof player.cueVideoById === 'function' && player._videoId) {
                 // Use cueVideoById to buffer video without auto-playing it
-                player.cueVideoById({
+                const cueObj = {
                   videoId: player._videoId,
-                  startSeconds: pickRandomTrailerStartSeconds(player._startTime || 0, player._endTime, true, currentItemId),
-                  endSeconds: player._endTime
-                });
+                  startSeconds: pickRandomTrailerStartSeconds(player._startTime || 0, player._endTime, true, currentItemId)
+                };
+                if (player._endTime !== undefined && player._endTime > 0) cueObj.endSeconds = player._endTime;
+                player.cueVideoById(cueObj);
 
                 if (STATE.slideshow.isMuted) {
                   player.mute();
@@ -3754,11 +3856,12 @@
 
               if (CONFIG.backdropVideoDelay === 0 && player && typeof player.loadVideoById === 'function' && player._videoId) {
                 // Zero delay: Natively load and play immediately to preserve Autoplay tokens
-                player.loadVideoById({
+                const loadObj = {
                   videoId: player._videoId,
-                  startSeconds: pickRandomTrailerStartSeconds(player._startTime || 0, player._endTime, true, currentItemId),
-                  endSeconds: player._endTime
-                });
+                  startSeconds: pickRandomTrailerStartSeconds(player._startTime || 0, player._endTime, true, currentItemId)
+                };
+                if (player._endTime !== undefined && player._endTime > 0) loadObj.endSeconds = player._endTime;
+                player.loadVideoById(loadObj);
 
                 if (STATE.slideshow.isMuted) {
                   player.mute();
@@ -3780,7 +3883,16 @@
                     player.getPlayerState() !== YT.PlayerState.BUFFERING) {
                     console.log("🎬 Media Bar:", "YouTube didn't start playback, retrying muted...");
                     player.mute();
-                    player.playVideo();
+                    if (typeof player.loadVideoById === 'function' && player._videoId) {
+                      const loadObj = {
+                        videoId: player._videoId,
+                        startSeconds: pickRandomTrailerStartSeconds(player._startTime || 0, player._endTime, false, currentItemId)
+                      };
+                      if (player._endTime !== undefined && player._endTime > 0) loadObj.endSeconds = player._endTime;
+                      player.loadVideoById(loadObj);
+                    } else {
+                      player.playVideo();
+                    }
                   }
                 }, 1000);
               }
@@ -4110,9 +4222,6 @@
     toggleMute() {
       STATE.slideshow.isMuted = !STATE.slideshow.isMuted;
       const isUnmuting = !STATE.slideshow.isMuted;
-      // Manual mute control cancels ephemeral hover-audio session
-      STATE.slideshow.hoverAudioEngaged = false;
-      STATE.slideshow.volumeFadeToken++;
       const muteButton = document.querySelector('.mute-button');
 
       const updateIcon = () => {
@@ -5684,10 +5793,18 @@
    * @returns {number} Volume level 0-100
    */
 
-  /**
-   * Whether hover-to-fade audio is enabled (server + optional client override).
-   * Default false.
-   */
+  ['click', 'keydown', 'pointerdown', 'touchstart'].forEach(evt => {
+    try {
+      window.addEventListener(evt, () => {
+        STATE.slideshow.hasUserInteracted = true;
+      }, { capture: true, passive: true });
+    } catch (e) { }
+  });
+
+  function hasUserGesture() {
+    return !!STATE.slideshow.hasUserInteracted;
+  }
+
   function isHoverAudioFadeEnabled() {
     const v = MediaBarEnhancedSettingsManager.getSetting('hoverAudioFade', CONFIG.hoverAudioFade);
     return v === true || v === 'true' || v === 1 || v === '1';
@@ -5742,15 +5859,27 @@
         try {
           video.muted = false;
           video.volume = startHtml5;
-          video.play().catch(() => {});
-        } catch (e) {}
+          setTimeout(() => {
+            if (video.paused && !STATE.slideshow.isPaused) {
+              console.warn("🎬 Media Bar:", "Browser blocked unmuted hover audio, reverting to muted...");
+              video.muted = true;
+              video.play().catch(() => { });
+            }
+          }, 50);
+        } catch (e) { }
       }
       if (yt && typeof yt.unMute === 'function') {
         try {
           yt.unMute();
           if (typeof yt.setVolume === 'function') yt.setVolume(startYt);
-          if (typeof yt.playVideo === 'function') yt.playVideo();
-        } catch (e) {}
+          setTimeout(() => {
+            if (typeof yt.getPlayerState === 'function' && yt.getPlayerState() === 2 && !STATE.slideshow.isPaused) {
+              console.warn("🎬 Media Bar:", "YouTube blocked unmuted hover audio, reverting to muted...");
+              if (typeof yt.mute === 'function') yt.mute();
+              if (typeof yt.playVideo === 'function') yt.playVideo();
+            }
+          }, 150);
+        } catch (e) { }
       }
     }
 
@@ -5769,7 +5898,7 @@
             video.muted = true;
             video.volume = 0;
           }
-        } catch (e) {}
+        } catch (e) { }
       }
       if (yt && typeof yt.setVolume === 'function') {
         try {
@@ -5777,7 +5906,7 @@
           if (!toAudible && u >= 1 && typeof yt.mute === 'function') {
             yt.mute();
           }
-        } catch (e) {}
+        } catch (e) { }
       }
       if (u < 1) {
         requestAnimationFrame(step);
@@ -5793,29 +5922,22 @@
 
   function onMediaBarHoverAudioEnter() {
     if (!isHoverAudioFadeEnabled()) return;
-    // Only while sound is turned off (muted). If user unmuted via button, leave alone.
+    if (STATE.slideshow.isPaused) return;
     if (!STATE.slideshow.isMuted) return;
-    if (!STATE.slideshow.isVideoPlaying && !getCurrentTrailerPlayback().video && !getCurrentTrailerPlayback().yt) {
-      // still try — video may exist without flag
-    }
+    if (!hasUserGesture()) return;
+
+    const { video, yt } = getCurrentTrailerPlayback();
+    const isPlaying = (video && !video.paused) || (yt && typeof yt.getPlayerState === 'function' && yt.getPlayerState() === 1);
+    if (!isPlaying) return;
+
     fadeTrailerVolume(true);
   }
 
   function onMediaBarHoverAudioLeave() {
     if (!isHoverAudioFadeEnabled()) return;
-    // Only reverse if we engaged hover audio while muted
     if (!STATE.slideshow.isMuted) return;
-    if (!STATE.slideshow.hoverAudioEngaged && getCurrentTrailerPlayback().video && !getCurrentTrailerPlayback().video.muted) {
-      // engaged path missed flag — still fade out if audible while isMuted
-      fadeTrailerVolume(false);
-      return;
-    }
     if (!STATE.slideshow.hoverAudioEngaged) return;
     fadeTrailerVolume(false);
-  }
-
-  function getEffectiveTrailerVolume() {
-    return parseInt(MediaBarEnhancedSettingsManager.getSetting('defaultTrailerVolume', CONFIG.defaultTrailerVolume), 10);
   }
 
   /**
@@ -5823,8 +5945,15 @@
    * @returns {number} Offset in seconds, 0 when the feature is disabled
    */
   function getTrailerStartOffsetSeconds() {
-    const offsetMs = parseInt(CONFIG.trailerStartOffset, 10);
-    return offsetMs > 0 ? offsetMs / 1000 : 0;
+    const settingVal = MediaBarEnhancedSettingsManager.getSetting('trailerStartOffset', CONFIG.trailerStartOffset);
+    const offsetMs = parseInt(settingVal, 10);
+    return (offsetMs && offsetMs > 0) ? offsetMs / 1000 : 0;
+  }
+
+  function getTrailerEndOffsetSeconds() {
+    const settingVal = MediaBarEnhancedSettingsManager.getSetting('trailerEndOffset', CONFIG.trailerEndOffset);
+    const offsetMs = parseInt(settingVal, 10);
+    return (offsetMs && offsetMs > 0) ? offsetMs / 1000 : 0;
   }
 
   /**
@@ -5836,8 +5965,9 @@
   function resetLocalVideoToStart(video) {
     const offset = getTrailerStartOffsetSeconds();
     const target = (video.duration && offset >= video.duration) ? 0 : offset;
+    video._startOffset = target;
     try {
-      if (video.currentTime !== target) {
+      if (Math.abs((video.currentTime || 0) - target) > 0.4) {
         video.currentTime = target;
       }
     } catch (e) { }
@@ -5847,17 +5977,11 @@
    * Returns the effective value for waiting for trailer to end, respecting client-side overrides.
    * @returns {boolean} Whether to wait for the trailer to end
    */
-
-  /**
-   * Whether random in-trailer start offset is enabled (client override aware).
-   * Only active when "Wait for trailer to end" is disabled.
-   * @returns {boolean}
-   */
   function getEffectiveRandomTrailerStart() {
     if (getEffectiveWaitForTrailer()) {
       return false;
     }
-    const val = MediaBarEnhancedSettingsManager.getSetting('randomTrailerStart', CONFIG.randomTrailerStartOffset);
+    const val = MediaBarEnhancedSettingsManager.getSetting('randomTrailerStartOffset', CONFIG.randomTrailerStartOffset);
     return val === true || val === 'true' || val === 1 || val === '1';
   }
 
@@ -5889,6 +6013,33 @@
     let baseStart = Math.max(0, Number(rangeStart) || 0);
     let end = Number(rangeEnd);
 
+    if ((!Number.isFinite(end) || end <= 0) && itemId) {
+      if (STATE.slideshow.videoPlayers && STATE.slideshow.videoPlayers[itemId]) {
+        const yt = STATE.slideshow.videoPlayers[itemId];
+        if (yt && typeof yt.getDuration === 'function') {
+          const d = yt.getDuration();
+          if (d && Number.isFinite(d) && d > 0) {
+            end = d;
+            const endOffset = getTrailerEndOffsetSeconds();
+            if (endOffset > 0 && end > endOffset) {
+              end = end - endOffset;
+            }
+          }
+        }
+      }
+      if (!Number.isFinite(end) || end <= 0) {
+        const currentSlide = document.querySelector(`.slide[data-item-id="${itemId}"]`);
+        const video = currentSlide ? currentSlide.querySelector('video') : null;
+        if (video && video.duration && Number.isFinite(video.duration) && video.duration > 0) {
+          end = video.duration;
+          const endOffset = getTrailerEndOffsetSeconds();
+          if (endOffset > 0 && end > endOffset) {
+            end = end - endOffset;
+          }
+        }
+      }
+    }
+
     // Apply fixed offset if configured and valid for this trailer
     if (fixedOffset > 0 && (!Number.isFinite(end) || fixedOffset < end)) {
       baseStart = Math.max(baseStart, fixedOffset);
@@ -5910,8 +6061,11 @@
       return baseStart;
     }
 
-    let minP = clampTrailerStartPercent(CONFIG.randomTrailerStartMinPercent, 10) / 100;
-    let maxP = clampTrailerStartPercent(CONFIG.randomTrailerStartMaxPercent, 75) / 100;
+    const minSetting = MediaBarEnhancedSettingsManager.getSetting('randomTrailerStartMinPercent', CONFIG.randomTrailerStartMinPercent);
+    const maxSetting = MediaBarEnhancedSettingsManager.getSetting('randomTrailerStartMaxPercent', CONFIG.randomTrailerStartMaxPercent);
+
+    let minP = clampTrailerStartPercent(minSetting, 10) / 100;
+    let maxP = clampTrailerStartPercent(maxSetting, 75) / 100;
     if (minP > maxP) {
       const tmp = minP;
       minP = maxP;
@@ -5928,12 +6082,12 @@
       STATE.slideshow.trailerStartByItem = {};
     }
 
-    if (!forceNew && itemId && STATE.slideshow.trailerStartByItem[itemId] != null) {
+    if (!forceNew && itemId && STATE.slideshow.trailerStartByItem[itemId] != null && STATE.slideshow.trailerStartByItem[itemId] > 0) {
       return STATE.slideshow.trailerStartByItem[itemId];
     }
 
     const t = lo + Math.random() * (hi - lo);
-    if (itemId) {
+    if (itemId && usableSpan > 5) {
       STATE.slideshow.trailerStartByItem[itemId] = t;
     }
     return t;
@@ -5952,6 +6106,7 @@
         const duration = video.duration;
         if (!duration || !Number.isFinite(duration) || duration < 1) return;
         const t = pickRandomTrailerStartSeconds(0, duration, forceNew, itemId);
+        video._startOffset = t;
         if (Math.abs((video.currentTime || 0) - t) > 0.4) {
           video.currentTime = t;
         }
@@ -5969,6 +6124,14 @@
     }
   }
 
+  function getEffectiveTrailerVolume() {
+    return parseInt(MediaBarEnhancedSettingsManager.getSetting('defaultTrailerVolume', CONFIG.defaultTrailerVolume), 10);
+  }
+
+  /**
+   * Returns the effective value for waiting for trailer to end, respecting client-side overrides.
+   * @returns {boolean} Whether to wait for the trailer to end
+   */
   function getEffectiveWaitForTrailer() {
     return MediaBarEnhancedSettingsManager.getSetting('waitForTrailer', CONFIG.waitForTrailerToEnd);
   }
