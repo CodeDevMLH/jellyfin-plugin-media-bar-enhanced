@@ -763,6 +763,47 @@
     opacity: 0.6 !important;
   }
 
+  /* Jellyfin v12 Mobile Overrides */
+  body.jellyfin-v12 .pause-button {
+    top: 68px !important;
+  }
+
+  body.jellyfin-v12 .mute-button {
+    top: 68px !important;
+  }
+
+  /* Default mobile view on v12 */
+  body.jellyfin-v12:not(.media-bar-mobile-16-9):not(.media-bar-mobile-4-3) .homeSectionsContainer {
+    top: calc(50% + 16vh) !important;
+  }
+
+  /* Compact 16:9 & 4:3 mobile views on v12 */
+  body.jellyfin-v12.media-bar-mobile-16-9 #slides-container,
+  body.jellyfin-v12.media-bar-mobile-4-3 #slides-container {
+    top: 50px !important;
+  }
+
+  body.jellyfin-v12.media-bar-mobile-16-9 .progress-bar-navbar,
+  body.jellyfin-v12.media-bar-mobile-4-3 .progress-bar-navbar {
+    top: 50px !important;
+  }
+
+  body.jellyfin-v12.media-bar-mobile-16-9 .homeSectionsContainer {
+    top: calc(56vw + 30px) !important;
+  }
+
+  body.media-bar-mobile-16-9.media-bar-has-counter .homeSectionsContainer {
+    top: calc(56vw + 43px);
+  }
+
+  body.jellyfin-v12.media-bar-mobile-4-3 .homeSectionsContainer {
+    top: calc(75vw + 27px) !important;
+  }
+
+  body.media-bar-mobile-4-3.media-bar-has-counter .homeSectionsContainer {
+    top: calc(75vw + 39px);
+  }
+
   .pause-button i,
   .mute-button i {
     font-size: 2.2rem !important;
@@ -2137,6 +2178,133 @@
   font-weight: 500;
   line-height: 1.2;
   color: #fff;
+}
+
+/* Header Settings Button Styling */
+.media-bar-settings-button {
+  border: none !important;
+  background: transparent !important;
+  cursor: pointer !important;
+  padding: 0 !important;
+  margin: auto 4px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  align-self: center !important;
+  color: inherit !important;
+  border-radius: 50% !important;
+  vertical-align: middle !important;
+  outline: none !important;
+  box-sizing: border-box !important;
+  width: 40px !important;
+  height: 40px !important;
+  overflow: visible !important;
+  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out !important;
+}
+
+/* Jellyfin 10.11.x Blue Hover */
+.media-bar-settings-button:hover {
+  color: var(--jf-palette-primary-main, var(--theme-primary-color, #00a4e4)) !important;
+  background-color: rgba(0, 165, 220, 0.400) !important;
+  border-radius: 50% !important;
+}
+
+/* Jellyfin v12 Full Header Height Grey Hover */
+body.jellyfin-v12 .media-bar-settings-button {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  position: relative !important;
+  box-sizing: border-box !important;
+  background-color: transparent !important;
+  outline: 0 !important;
+  border: 0 !important;
+  margin: 0 !important;
+  cursor: pointer !important;
+  user-select: none !important;
+  vertical-align: middle !important;
+  appearance: none !important;
+  text-decoration: none !important;
+  text-align: center !important;
+  flex: 0 0 auto !important;
+  border-radius: 50% !important;
+  overflow: visible !important;
+  transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1) !important;
+  color: inherit !important;
+  padding: 12px !important;
+  font-size: 1.75rem !important;
+  width: auto !important;
+  height: auto !important;
+}
+
+/* MUI Profile Menu Item Styling */
+.media-bar-usermenu-item {
+  display: flex !important;
+  align-items: center !important;
+  padding: 6px 16px !important;
+  min-height: 36px !important;
+  box-sizing: border-box !important;
+  white-space: nowrap !important;
+  width: 100% !important;
+  margin: 0 !important;
+  transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms !important;
+}
+
+.media-bar-usermenu-item:hover {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+  background-color: rgba(var(--jf-palette-action-activeChannel, 255 255 255) / var(--jf-palette-action-hoverOpacity, 0.08)) !important;
+}
+
+.media-bar-usermenu-item .MuiListItemIcon-root {
+  min-width: 36px !important;
+  width: 36px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  flex-shrink: 0 !important;
+  margin-right: 0 !important;
+}
+
+.media-bar-usermenu-item img {
+  width: 20px !important;
+  height: 20px !important;
+  object-fit: contain !important;
+  vertical-align: middle !important;
+  pointer-events: none !important;
+  margin: 0 !important;
+}
+
+.media-bar-usermenu-item .MuiListItemText-root {
+  flex: 1 1 auto !important;
+  margin: 0 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+body.jellyfin-v12 .media-bar-settings-button:hover {
+  color: inherit !important;
+  background-color: rgba(255, 255, 255, 0.08) !important;
+  background-color: rgba(var(--jf-palette-action-activeChannel, 255 255 255) / var(--jf-palette-action-hoverOpacity, 0.08)) !important;
+  border-radius: 50% !important;
+}
+
+.media-bar-settings-button img {
+  width: 24px !important;
+  height: 24px !important;
+  border-radius: 0 !important;
+  vertical-align: middle !important;
+  pointer-events: none !important;
+  object-fit: contain !important;
+  overflow: visible !important;
+}
+
+.media-bar-settings-backdrop {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8em;
+  flex: 1;
+  overflow-y: auto;
 }
 
 /* Body Container */
