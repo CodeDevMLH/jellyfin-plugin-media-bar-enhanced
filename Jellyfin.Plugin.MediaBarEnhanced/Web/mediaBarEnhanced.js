@@ -30,7 +30,7 @@
   window.mediaBarEnhancedLoaded = true;
 
   // MARK: Version
-  const PLUGIN_VERSION = "3.1.0.0";
+  const PLUGIN_VERSION = "3.3.0.0";
 
   //Core Module Configuration
   const CONFIG = {
@@ -590,7 +590,7 @@
       STATE.jellyfinData = {
         userId: getVal('getCurrentUserId', '_currentUser', 'Not Found'),
         appName: getVal('appName', '_appName', 'Jellyfin Web'),
-        appVersion: getVal('appVersion', '_appVersion', '10.9.0'),
+        appVersion: getVal('appVersion', '_appVersion', '10.10.0'),
         deviceName: getVal('deviceName', '_deviceName', 'Browser'),
         deviceId: getVal('deviceId', '_deviceId', 'browser'),
         accessToken: getVal('accessToken', '_serverInfo', 'Not Found'),
@@ -598,6 +598,14 @@
         serverAddress: getVal('serverAddress', '_serverAddress', window.location.origin),
         pluginVersion: PLUGIN_VERSION,
       };
+
+      try {
+        const appVer = STATE.jellyfinData.appVersion || '';
+        const majorVer = parseInt(appVer.split('.')[0], 10);
+        if (appVer.startsWith('12.') || majorVer >= 12) {
+          document.body.classList.add('jellyfin-v12');
+        }
+      } catch (e) { }
 
       if (callback && typeof callback === "function") {
         callback();
@@ -1017,6 +1025,9 @@
           element.innerHTML = value;
         } else if (key === "onclick" && typeof value === "function") {
           element.addEventListener("click", value);
+        } else if (key === "disablePictureInPicture" || key === "disablepictureinpicture") {
+          element.disablePictureInPicture = !!value;
+          if (value) element.setAttribute("disablepictureinpicture", "");
         } else {
           element.setAttribute(key, value);
         }
@@ -1219,8 +1230,13 @@
           src: url,
           controls: true,
           autoplay: true,
+          disablePictureInPicture: true,
+          controlsList: 'nodownload noplaybackrate nopip',
           className: 'video-modal-player'
         });
+        video.disablePictureInPicture = true;
+        video.setAttribute('disablepictureinpicture', '');
+        video.setAttribute('controlsList', 'nodownload noplaybackrate nopip');
         video.setAttribute('playsinline', '');
         contentContainer.appendChild(video);
         overlay.append(closeButton, contentContainer);
@@ -2537,21 +2553,23 @@
       const itemId = item.Id;
       const serverAddress = STATE.jellyfinData.serverAddress;
 
-      const slide = SlideUtils.createElement("a", {
+      const slide = SlideUtils.createElement("div", {
         className: "slide",
-        target: "_top",
-        rel: "noreferrer",
         tabIndex: 0,
         "data-item-id": itemId,
         onclick: (e) => {
-          // Prevent navigation if clicking on buttons or arrows
-          if (e.target.closest('button') || e.target.closest('.arrow')) return;
+          // Prevent navigation if clicking on buttons, links, or arrows
+          if (e.target.closest('button') || e.target.closest('a') || e.target.closest('.arrow')) return;
 
           // On desktop/tablets, detail navigation is handled strictly by the details button.
           // Full slide clicking is only enabled for compact mobile modes (16:9 and 4:3) where the details button is hidden.
           const isMobileLayout = document.body.classList.contains("media-bar-mobile-16-9") ||
             document.body.classList.contains("media-bar-mobile-4-3");
-          if (!isMobileLayout) return;
+          if (!isMobileLayout) {
+            e.preventDefault();
+            e.stopPropagation();
+            return;
+          }
 
           e.preventDefault();
           e.stopPropagation();
@@ -2922,6 +2940,7 @@
             className: "backdrop video-backdrop",
             preload: "none",
             disablePictureInPicture: true,
+            controlsList: "nodownload noplaybackrate nopip",
             "data-src": videoSrc,
             style: "object-fit: cover; object-position: center center; width: 100%; height: 100%; position: absolute; top: 0; left: 0; pointer-events: none; opacity: 0; transition: opacity 1.2s ease-in-out;"
           };
@@ -2930,6 +2949,9 @@
           videoAttributes.playsinline = "";
 
           videoBackdrop = SlideUtils.createElement("video", videoAttributes);
+          videoBackdrop.disablePictureInPicture = true;
+          videoBackdrop.setAttribute('disablepictureinpicture', '');
+          videoBackdrop.setAttribute('controlsList', 'nodownload noplaybackrate nopip');
           videoBackdrop.volume = getEffectiveTrailerVolume() / 100;
 
           STATE.slideshow.videoPlayers[itemId] = videoBackdrop;
@@ -5145,16 +5167,20 @@
     createIcon() {
       const button = document.createElement('button');
       button.type = 'button';
-      button.className = 'paper-icon-button-light headerButton media-bar-settings-button';
+
+      const isV12 = !!(document.getElementById('root')
+        || document.querySelector('.appHeader')
+        || document.querySelector('[class*="appHeader"]')
+        || document.body.classList.contains('jellyfin-v12'));
+
+      if (isV12) {
+        button.className = 'MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeLarge headerButton media-bar-settings-button';
+      } else {
+        button.className = 'headerSyncButton syncButton headerButton headerButtonRight paper-icon-button-light media-bar-settings-button';
+      }
+
       button.title = 'Media Bar Settings';
-      // button.innerHTML = '<span class="material-icons">tune</span>';
-
-      // button.innerHTML = `<img src="${STATE.jellyfinData.serverAddress}/MediaBarEnhanced/Resources/assets/logo_SW.svg" style="width: 24px; height: 24px; vertical-align: middle;">`;
-      // currently not optimal, as it's egg-shaped due to the svg format... but if it's square, it's very small...
-      // button.innerHTML = `<img src="${STATE.jellyfinData.serverAddress}/MediaBarEnhanced/Resources/assets/logo_SW.svg" draggable="false" style="width: 52px; height: 24px; vertical-align: middle; pointer-events: none;">`;
-      // button.innerHTML = `<img src="${STATE.jellyfinData.serverAddress}/MediaBarEnhanced/Resources/assets/logo_SW_SHORT.svg" draggable="false" style="width: 41px; height: 24px; vertical-align: middle; pointer-events: none;">`;
       button.innerHTML = `<img src="${STATE.jellyfinData.serverAddress}/MediaBarEnhanced/Resources/assets/logo_SW_MINIMAL.svg" draggable="false" style="width: 24px; height: 24px; vertical-align: middle; pointer-events: none;">`;
-
       button.style.verticalAlign = 'middle';
 
       button.addEventListener('click', (e) => {
@@ -5169,106 +5195,301 @@
       const menuLocation = isMobile
         ? this.getSetting('menuLocationMobile', CONFIG.clientMenuLocationMobile)
         : this.getSetting('menuLocation', CONFIG.clientMenuLocation);
-      let navbarInjected = false;
       let debounceTimer = null;
 
       const tryInject = () => {
-        // 1. Inject to Navbar if "Navbar" or "Both" (skip once injected)
-        if (!navbarInjected && (menuLocation === 'Navbar' || menuLocation === 'Both')) {
-          const headerRight = document.querySelector('.headerRight');
-          if (headerRight && !headerRight.querySelector('.media-bar-settings-button')) {
-            const icon = this.createIcon();
-            headerRight.prepend(icon);
-            navbarInjected = true;
+        const header = document.querySelector('.skinHeader')
+          || document.querySelector('[class*="skinHeader"]')
+          || document.querySelector('.appHeader')
+          || document.querySelector('[class*="appHeader"]')
+          || document.querySelector('header');
+
+        let targetButton = document.querySelector('[aria-controls="app-sync-play-menu"]');
+
+        if (!targetButton && header) {
+          targetButton = header.querySelector('.headerUserButton')
+            || header.querySelector('[class*="headerUserButton"]')
+            || header.querySelector('.btnMyUser')
+            || header.querySelector('[class*="btnMyUser"]')
+            || header.querySelector('.headerButtonRight')
+            || header.querySelector('[class*="headerButtonRight"]');
+          if (!targetButton) {
+            const candidates = Array.from(header.querySelectorAll('button, a, [role="button"]')).filter(el => {
+              const style = window.getComputedStyle(el);
+              return style.display !== 'none' && style.visibility !== 'hidden';
+            });
+            if (candidates.length > 0) {
+              targetButton = candidates[candidates.length - 1];
+            }
           }
         }
 
-        // 2. Inject to Sidebar if "Sidebar" or "Both"
-        if (menuLocation === 'Sidebar' || menuLocation === 'Both') {
-          const containers = document.querySelectorAll('.sidebarLinks, .mainDrawer-scrollContainer');
-          containers.forEach(container => {
-            // Prevent injecting directly into the scroll container if a nested sidebarLinks div exists
-            if (container.classList.contains('mainDrawer-scrollContainer') && container.querySelector('.sidebarLinks')) {
-              return;
+        const headerRight = targetButton?.parentNode
+          || document.querySelector('.headerRight')
+          || document.querySelector('[class*="headerRight"]')
+          || document.querySelector('.headerButtonRight')?.parentNode
+          || document.querySelector('[class*="headerButtonRight"]')?.parentNode;
+
+        const shouldInjectNavbar = menuLocation === 'Navbar' || menuLocation === 'Navbar+Sidebar' || menuLocation === 'Navbar+UserMenu' || menuLocation === 'All' || menuLocation === 'Both';
+        const shouldInjectSidebar = menuLocation === 'Sidebar' || menuLocation === 'Navbar+Sidebar' || menuLocation === 'All' || menuLocation === 'Both';
+        const shouldInjectUserMenu = menuLocation === 'UserMenu' || menuLocation === 'Navbar+UserMenu' || menuLocation === 'All' || menuLocation === 'Both';
+
+        // 1. Inject to Navbar if "Navbar", "Both" or "All"
+        if (shouldInjectNavbar) {
+          if (headerRight && !headerRight.querySelector('.media-bar-settings-button')) {
+            const icon = this.createIcon();
+            const isV12 = !!(document.getElementById('root')
+              || document.querySelector('.appHeader')
+              || document.querySelector('[class*="appHeader"]')
+              || document.body.classList.contains('jellyfin-v12'));
+            if (isV12 && targetButton && targetButton.parentNode === headerRight) {
+              headerRight.insertBefore(icon, targetButton);
+            } else {
+              headerRight.prepend(icon);
             }
-
-            if (!container.querySelector('.media-bar-sidebar-settings-link')) {
-              const customItems = Array.from(container.querySelectorAll('[data-plugin-sidebar-priority]'));
-              const nextElement = customItems.find(el => {
-                const p = parseInt(el.getAttribute('data-plugin-sidebar-priority'), 10);
-                return p > 10;
-              });
-
-              // Add sidebar section header if not present
-              let header = container.querySelector('.media-bar-sidebar-header');
-              if (!header) {
-                header = document.createElement('h3');
-                header.className = 'sidebarHeader media-bar-sidebar-header';
-                header.textContent = 'Media Bar';
-                header.setAttribute('data-plugin-sidebar-priority', '10');
-                if (nextElement) {
-                  container.insertBefore(header, nextElement);
-                } else {
-                  container.appendChild(header);
-                }
-              }
-
-              const link = document.createElement('a');
-              link.className = 'sidebarLink navMenuOption media-bar-sidebar-settings-link';
-              link.href = '#';
-              link.setAttribute('data-plugin-sidebar-priority', '10');
-
-              // Add logo icon
-              const logoImg = document.createElement('img');
-              logoImg.className = 'sidebarLinkIcon navMenuOptionIcon';
-              logoImg.src = `${STATE.jellyfinData.serverAddress}/MediaBarEnhanced/Resources/assets/logo_SW_MINIMAL.svg`;
-              logoImg.draggable = false;
-              Object.assign(logoImg.style, {
-                width: '24px',
-                height: '24px',
-                verticalAlign: 'middle',
-                marginRight: '1.2em',
-                pointerEvents: 'none'
-              });
-
-              // Add text
-              const textSpan = document.createElement('span');
-              textSpan.className = 'sidebarLinkText navMenuOptionText';
-
-              let locale = LocalizationUtils.cachedLocale || 'en';
-              locale = locale.split('-')[0].toLowerCase();
-              const t = CLIENT_MENU_TRANSLATIONS[locale] ? CLIENT_MENU_TRANSLATIONS[locale] : CLIENT_MENU_TRANSLATIONS['en'];
-
-              // Clean up name to "Settings" or local equivalent since it sits under the header
-              let linkText = t.title;
-              if (linkText.includes('Media Bar ')) {
-                linkText = linkText.replace('Media Bar ', '');
-              } else if (linkText.includes(' de Media Bar')) {
-                linkText = linkText.replace(' de Media Bar', '');
-              } else if (linkText.includes(' Media Bar')) {
-                linkText = linkText.replace(' Media Bar', '');
-              }
-              textSpan.textContent = linkText;
-
-              link.appendChild(logoImg);
-              link.appendChild(textSpan);
-
-              link.addEventListener('click', (e) => {
-                e.preventDefault();
-                this.toggleSettingsPopup(link);
-              });
-
-              if (nextElement) {
-                container.insertBefore(link, nextElement);
-              } else {
-                container.appendChild(link);
-              }
-            }
-          });
+          }
         }
 
-        // 3. Ensure Media Bar settings button is always immediately to the left of Seasonals settings button
-        const headerRight = document.querySelector('.headerRight');
+        // 2. Inject to Sidebar Drawer
+        if (shouldInjectSidebar) {
+          // 10.11.x Sidebar Drawer (targets .customMenuOptions / .sidebarLinks, which only exist in main user drawer like alt.js)
+          const container = document.querySelector('.mainDrawer .customMenuOptions, .mainDrawer .sidebarLinks, .mainDrawer-scrollContainer .sidebarLinks');
+          if (container && !container.querySelector('.media-bar-sidebar-settings-link')) {
+            if (container.classList.contains('customMenuOptions')) {
+              container.style.display = 'block';
+            }
+
+            let headerEl = container.querySelector('.media-bar-sidebar-header');
+            if (!headerEl && (container.classList.contains('customMenuOptions') || container.classList.contains('sidebarLinks'))) {
+              headerEl = document.createElement('h3');
+              headerEl.className = 'sidebarHeader media-bar-sidebar-header';
+              headerEl.textContent = 'Media Bar';
+            }
+
+            const link = document.createElement('a');
+            link.className = 'sidebarLink navMenuOption media-bar-sidebar-settings-link lnkMediaFolder';
+            link.href = '#';
+            link.setAttribute('is', 'emby-linkbutton');
+
+            // Add logo icon
+            const logoImg = document.createElement('img');
+            logoImg.className = 'sidebarLinkIcon navMenuOptionIcon';
+            logoImg.src = `${STATE.jellyfinData.serverAddress}/MediaBarEnhanced/Resources/assets/logo_SW_MINIMAL.svg`;
+            logoImg.draggable = false;
+            Object.assign(logoImg.style, {
+              width: '24px',
+              height: '24px',
+              verticalAlign: 'middle',
+              marginRight: '1.2em',
+              pointerEvents: 'none'
+            });
+
+            // Add text
+            const textSpan = document.createElement('span');
+            textSpan.className = 'sidebarLinkText navMenuOptionText';
+            let locale = LocalizationUtils.cachedLocale || 'en';
+            locale = locale.split('-')[0].toLowerCase();
+            const t = CLIENT_MENU_TRANSLATIONS[locale] ? CLIENT_MENU_TRANSLATIONS[locale] : CLIENT_MENU_TRANSLATIONS['en'];
+            textSpan.textContent = t.title;
+
+            link.appendChild(logoImg);
+            link.appendChild(textSpan);
+
+            link.addEventListener('click', (e) => {
+              e.preventDefault();
+              this.toggleSettingsPopup(link);
+            });
+
+            const seasonalHeader = container.querySelector('.seasonal-sidebar-header');
+            if (seasonalHeader) {
+              container.insertBefore(headerEl, seasonalHeader);
+              container.insertBefore(link, seasonalHeader);
+            } else {
+              container.appendChild(headerEl);
+              container.appendChild(link);
+            }
+          }
+
+          // Jellyfin v12 MUI Drawer
+          const isDashboard = window.location.href.includes('dashboard') || document.body.classList.contains('dashboardDocument');
+          const muiDrawer = document.querySelector('.MuiDrawer-paper');
+          if (muiDrawer && !isDashboard && !muiDrawer.querySelector('.media-bar-sidebar-settings-link')) {
+            let locale = LocalizationUtils.cachedLocale || 'en';
+            locale = locale.split('-')[0].toLowerCase();
+            const t = CLIENT_MENU_TRANSLATIONS[locale] ? CLIENT_MENU_TRANSLATIONS[locale] : CLIENT_MENU_TRANSLATIONS['en'];
+
+            const muiList = muiDrawer.querySelector('ul.MuiList-root, .MuiList-root');
+            if (muiList) {
+              const header = document.createElement('div');
+              header.className = 'media-bar-sidebar-header';
+              header.style.padding = '16px 16px 8px 16px';
+              header.style.fontWeight = '500';
+              header.style.fontSize = '0.85rem';
+              header.style.letterSpacing = '0.04em';
+              header.style.opacity = '0.7';
+              header.textContent = 'Media Bar';
+
+              const li = document.createElement('li');
+              li.className = 'MuiListItem-root media-bar-sidebar-settings-link';
+              li.style.listStyle = 'none';
+              li.innerHTML = `
+                <a class="MuiButtonBase-root MuiListItemButton-root MuiListItemButton-gutters" href="#" style="width: 100%; display: flex; align-items: center; text-decoration: none; color: inherit; padding: 8px 16px;">
+                  <div class="MuiListItemIcon-root" style="min-width: 36px; display: inline-flex; align-items: center;">
+                    <img src="${STATE.jellyfinData.serverAddress}/MediaBarEnhanced/Resources/assets/logo_SW_MINIMAL.svg" style="width: 20px; height: 20px; vertical-align: middle; pointer-events: none;" />
+                  </div>
+                  <div class="MuiListItemText-root">
+                    <span class="MuiTypography-root MuiTypography-body1">${t.title}</span>
+                  </div>
+                </a>
+              `;
+
+              li.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                this.toggleSettingsPopup(li);
+              });
+
+              const seasonalItem = muiList.querySelector('.seasonal-sidebar-header, .seasonal-sidebar-settings-link');
+              if (seasonalItem) {
+                muiList.insertBefore(header, seasonalItem);
+                muiList.insertBefore(li, seasonalItem);
+              } else {
+                muiList.appendChild(header);
+                muiList.appendChild(li);
+              }
+            }
+          }
+        }
+
+        // 3. Inject to User Profile Menu
+        if (shouldInjectUserMenu) {
+          let locale = LocalizationUtils.cachedLocale || 'en';
+          locale = locale.split('-')[0].toLowerCase();
+          const t = CLIENT_MENU_TRANSLATIONS[locale] ? CLIENT_MENU_TRANSLATIONS[locale] : CLIENT_MENU_TRANSLATIONS['en'];
+
+          // A) 10.11.x Sidebar Drawer
+          const drawerUserOptions = document.querySelector('.mainDrawer .userMenuOptions, .mainDrawer-scrollContainer .userMenuOptions');
+          if (drawerUserOptions && !drawerUserOptions.querySelector('.media-bar-usermenu-drawer-link')) {
+            const link = document.createElement('a');
+            link.className = 'sidebarLink navMenuOption media-bar-usermenu-drawer-link lnkMediaFolder';
+            link.href = '#';
+            link.setAttribute('is', 'emby-linkbutton');
+
+            const logoImg = document.createElement('img');
+            logoImg.className = 'sidebarLinkIcon navMenuOptionIcon';
+            logoImg.src = `${STATE.jellyfinData.serverAddress}/MediaBarEnhanced/Resources/assets/logo_SW_MINIMAL.svg`;
+            logoImg.draggable = false;
+            Object.assign(logoImg.style, {
+              width: '24px',
+              height: '24px',
+              verticalAlign: 'middle',
+              marginRight: '1.2em',
+              pointerEvents: 'none'
+            });
+
+            const textSpan = document.createElement('span');
+            textSpan.className = 'sidebarLinkText navMenuOptionText';
+            textSpan.textContent = t.title;
+
+            link.appendChild(logoImg);
+            link.appendChild(textSpan);
+
+            link.addEventListener('click', (e) => {
+              e.preventDefault();
+              this.toggleSettingsPopup(link);
+            });
+
+            const btnSettings = drawerUserOptions.querySelector('.btnSettings, [data-itemid="settings"]');
+            const btnLogout = drawerUserOptions.querySelector('.btnLogout, [data-itemid="logout"]');
+            if (btnSettings && btnSettings.nextSibling) {
+              drawerUserOptions.insertBefore(link, btnSettings.nextSibling);
+            } else if (btnLogout) {
+              drawerUserOptions.insertBefore(link, btnLogout);
+            } else {
+              drawerUserOptions.appendChild(link);
+            }
+          }
+
+          // B) Profile Picture Popup Menu
+          const muiUserMenu = document.querySelector('#app-user-menu .MuiMenu-list')
+            || document.querySelector('#app-user-menu ul')
+            || document.querySelector('.MuiMenu-paper .MuiMenu-list')
+            || document.querySelector('.MuiMenu-paper ul')
+            || document.querySelector('.MuiPopover-paper ul')
+            || document.querySelector('.MuiModal-root ul')
+            || document.querySelector('div[role="presentation"] ul')
+            || document.querySelector('[role="menu"]')
+            || document.querySelector('.actionSheetScroller');
+
+          if (muiUserMenu && !muiUserMenu.querySelector('.media-bar-usermenu-item')) {
+            const li = document.createElement('li');
+            li.className = 'MuiButtonBase-root MuiMenuItem-root MuiMenuItem-gutters media-bar-usermenu-item';
+            li.setAttribute('role', 'menuitem');
+            li.setAttribute('tabindex', '-1');
+            li.style.cssText = 'display: flex !important; align-items: center !important; width: 100% !important; box-sizing: border-box !important; padding: 6px 16px !important; cursor: pointer !important; white-space: nowrap !important; min-height: 36px !important; margin: 0 !important;';
+
+            li.innerHTML = `
+              <div class="MuiListItemIcon-root" style="min-width: 36px !important; width: 36px !important; display: inline-flex !important; align-items: center !important; justify-content: flex-start !important; flex-shrink: 0 !important; margin-right: 0 !important;">
+                <img src="${STATE.jellyfinData.serverAddress}/MediaBarEnhanced/Resources/assets/logo_SW_MINIMAL.svg" style="width: 20px !important; height: 20px !important; object-fit: contain !important; vertical-align: middle !important; pointer-events: none !important; margin: 0 !important;" />
+              </div>
+              <div class="MuiListItemText-root" style="flex: 1 1 auto !important; margin: 0 !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important;">
+                <span class="MuiTypography-root MuiTypography-body1" style="white-space: nowrap !important; font-size: 1rem !important; line-height: 1.5 !important; color: inherit !important; display: block !important;">${t.title}</span>
+              </div>
+            `;
+
+            li.addEventListener('click', (e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              this.toggleSettingsPopup(li);
+            });
+
+            // Position directly under Settings / mypreferences item
+            const settingsItem = Array.from(muiUserMenu.children).find(el => {
+              const txt = el.textContent || '';
+              const href = el.getAttribute('href') || el.querySelector('a')?.getAttribute('href') || '';
+              return href.includes('mypreferences') || txt.includes('Settings') || txt.includes('Einstellungen');
+            });
+
+            if (settingsItem && settingsItem.nextSibling) {
+              muiUserMenu.insertBefore(li, settingsItem.nextSibling);
+            } else {
+              muiUserMenu.appendChild(li);
+            }
+          }
+
+          // C) 10.11.x MyPreferences Menu Page
+          const prefMenuSection = document.querySelector('#myPreferencesMenuPage:not(.hide) .verticalSection, .myPreferencesMenuPage:not(.hide) .verticalSection');
+          if (prefMenuSection && !prefMenuSection.querySelector('.media-bar-prefpage-link')) {
+            const link = document.createElement('a');
+            link.id = 'mediaBarUserPrefsLink';
+            link.setAttribute('is', 'emby-linkbutton');
+            link.setAttribute('data-ripple', 'false');
+            link.href = '#';
+            link.className = 'listItem-border emby-button media-bar-prefpage-link';
+            link.style.display = 'block';
+            link.style.padding = '0';
+            link.style.margin = '0';
+
+            link.innerHTML = `
+              <div class="listItem" style="height: 53px; min-height: 53px; box-sizing: border-box;">
+                <img src="${STATE.jellyfinData.serverAddress}/MediaBarEnhanced/Resources/assets/logo_SW_MINIMAL.svg" class="listItemIcon listItemIcon-transparent" style="width: 24px; height: 24px; vertical-align: middle; pointer-events: none;" />
+                <div class="listItemBody">
+                  <div class="listItemBodyText">${t.title}</div>
+                </div>
+              </div>
+            `;
+
+            link.addEventListener('click', (e) => {
+              e.preventDefault();
+              this.toggleSettingsPopup(link);
+            });
+
+            // Insert into upper section (like Jellyfin Enhanced)
+            prefMenuSection.appendChild(link);
+          }
+        }
+
+        // 4. Ensure Media Bar settings button is always immediately to the left of Seasonals settings button
         if (headerRight) {
           const mbBtn = headerRight.querySelector('.media-bar-settings-button');
           const seasBtn = headerRight.querySelector('.seasonal-settings-button');
@@ -5279,6 +5500,7 @@
       };
 
       const observer = new MutationObserver(() => {
+        tryInject();
         if (debounceTimer) clearTimeout(debounceTimer);
         debounceTimer = setTimeout(tryInject, 150);
       });
@@ -5287,6 +5509,16 @@
         childList: true,
         subtree: true
       });
+
+      const handleUserAvatarTrigger = (e) => {
+        if (e.target && e.target.closest('.mainDrawerButton, [class*="mainDrawerButton"], .barsMenuButton, .headerUserButton, [class*="headerUserButton"], .btnMyUser, [class*="btnMyUser"], [aria-label*="UserMenu"], [aria-label*="Profile"], [aria-label*="Profil"], [aria-controls="app-user-menu"], .headerUserButtonImage, [class*="headerUserButtonImage"], [class*="UserAvatar"]')) {
+          setTimeout(tryInject, 50);
+          setTimeout(tryInject, 250);
+        }
+      };
+
+      document.addEventListener('click', handleUserAvatarTrigger);
+      document.addEventListener('touchstart', handleUserAvatarTrigger, { passive: true });
 
       // Initial injection attempt without waiting for mutations
       tryInject();
@@ -5299,19 +5531,21 @@
       const existingOverlay = document.querySelector('.media-bar-modal-overlay');
       if (existingOverlay) existingOverlay.remove();
 
-      const isSidebarLink = anchorElement && anchorElement.classList.contains('media-bar-sidebar-settings-link');
+      // Only the Navbar header icon opens as a dropdown; ALL other buttons open as a centered modal!
+      const isNavbarButton = anchorElement && anchorElement.classList.contains('media-bar-settings-button');
+      const isModal = !isNavbarButton;
 
       let overlay = null;
-      if (isSidebarLink) {
+      if (isModal) {
         overlay = document.createElement('div');
         overlay.className = 'media-bar-modal-overlay';
         document.body.appendChild(overlay);
       }
 
       const popup = document.createElement('div');
-      popup.className = `media-bar-settings-popup dialog ${isSidebarLink ? 'media-bar-modal' : 'media-bar-dropdown'}`;
+      popup.className = `media-bar-settings-popup dialog ${isModal ? 'media-bar-modal' : 'media-bar-dropdown'}`;
 
-      if (!isSidebarLink) {
+      if (!isModal) {
         const rect = anchorElement.getBoundingClientRect();
         let rightPos = window.innerWidth - rect.right;
         if (window.innerWidth < 450 || (window.innerWidth - rightPos) < 260) {
@@ -5485,7 +5719,10 @@
         <select id="mb-setting-menuLocation" class="media-bar-select">
             <option value="Navbar" ${menuLocationVal === 'Navbar' ? 'selected' : ''}>${t.optionMenuLocationNavbar || 'Navbar'}</option>
             <option value="Sidebar" ${menuLocationVal === 'Sidebar' ? 'selected' : ''}>${t.optionMenuLocationSidebar || 'Sidebar'}</option>
-            <option value="Both" ${menuLocationVal === 'Both' ? 'selected' : ''}>${t.optionMenuLocationBoth || 'Both'}</option>
+            <option value="UserMenu" ${menuLocationVal === 'UserMenu' ? 'selected' : ''}>${t.optionMenuLocationUserMenu || 'User Menu'}</option>
+            <option value="Navbar+Sidebar" ${menuLocationVal === 'Navbar+Sidebar' ? 'selected' : ''}>Navbar + Sidebar</option>
+            <option value="Navbar+UserMenu" ${menuLocationVal === 'Navbar+UserMenu' ? 'selected' : ''}>Navbar + User Menu</option>
+            <option value="All" ${menuLocationVal === 'All' || menuLocationVal === 'Both' ? 'selected' : ''}>${t.optionMenuLocationAll || 'All Locations (Everywhere)'}</option>
         </select>
     </div>
     `;
@@ -5500,7 +5737,10 @@
         <select id="mb-setting-menuLocationMobile" class="media-bar-select">
             <option value="Navbar" ${menuLocationMobileVal === 'Navbar' ? 'selected' : ''}>${t.optionMenuLocationNavbar || 'Navbar'}</option>
             <option value="Sidebar" ${menuLocationMobileVal === 'Sidebar' ? 'selected' : ''}>${t.optionMenuLocationSidebar || 'Sidebar'}</option>
-            <option value="Both" ${menuLocationMobileVal === 'Both' ? 'selected' : ''}>${t.optionMenuLocationBoth || 'Both'}</option>
+            <option value="UserMenu" ${menuLocationMobileVal === 'UserMenu' ? 'selected' : ''}>${t.optionMenuLocationUserMenu || 'User Menu'}</option>
+            <option value="Navbar+Sidebar" ${menuLocationMobileVal === 'Navbar+Sidebar' ? 'selected' : ''}>Navbar + Sidebar</option>
+            <option value="Navbar+UserMenu" ${menuLocationMobileVal === 'Navbar+UserMenu' ? 'selected' : ''}>Navbar + User Menu</option>
+            <option value="All" ${menuLocationMobileVal === 'All' || menuLocationMobileVal === 'Both' ? 'selected' : ''}>${t.optionMenuLocationAll || 'All Locations (Everywhere)'}</option>
         </select>
     </div>
     `;
