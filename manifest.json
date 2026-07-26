@@ -9,12 +9,12 @@
     "imageUrl": "https://raw.githubusercontent.com/CodeDevMLH/jellyfin-plugin-media-bar-enhanced/refs/heads/main/logo.png",
     "versions": [
       {
-        "version": "3.2.0.0",
-        "changelog": "- feat: Add SponsorBlock categories configuration\n- fix: Improve fetching of excluded libraries (update views URL to include CollectionFolder type for user-specific items)\n- feat: Support Jellyfin 12.0 layout changes\n- fix: Adjust container positioning to work in both 10.11.11 and 12.0 layouts",
-        "targetAbi": "12.0.0.0",
-        "sourceUrl": "https://github.com/CodeDevMLH/jellyfin-plugin-media-bar-enhanced/releases/download/v3.2.0.0/Jellyfin.Plugin.MediaBarEnhanced.zip",
-        "checksum": "d18787d915d5457f103a08706d21970d",
-        "timestamp": "2026-07-17T00:48:46Z"
+        "version": "3.3.0.0",
+        "changelog": "- feat: Add Hover Audio Fade option (fade sound in/out when hovering media bar while muted)\n- feat: Add Random Trailer Start Offset option for greater playback variety\n- feat: Add Trailer Start Offset option to skip intros and studio logos manually\n- feat: Add Trailer End Offset option to trim outros and end credits manually\n- feat: Improve Admin UI layout with grouped controls for SponsorBlock and Trailer Offsets\n- fix: Jellyfin 12.X layout fixes and other improvements",
+        "targetAbi": "10.11.0.0",
+        "sourceUrl": "https://github.com/CodeDevMLH/jellyfin-plugin-media-bar-enhanced/releases/download/v3.3.0.0/Jellyfin.Plugin.MediaBarEnhanced.zip",
+        "checksum": "",
+        "timestamp": "2026-07-26T03:00:00Z"
       },
       {
         "version": "3.2.0.0",
