@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Jellyfin Slideshow by M0RPH3US v4.0.1
  * Modified by CodeDevMLH
  * 
@@ -501,6 +501,31 @@
       failsafeTimeout: null,
       isVideoPlaying: false,
     },
+  };
+
+  /**
+   * Central helper function to detect if Jellyfin is running in TV mode
+   * and automatically synchronize TV CSS classes.
+   * @returns {boolean} True if running on a TV device or in TV layout mode.
+   */
+  const isTvMode = () => {
+    const isTvDevice = !!(window.browser && window.browser.tv);
+    const isTvLayout = !!(window.layoutManager && window.layoutManager.tv);
+    const hasTvClass = document.documentElement.classList.contains('layout-tv') ||
+      document.body.classList.contains('layout-tv') ||
+      document.body.classList.contains('media-bar-tv-mode');
+    const isTv = isTvDevice || isTvLayout || hasTvClass;
+
+    if (isTv) {
+      if (!document.body.classList.contains('media-bar-tv-mode')) {
+        document.body.classList.add('media-bar-tv-mode');
+      }
+      if (!document.documentElement.classList.contains('media-bar-tv-mode')) {
+        document.documentElement.classList.add('media-bar-tv-mode');
+      }
+    }
+
+    return isTv;
   };
 
   // Request throttling system
@@ -2499,11 +2524,7 @@
       }
 
       if (isVisible && !this.wasVisible) {
-        const isTvDevice = window.browser && window.browser.tv;
-        const isTvLayout = window.layoutManager && window.layoutManager.tv;
-        const hasTvClass = document.documentElement.classList.contains('layout-tv') || document.body.classList.contains('layout-tv');
-        const isTvMode = isTvDevice || isTvLayout || hasTvClass;
-        if (isTvMode) {
+        if (isTvMode()) {
           setTimeout(() => {
             if (container && container.style.display !== 'none') {
               container.focus({ preventScroll: true });
@@ -4347,10 +4368,7 @@
       });
 
       if (prunedAny) {
-        const isTvMode = (window.layoutManager && window.layoutManager.tv) ||
-          document.documentElement.classList.contains('layout-tv') ||
-          document.body.classList.contains('layout-tv');
-        if (isTvMode) {
+        if (isTvMode()) {
           const container = document.getElementById("slides-container");
           // Only maintain focus if focus was ALREADY on the media bar container
           if (container && container.style.display !== 'none' && (container.contains(document.activeElement) || document.activeElement === container)) {
@@ -4874,14 +4892,7 @@
 
       // Auto-scroll focused element into view for TV mode & keyboard navigation
       document.addEventListener('focusin', (e) => {
-        const isTvDevice = window.browser && window.browser.tv;
-        const isTvLayout = window.layoutManager && window.layoutManager.tv;
-        const hasTvClass = document.documentElement.classList.contains('layout-tv') || document.body.classList.contains('layout-tv');
-        const isTvMode = isTvDevice || isTvLayout || hasTvClass;
-        if (isTvMode) {
-          document.body.classList.add('media-bar-tv-mode');
-          document.documentElement.classList.add('media-bar-tv-mode');
-        } else {
+        if (!isTvMode()) {
           return;
         }
 
@@ -4926,10 +4937,7 @@
         }
 
         const activeElement = document.activeElement;
-        const isTvDevice = window.browser && window.browser.tv;
-        const isTvLayout = window.layoutManager && window.layoutManager.tv;
-        const hasTvClass = document.documentElement.classList.contains('layout-tv') || document.body.classList.contains('layout-tv');
-        const isTvMode = isTvDevice || isTvLayout || hasTvClass;
+        const isTv = isTvMode();
 
         // Check for Input Fields (always ignore typing)
         const isInputElement = activeElement && (activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA' || activeElement.isContentEditable);
@@ -4942,7 +4950,7 @@
         if (isVideoOpen) return;
 
         // 1. Try TV D-pad navigation first
-        if (isTvMode && this.TvNavigationEngine.handleTvKey(e, activeElement)) {
+        if (isTv && this.TvNavigationEngine.handleTvKey(e, activeElement)) {
           e.preventDefault();
           e.stopPropagation();
           return;
@@ -4953,7 +4961,7 @@
         const isContainerFocused = activeElement === container;
         const isInsideContainer = container ? container.contains(activeElement) : false;
         const isHomeView = window.location.hash === '#/home.html' || window.location.hash === '#/home' || !window.location.hash;
-        const canControlSlideshow = isContainerFocused || isInsideContainer || isBodyFocused || (isTvMode && isHomeView);
+        const canControlSlideshow = isContainerFocused || isInsideContainer || isBodyFocused || (isTv && isHomeView);
 
         const key = e.key || "";
         const code = e.code || "";
@@ -5510,17 +5518,8 @@
       }, 300);
     };
 
-    const isTvDevice = window.browser && window.browser.tv;
-    const isTvLayout = window.layoutManager && window.layoutManager.tv;
-    const hasTvClass = document.documentElement.classList.contains('layout-tv') || document.body.classList.contains('layout-tv');
-    const isTvMode = isTvDevice || isTvLayout || hasTvClass;
-
-    if (isTvMode) {
-      document.body.classList.add('media-bar-tv-mode');
-      document.documentElement.classList.add('media-bar-tv-mode');
-    }
-
-    const alwaysShow = CONFIG.alwaysShowArrows || isTvMode;
+    const isTv = isTvMode();
+    const alwaysShow = CONFIG.alwaysShowArrows || isTv;
 
     if (alwaysShow) {
       showArrows();
@@ -6303,12 +6302,7 @@
         document.addEventListener('focusin', popupFocusListener);
       }, 150);
 
-      const isTvDevice = window.browser && window.browser.tv;
-      const isTvLayout = window.layoutManager && window.layoutManager.tv;
-      const hasTvClass = document.documentElement.classList.contains('layout-tv') || document.body.classList.contains('layout-tv');
-      const isTvMode = isTvDevice || isTvLayout || hasTvClass;
-
-      if (isTvMode) {
+      if (isTvMode()) {
         popup.classList.add('media-bar-tv-mode');
 
         // Set initial focus to the first active tab in TV mode
