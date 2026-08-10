@@ -209,10 +209,26 @@
   display: block;
   text-align: center;
   -webkit-tap-highlight-color: #fff0;
-  transition: background-color 0.3s ease, transform 0.2s ease;
+  transition: background-color 0.3s ease, transform 0.2s ease, color 0.2s ease, filter 0.2s ease;
   user-select: none;
   margin: 0;
   padding: 0;
+}
+
+/* TV Mode: Blue left/right arrows only when slideshow container itself is directly focused (slide navigation mode) */
+:is(.layout-tv, .media-bar-tv-mode) #slides-container:focus:not(:has(button:focus)) .arrow,
+:is(.layout-tv, .media-bar-tv-mode) #slides-container.is-container-focused .arrow {
+  color: var(--jf-palette-primary-main, #00a4dc) !important;
+  fill: var(--jf-palette-primary-main, #00a4dc) !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: translateY(-50%) scale(1.25) !important;
+  filter: drop-shadow(0 0 10px rgba(0, 164, 220, 0.9)) !important;
+}
+
+:is(.layout-tv, .media-bar-tv-mode) #slides-container:focus:not(:has(button:focus)) .arrow i,
+:is(.layout-tv, .media-bar-tv-mode) #slides-container.is-container-focused .arrow i {
+  color: var(--jf-palette-primary-main, #00a4dc) !important;
 }
 
 .arrow i {
@@ -598,7 +614,7 @@
   width: 50px;
   border: none;
   cursor: pointer;
-  transition: color 0.2s;
+  transition: all 0.3s ease;
   -webkit-tap-highlight-color: #fff0;
 }
 
@@ -611,7 +627,7 @@
   width: 50px;
   border: none;
   cursor: pointer;
-  transition: color 0.2s;
+  transition: all 0.3s ease;
   -webkit-tap-highlight-color: #fff0;
 }
 
@@ -655,6 +671,86 @@
 .favorite-button:hover,
 .trailer-button:hover {
   opacity: 0.8;
+}
+
+/* Button Focus Styles, TV mode only */
+:is(.layout-tv, .media-bar-tv-mode, .is-tv-focused) :is(#slides-container button, .pause-button, .mute-button):is(:focus, :focus-visible, .is-focused) {
+  outline: 3px solid var(--jf-palette-primary-main, #00a4dc) !important;
+  outline-offset: 3px !important;
+  transform: scale(1.15) !important;
+  box-shadow: 0 0 15px rgba(0, 164, 220, 0.8), 0 0 5px rgba(255, 255, 255, 0.9) !important;
+  opacity: 1 !important;
+  z-index: 10 !important;
+  font-weight: 800 !important;
+}
+
+/* Disable focus ring on Desktop / Mobile mouse click */
+#slides-container :is(button, .pause-button, .mute-button):focus {
+  outline: none;
+  box-shadow: none;
+}
+
+/* Navbar Settings Icon Focus in TV mode only */
+.layout-tv .media-bar-settings-button:focus,
+.layout-tv .media-bar-settings-button:focus-visible,
+.layout-tv .media-bar-settings-button.is-focused,
+.media-bar-tv-mode.media-bar-settings-button:focus,
+.media-bar-tv-mode.media-bar-settings-button:focus-visible,
+.media-bar-tv-mode.media-bar-settings-button.is-focused {
+  background: none !important;
+  background-color: transparent !important;
+  outline: none !important;
+  box-shadow: none !important;
+  border: none !important;
+  transform: scale(1.35) !important;
+  transition: transform 0.2s ease-in-out !important;
+}
+
+.layout-tv .media-bar-settings-button:focus img,
+.layout-tv .media-bar-settings-button:focus-visible img,
+.layout-tv .media-bar-settings-button.is-focused img,
+.media-bar-tv-mode.media-bar-settings-button:focus img,
+.media-bar-tv-mode.media-bar-settings-button:focus-visible img,
+.media-bar-tv-mode.media-bar-settings-button.is-focused img {
+  filter: invert(48%) sepia(85%) saturate(1832%) hue-rotate(167deg) brightness(98%) contrast(101%) !important;
+  transform: scale(1.1) !important;
+  transition: transform 0.2s ease-in-out !important;
+}
+
+/* Client Settings Popup Focus Styles - TV mode only */
+.layout-tv .media-bar-client-tab:focus,
+.layout-tv .media-bar-client-tab:focus-visible,
+.layout-tv .media-bar-switch:focus,
+.layout-tv .media-bar-switch:focus-visible,
+.layout-tv .media-bar-switch:focus-within,
+.layout-tv .media-bar-select:focus,
+.layout-tv .media-bar-select:focus-visible,
+.layout-tv .media-bar-btn:focus,
+.layout-tv .media-bar-btn:focus-visible,
+.layout-tv .media-bar-settings-close-button:focus,
+.layout-tv .media-bar-settings-close-button:focus-visible,
+.media-bar-tv-mode .media-bar-client-tab:focus,
+.media-bar-tv-mode .media-bar-client-tab:focus-visible,
+.media-bar-tv-mode .media-bar-switch:focus,
+.media-bar-tv-mode .media-bar-switch:focus-visible,
+.media-bar-tv-mode .media-bar-switch:focus-within,
+.media-bar-tv-mode .media-bar-select:focus,
+.media-bar-tv-mode .media-bar-select:focus-visible,
+.media-bar-tv-mode .media-bar-btn:focus,
+.media-bar-tv-mode .media-bar-btn:focus-visible,
+.media-bar-tv-mode .media-bar-settings-close-button:focus,
+.media-bar-tv-mode .media-bar-settings-close-button:focus-visible {
+  outline: 3px solid var(--jf-palette-primary-main, #00a4dc) !important;
+  outline-offset: 2px !important;
+  box-shadow: 0 0 12px rgba(0, 164, 220, 0.8) !important;
+  border-radius: 6px !important;
+}
+
+#slides-container:focus,
+#slides-container:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+  transform: none !important;
 }
 
 .info-container {
@@ -2297,6 +2393,7 @@ body.jellyfin-v12 .media-bar-settings-button:hover {
   pointer-events: none !important;
   object-fit: contain !important;
   overflow: visible !important;
+  transition: transform 0.2s ease !important;
 }
 
 .media-bar-settings-backdrop {
@@ -2811,4 +2908,17 @@ select.media-bar-select option {
 
 #mb-client-tab-libraries::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.3);
+}
+
+/* Hide Media Bar settings icon strictly during active Video Playback / OSD */
+body.is-videoplayer .media-bar-settings-button,
+html.is-videoplayer .media-bar-settings-button,
+.headerVideo .media-bar-settings-button,
+.videoPlayerContainer:not(.hide) .media-bar-settings-button,
+.videoPlayerContainer-onTop .media-bar-settings-button,
+#videoOsdPage:not(.hide) .media-bar-settings-button,
+body:has(#videoOsdPage:not(.hide)) .media-bar-settings-button,
+body:has(.videoPlayerContainer:not(.hide)) .media-bar-settings-button,
+body:has(.videoPlayerContainer-onTop) .media-bar-settings-button {
+  display: none !important;
 }

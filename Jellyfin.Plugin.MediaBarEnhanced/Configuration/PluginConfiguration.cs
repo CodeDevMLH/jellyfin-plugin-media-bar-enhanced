@@ -28,7 +28,7 @@ namespace Jellyfin.Plugin.MediaBarEnhanced.Configuration
         public string SponsorBlockCategories { get; set; } = "intro,outro,preview";
         public bool PreferLocalTrailers { get; set; } = false;
         public bool RandomizeLocalTrailers { get; set; } = false;
-        public bool RandomTrailerStartOffset { get; set; } = true;
+        public bool RandomTrailerStartOffset { get; set; } = false;
         public int RandomTrailerStartMinPercent { get; set; } = 10;
         public int RandomTrailerStartMaxPercent { get; set; } = 75;
         public bool PreferLocalBackdrops { get; set; } = false;
