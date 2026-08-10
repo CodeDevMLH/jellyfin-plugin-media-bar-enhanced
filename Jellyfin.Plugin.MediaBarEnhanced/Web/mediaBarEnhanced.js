@@ -30,7 +30,7 @@
   window.mediaBarEnhancedLoaded = true;
 
   // MARK: Version
-  const PLUGIN_VERSION = "3.3.0.0";
+  const PLUGIN_VERSION = "3.3.1.0";
 
   //Core Module Configuration
   const CONFIG = {
@@ -179,7 +179,11 @@
       randomTrailerStartLabel: 'Random Trailer Start Position',
       randomTrailerStartDesc: 'Start each backdrop trailer at a random time instead of the beginning (only active when "Wait For Trailer To End" is disabled). On by default for the media bar; turn off to always start from the beginning.',
       yoYoProgressBarLabel: 'Yo-Yo Progress Bar',
-      yoYoProgressBarDesc: 'Empty progress bar from left to right on alternating slides instead of resetting.'
+      yoYoProgressBarDesc: 'Empty progress bar from left to right on alternating slides instead of resetting.',
+      toastMuted: 'Muted',
+      toastUnmuted: 'Audio On',
+      toastPaused: 'Slideshow Paused',
+      toastResumed: 'Slideshow Resumed'
     },
     'de': {
       title: 'Media Bar Einstellungen',
@@ -244,7 +248,11 @@
       randomTrailerStartLabel: 'Zufällige Trailer-Startposition',
       randomTrailerStartDesc: 'Startet jeden Hintergrund-Trailer an einer zufälligen Position statt am Anfang (greift nur, wenn "Auf Trailer-Ende warten" deaktiviert ist). Für die Media Bar standardmäßig aktiv; deaktivieren, um immer am Anfang zu starten.',
       yoYoProgressBarLabel: 'Yo-Yo-Ladebalken',
-      yoYoProgressBarDesc: 'Ladebalken bei abwechselnden Folien von links nach rechts leeren anstatt zurückzuspringen.'
+      yoYoProgressBarDesc: 'Ladebalken bei abwechselnden Folien von links nach rechts leeren anstatt zurückzuspringen.',
+      toastMuted: 'Stumm geschaltet',
+      toastUnmuted: 'Ton aktiviert',
+      toastPaused: 'Diashow pausiert',
+      toastResumed: 'Diashow fortgesetzt'
     },
     'es': {
       title: 'Ajustes de Media Bar',
@@ -309,7 +317,11 @@
       randomTrailerStartLabel: 'Posición de inicio aleatoria del tráiler',
       randomTrailerStartDesc: 'Inicia cada tráiler de fondo en un momento aleatorio en lugar del principio (solo activo si "Esperar a que termine el tráiler" está desactivado). Activado por defecto en la barra de medios; desactívalo para empezar siempre desde el principio.',
       yoYoProgressBarLabel: 'Barra de progreso Yo-Yo',
-      yoYoProgressBarDesc: 'Vaciar la barra de progreso de izquierda a derecha en diapositivas alternas en lugar de reiniciar.'
+      yoYoProgressBarDesc: 'Vaciar la barra de progreso de izquierda a derecha en diapositivas alternas en lugar de reiniciar.',
+      toastMuted: 'Silenciado',
+      toastUnmuted: 'Sonido activado',
+      toastPaused: 'Diapositivas en pausa',
+      toastResumed: 'Diapositivas en reproducción'
     },
     'fr': {
       title: 'Paramètres de Media Bar',
@@ -374,7 +386,11 @@
       randomTrailerStartLabel: 'Position de départ aléatoire de la bande-annonce',
       randomTrailerStartDesc: 'Démarre chaque bande-annonce en arrière-plan à un moment aléatoire au lieu du début (actif uniquement si "Attendre la fin de la bande-annonce" est désactivé). Activé par défaut pour la barre multimédia ; désactivez pour toujours démarrer du début.',
       yoYoProgressBarLabel: 'Barre de progression Yo-Yo',
-      yoYoProgressBarDesc: 'Vider la barre de progression de gauche à droite sur les diapositives alternées au lieu de réinitialiser.'
+      yoYoProgressBarDesc: 'Vider la barre de progression de gauche à droite sur les diapositives alternées au lieu de réinitialiser.',
+      toastMuted: 'Muet',
+      toastUnmuted: 'Son activé',
+      toastPaused: 'Diaporama en pause',
+      toastResumed: 'Reprise du diaporama'
     },
     'it': {
       title: 'Impostazioni Media Bar',
@@ -439,7 +455,11 @@
       randomTrailerStartLabel: 'Posizione di avvio casuale del trailer',
       randomTrailerStartDesc: 'Avvia ciascun trailer in background in un punto casuale anziché dall\'inizio (attivo solo se "Attendi fine trailer" è disattivato). Attivo per impostazione predefinita per la barra multimediale; disattiva per iniziare sempre dall\'inizio.',
       yoYoProgressBarLabel: 'Barra di avanzamento Yo-Yo',
-      yoYoProgressBarDesc: 'Svuota la barra di avanzamento da sinistra a destra nelle diapositive alternate invece di ripristinare.'
+      yoYoProgressBarDesc: 'Svuota la barra di avanzamento da sinistra a destra nelle diapositive alternate invece di ripristinare.',
+      toastMuted: 'Disattivato',
+      toastUnmuted: 'Audio attivato',
+      toastPaused: 'Presentazione in pausa',
+      toastResumed: 'Presentazione ripresa'
     }
   };
 
@@ -1054,9 +1074,14 @@
         container = this.createElement("div", {
           id: "slides-container",
           className: "noautofocus",
-          tabIndex: "-1"
+          tabIndex: "-1",
+          "data-scroll-mode-x": "custom",
+          "data-scroll-mode-y": "custom"
         });
         document.body.appendChild(container);
+      } else {
+        container.setAttribute("data-scroll-mode-x", "custom");
+        container.setAttribute("data-scroll-mode-y", "custom");
       }
       return container;
     },
@@ -1178,13 +1203,24 @@
         id: 'video-modal-overlay'
       });
 
+      const keydownHandler = (e) => {
+        if (e.key === 'Escape' || e.key === 'Back' || e.key === 'GoBack' || e.keyCode === 27 || e.keyCode === 10009 || e.keyCode === 461) {
+          closeModal();
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      };
+
       const closeModal = () => {
+        document.removeEventListener('keydown', keydownHandler);
         overlay.remove();
         STATE.slideshow.isPaused = false;
         if (STATE.slideshow.slideInterval) {
           STATE.slideshow.slideInterval.start();
         }
       };
+
+      document.addEventListener('keydown', keydownHandler);
 
       const closeButton = this.createElement('button', {
         className: 'modal-close-button',
@@ -1506,6 +1542,16 @@
       }
 
       return translated;
+    },
+
+    getCustomLocalizedString(key, fallback) {
+      let locale = this.cachedLocale || 'en';
+      locale = locale.split('-')[0].toLowerCase();
+      const dict = CLIENT_MENU_TRANSLATIONS[locale] || CLIENT_MENU_TRANSLATIONS['en'];
+      if (dict && dict[key]) {
+        return dict[key];
+      }
+      return this.getLocalizedString(key, fallback);
     }
   };
 
@@ -1556,7 +1602,7 @@
       if (STATE.slideshow.libraryIds) return STATE.slideshow.libraryIds;
 
       try {
-        const viewsUrl = `${STATE.jellyfinData.serverAddress}/Items?IncludeItemTypes=CollectionFolder&userId=${STATE.jellyfinData.userId}`;
+        const viewsUrl = `${STATE.jellyfinData.serverAddress}/Users/${STATE.jellyfinData.userId}/Views`;
         const response = await fetch(viewsUrl, { headers: this.getAuthHeaders() });
         if (!response.ok) throw new Error("Failed to fetch views");
         const data = await response.json();
@@ -1564,8 +1610,10 @@
 
         const map = {};
         views.forEach(view => {
-          map[view.Name.toLowerCase().trim()] = view.Id;
-          map[view.Id] = view.Id;
+          if (view.Name && view.Id) {
+            map[view.Name.toLowerCase().trim()] = view.Id;
+            map[view.Id] = view.Id;
+          }
         });
 
         STATE.slideshow.libraryIds = map;
@@ -2387,6 +2435,19 @@
     restart() {
       return this.stop().start();
     }
+
+    /**
+     * Immediately triggers next slide and restarts timer
+     * @returns {SlideTimer} This instance for chaining
+     */
+    next() {
+      if (typeof SlideshowManager !== 'undefined' && SlideshowManager.nextSlide) {
+        SlideshowManager.nextSlide();
+      } else if (typeof this.callback === 'function') {
+        this.callback();
+      }
+      return this.restart();
+    }
   }
 
   /**
@@ -2397,9 +2458,13 @@
     updateVisibility() {
       const videoPlayer = document.querySelector('.videoPlayerContainer');
       const trailerPlayer = document.querySelector('.youtubePlayerContainer');
+      const isVideoPlayerActive = (videoPlayer && !videoPlayer.classList.contains('hide')) ||
+        (trailerPlayer && !trailerPlayer.classList.contains('hide')) ||
+        document.querySelector('#videoOsdPage:not(.hide)') ||
+        document.body.classList.contains('is-videoplayer');
 
       // If a full screen video player is active, hide slideshow and stop playback
-      if ((videoPlayer && !videoPlayer.classList.contains('hide')) || (trailerPlayer && !trailerPlayer.classList.contains('hide'))) {
+      if (isVideoPlayerActive) {
         const container = document.getElementById("slides-container");
         if (container) {
           container.style.display = "none";
@@ -2410,6 +2475,7 @@
           STATE.slideshow.slideInterval.stop();
         }
         SlideshowManager.stopAllPlayback();
+        this.wasVisible = false; // Reset so returning to home correctly restarts the slideshow!
         return;
       }
 
@@ -2433,6 +2499,18 @@
       }
 
       if (isVisible && !this.wasVisible) {
+        const isTvDevice = window.browser && window.browser.tv;
+        const isTvLayout = window.layoutManager && window.layoutManager.tv;
+        const hasTvClass = document.documentElement.classList.contains('layout-tv') || document.body.classList.contains('layout-tv');
+        const isTvMode = isTvDevice || isTvLayout || hasTvClass;
+        if (isTvMode) {
+          setTimeout(() => {
+            if (container && container.style.display !== 'none') {
+              container.focus({ preventScroll: true });
+            }
+          }, 300);
+        }
+
         if (STATE.slideshow.hasInitialized && STATE.slideshow.itemIds.length > 0) {
           SlideshowManager.updateCurrentSlide(STATE.slideshow.currentSlideIndex);
         }
@@ -2476,6 +2554,8 @@
 
       document.body.addEventListener("click", () => this.updateVisibility());
       window.addEventListener("hashchange", () => this.updateVisibility());
+      window.addEventListener("popstate", () => this.updateVisibility());
+      document.addEventListener("viewshow", () => this.updateVisibility());
 
       this.updateVisibility();
     },
@@ -2557,6 +2637,8 @@
         className: "slide",
         tabIndex: 0,
         "data-item-id": itemId,
+        "data-scroll-mode-x": "custom",
+        "data-scroll-mode-y": "custom",
         onclick: (e) => {
           // Prevent navigation if clicking on buttons, links, or arrows
           if (e.target.closest('button') || e.target.closest('a') || e.target.closest('.arrow')) return;
@@ -2900,7 +2982,11 @@
                         event.target._wrapperDiv.style.transition = "none";
                         event.target._wrapperDiv.style.opacity = "0";
                       }
-                      if (typeof SlideshowManager !== 'undefined' && SlideshowManager.nextSlide) SlideshowManager.nextSlide();
+                      if (STATE.slideshow.slideInterval) {
+                        STATE.slideshow.slideInterval.next();
+                      } else if (typeof SlideshowManager !== 'undefined' && SlideshowManager.nextSlide) {
+                        SlideshowManager.nextSlide();
+                      }
                     }
                   } else {
                     if (isActive) {
@@ -2987,7 +3073,11 @@
             const slide = event.target.closest('.slide');
             if (slide && slide.classList.contains('active')) {
               STATE.slideshow.isVideoPlaying = false;
-              SlideshowManager.nextSlide();
+              if (STATE.slideshow.slideInterval) {
+                STATE.slideshow.slideInterval.next();
+              } else {
+                SlideshowManager.nextSlide();
+              }
             }
           });
 
@@ -3011,8 +3101,11 @@
 
               if (video.currentTime >= effectiveEnd - 0.25) {
                 video.pause();
-                if (STATE.slideshow.slideInterval && !STATE.slideshow.isPaused) {
+                STATE.slideshow.isVideoPlaying = false;
+                if (!STATE.slideshow.isPaused && STATE.slideshow.slideInterval) {
                   STATE.slideshow.slideInterval.next();
+                } else if (!STATE.slideshow.isPaused && typeof SlideshowManager !== 'undefined' && SlideshowManager.nextSlide) {
+                  SlideshowManager.nextSlide();
                 }
                 return;
               }
@@ -3495,7 +3588,11 @@
                 player._wrapperDiv.style.transition = "none";
                 player._wrapperDiv.style.opacity = "0";
               }
-              SlideshowManager.nextSlide();
+              if (STATE.slideshow.slideInterval) {
+                STATE.slideshow.slideInterval.next();
+              } else {
+                SlideshowManager.nextSlide();
+              }
             }
             return;
           }
@@ -3654,6 +3751,17 @@
           `.slide[data-item-id="${currentItemId}"]`
         );
 
+        // Detect if a slide button or container is currently focused in TV mode
+        let focusedButtonSelector = null;
+        const activeEl = document.activeElement;
+        if (container && activeEl && container.contains(activeEl) && activeEl.tagName === 'BUTTON') {
+          if (activeEl.classList.contains('play-button')) focusedButtonSelector = '.play-button';
+          else if (activeEl.classList.contains('detail-button')) focusedButtonSelector = '.detail-button';
+          else if (activeEl.classList.contains('favorite-button')) focusedButtonSelector = '.favorite-button';
+          else if (activeEl.classList.contains('trailer-button')) focusedButtonSelector = '.trailer-button';
+          else focusedButtonSelector = 'button';
+        }
+
         // pruning for iOS/LowPower
         const isLowPower = isLowPowerDevice();
         const isIOSApp = /iPhone|iPad|iPod/i.test(navigator.userAgent);
@@ -3716,6 +3824,16 @@
         void currentSlide.offsetWidth;
         currentSlide.classList.add("active");
         STATE.slideshow.playSignals[currentItemId] = false;
+
+        // Restore focus to equivalent button or container on the new active slide
+        if (focusedButtonSelector && currentSlide) {
+          setTimeout(() => {
+            const btnToFocus = currentSlide.querySelector(focusedButtonSelector) || currentSlide.querySelector('.button-container button');
+            if (btnToFocus) {
+              btnToFocus.focus({ preventScroll: true });
+            }
+          }, 50);
+        }
 
         // Manage Video Playback: Stop others, Play current
         // 1. Stop all other YouTube players and local video elements, release connections
@@ -3957,8 +4075,8 @@
         }, CONFIG.fadeTransitionDuration);
 
         // Only restart interval if we are NOT waiting for a video to end
-        const hasVideo = currentSlide.querySelector('.video-backdrop') ||
-          (STATE.slideshow.videoPlayers && STATE.slideshow.videoPlayers[currentItemId]);
+        const activeVideo = currentSlide.querySelector('.video-backdrop, iframe, video');
+        const hasVideo = !!activeVideo;
 
         this.preloadAdjacentSlides(index);
         this.updateDots();
@@ -3979,9 +4097,10 @@
                 if (fill) {
                   const bar = fill.closest('.media-bar-progress-bar');
                   if (bar) {
-                    bar.classList.add('animating');
-                    fill.style.transform = 'scaleX(0)';
+                    fill.style.transform = '';
+                    fill.style.animation = '';
                     fill.style.animationDuration = `${CONFIG.shuffleInterval}ms`;
+                    bar.classList.add('animating');
                   }
                 }
               }
@@ -4064,8 +4183,8 @@
 
       const fill = progressBar.querySelector('.media-bar-progress-fill');
       if (fill) {
-        fill.style.transform = isReverse ? 'scaleX(1)' : 'scaleX(0)';
-        fill.style.animationDuration = '0s';
+        fill.style.animation = 'none';
+        fill.style.transform = ''; // Clear inline transform leftover from manual video progress updates!
       }
       void progressBar.offsetWidth; // force reflow
 
@@ -4078,6 +4197,7 @@
 
       // Start keyframe animation
       if (fill) {
+        fill.style.animation = '';
         fill.style.animationDuration = `${CONFIG.shuffleInterval}ms`;
       }
       progressBar.classList.add('animating');
@@ -4231,14 +4351,42 @@
           document.documentElement.classList.contains('layout-tv') ||
           document.body.classList.contains('layout-tv');
         if (isTvMode) {
-          setTimeout(() => {
-            const container = document.getElementById("slides-container");
-            if (container && container.style.display !== 'none') {
-              container.focus({ preventScroll: true });
-            }
-          }, 0);
+          const container = document.getElementById("slides-container");
+          // Only maintain focus if focus was ALREADY on the media bar container
+          if (container && container.style.display !== 'none' && (container.contains(document.activeElement) || document.activeElement === container)) {
+            setTimeout(() => {
+              if (container && container.style.display !== 'none' && (container.contains(document.activeElement) || document.activeElement === container)) {
+                container.focus({ preventScroll: true });
+              }
+            }, 0);
+          }
         }
       }
+    },
+
+    showOsdToast(iconName, text) {
+      const container = document.getElementById('slides-container');
+      if (!container) return;
+
+      let toast = container.querySelector('.media-bar-osd-toast');
+      if (!toast) {
+        toast = document.createElement('div');
+        toast.className = 'media-bar-osd-toast';
+        toast.style.cssText = 'position: absolute !important; top: 7.5rem !important; right: 1rem !important; z-index: 9999 !important; background: rgba(0, 0, 0, 0.75) !important; backdrop-filter: blur(12px) !important; -webkit-backdrop-filter: blur(12px) !important; color: #ffffff !important; padding: 10px 18px !important; border-radius: 24px !important; font-size: 1.1rem !important; font-weight: 500 !important; display: flex !important; align-items: center !important; gap: 10px !important; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4) !important; border: 1px solid rgba(255, 255, 255, 0.15) !important; pointer-events: none !important; transition: opacity 0.3s ease, transform 0.3s ease !important; opacity: 0; transform: translateY(-10px);';
+        container.appendChild(toast);
+      }
+
+      toast.innerHTML = `<i class="material-icons" style="font-size: 22px !important; color: #00a4dc !important;">${iconName}</i> <span>${text}</span>`;
+      toast.style.opacity = '1';
+      toast.style.transform = 'translateY(0)';
+
+      if (this._osdToastTimer) clearTimeout(this._osdToastTimer);
+      this._osdToastTimer = setTimeout(() => {
+        if (toast) {
+          toast.style.opacity = '0';
+          toast.style.transform = 'translateY(-10px)';
+        }
+      }, 1600);
     },
 
     toggleMute() {
@@ -4542,13 +4690,237 @@
     },
 
     /**
+     * TV Spatial Navigation Engine
+     */
+    TvNavigationEngine: {
+      getContainer() {
+        return document.getElementById('slides-container');
+      },
+
+      getActiveSlideButtons() {
+        const container = this.getContainer();
+        if (!container) return [];
+        const activeSlide = container.querySelector('.slide.active');
+        if (!activeSlide) return [];
+        return Array.from(activeSlide.querySelectorAll('.button-container button, .pause-button, .mute-button'))
+          .filter(b => b.offsetWidth > 0 && b.offsetHeight > 0 && window.getComputedStyle(b).display !== 'none');
+      },
+
+      isNavbarFocused(activeElement) {
+        return !!(activeElement && activeElement.closest && (
+          activeElement.closest('.skinHeader, .appHeader, .sectionTabs, .emby-tabs, .headerRight') ||
+          activeElement.classList.contains('emby-tab-button')
+        ));
+      },
+
+      isTopDashboardElement(activeElement) {
+        const container = this.getContainer();
+        if (!activeElement || !container || container.contains(activeElement)) return false;
+
+        const section = activeElement.closest('.homeSectionsContainer, .sections, #indexPage, .page');
+        if (!section) return false;
+
+        const activeRect = activeElement.getBoundingClientRect();
+        // Look for any focusable element inside section that is vertically ABOVE activeElement
+        const cardsAbove = Array.from(section.querySelectorAll('button, a, [tabindex="0"], .card')).filter(el => {
+          if (el === activeElement || el.contains(activeElement) || activeElement.contains(el)) return false;
+          const style = window.getComputedStyle(el);
+          if (style.display === 'none' || style.visibility === 'hidden') return false;
+          const rect = el.getBoundingClientRect();
+          return rect.height > 0 && rect.bottom < activeRect.top - 15;
+        });
+
+        return cardsAbove.length === 0;
+      },
+
+      focusFirstSlideButton() {
+        const buttons = this.getActiveSlideButtons();
+        if (buttons.length > 0) {
+          buttons[0].focus();
+          return true;
+        }
+        return false;
+      },
+
+      focusSectionBelow() {
+        const container = this.getContainer();
+        if (!container) return false;
+
+        const candidateSelectors = [
+          '.homeSectionsContainer button, .homeSectionsContainer a, .homeSectionsContainer [tabindex="0"]',
+          '.sections button, .sections a, .sections [tabindex="0"]',
+          '.emby-scroller button, .emby-scroller a, .emby-scroller [tabindex="0"]',
+          '.card button, .card a, .card[tabindex="0"]',
+          '#indexPage button, #indexPage a, #indexPage [tabindex="0"]'
+        ];
+
+        for (const selector of candidateSelectors) {
+          const elements = Array.from(document.querySelectorAll(selector)).filter(el => {
+            if (container.contains(el)) return false;
+            const rect = el.getBoundingClientRect();
+            const containerRect = container.getBoundingClientRect();
+            const style = window.getComputedStyle(el);
+            return rect.top >= containerRect.bottom - 80 && style.display !== 'none' && style.visibility !== 'hidden';
+          });
+          if (elements.length > 0) {
+            elements[0].focus();
+            return true;
+          }
+        }
+        return false;
+      },
+
+      focusNavbarAbove() {
+        const candidateSelectors = [
+          '.emby-tab-button-active',
+          '.emby-tab-button',
+          '.headerUserButton',
+          '[class*="headerUserButton"]',
+          '.headerButton',
+          'button[class*="Header"]',
+          '.media-bar-settings-button',
+          '#searchButton',
+          '#settingsButton'
+        ];
+
+        for (const selector of candidateSelectors) {
+          const elements = Array.from(document.querySelectorAll(selector)).filter(el => {
+            const style = window.getComputedStyle(el);
+            return style.display !== 'none' && style.visibility !== 'hidden';
+          });
+          if (elements.length > 0) {
+            elements[0].focus();
+            return true;
+          }
+        }
+        return false;
+      },
+
+      handleTvKey(e, activeElement) {
+        const container = this.getContainer();
+        if (!container || container.style.display === 'none') return false;
+
+        const isInsideContainer = container.contains(activeElement);
+        const isContainerFocused = activeElement === container;
+        const isButtonFocused = isInsideContainer && activeElement.tagName === 'BUTTON';
+
+        switch (e.key) {
+          case "ArrowRight":
+            if (isButtonFocused) {
+              const buttons = this.getActiveSlideButtons();
+              const idx = buttons.indexOf(activeElement);
+              if (idx !== -1 && idx < buttons.length - 1) {
+                buttons[idx + 1].focus();
+              }
+              return true;
+            }
+            break;
+
+          case "ArrowLeft":
+            if (isButtonFocused) {
+              const buttons = this.getActiveSlideButtons();
+              const idx = buttons.indexOf(activeElement);
+              if (idx > 0) {
+                buttons[idx - 1].focus();
+              }
+              return true;
+            }
+            break;
+
+          case "ArrowDown":
+            if (this.isNavbarFocused(activeElement)) {
+              container.focus({ preventScroll: true });
+              return true;
+            }
+            if (isContainerFocused) {
+              if (!this.focusFirstSlideButton()) {
+                this.focusSectionBelow();
+              }
+              return true;
+            }
+            if (isButtonFocused) {
+              this.focusSectionBelow();
+              return true;
+            }
+            break;
+
+          case "ArrowUp":
+            if (isButtonFocused) {
+              container.focus({ preventScroll: true });
+              return true;
+            }
+            if (isContainerFocused) {
+              this.focusNavbarAbove();
+              return true;
+            }
+            if (this.isTopDashboardElement(activeElement)) {
+              if (!this.focusFirstSlideButton()) {
+                container.focus({ preventScroll: true });
+              }
+              return true;
+            }
+            break;
+        }
+
+        return false;
+      }
+    },
+
+    /**
      * Initializes keyboard event listeners
      */
     initKeyboardEvents() {
       if (!CONFIG.enableKeyboardControls) return;
 
+      // Auto-scroll focused element into view for TV mode & keyboard navigation
+      document.addEventListener('focusin', (e) => {
+        const isTvDevice = window.browser && window.browser.tv;
+        const isTvLayout = window.layoutManager && window.layoutManager.tv;
+        const hasTvClass = document.documentElement.classList.contains('layout-tv') || document.body.classList.contains('layout-tv');
+        const isTvMode = isTvDevice || isTvLayout || hasTvClass;
+        if (isTvMode) {
+          document.body.classList.add('media-bar-tv-mode');
+          document.documentElement.classList.add('media-bar-tv-mode');
+        } else {
+          return;
+        }
+
+        const container = document.getElementById('slides-container');
+        if (container) {
+          if (document.activeElement === container || container.contains(document.activeElement)) {
+            container.classList.add('is-tv-focused');
+          } else {
+            container.classList.remove('is-tv-focused');
+          }
+
+          if (document.activeElement === container) {
+            container.classList.add('is-container-focused');
+          } else {
+            container.classList.remove('is-container-focused');
+          }
+        }
+
+        const el = e.target;
+        if (!el || el === document.body || el === document.documentElement) return;
+        if (el === container || (container && container.contains(el))) {
+          if (window.scrollY !== 0) {
+            window.scrollTo(window.scrollX, 0);
+          }
+          return;
+        }
+
+        try {
+          const rect = el.getBoundingClientRect();
+          const viewHeight = window.innerHeight || document.documentElement.clientHeight;
+          // If element is below or above the visible viewport, scroll it into view
+          if (rect.bottom > viewHeight - 20 || rect.top < 80) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+          }
+        } catch (err) { }
+      });
+
       document.addEventListener("keydown", (e) => {
-        const container = document.getElementById("slides-container");
+        const container = this.TvNavigationEngine.getContainer();
         if (!container || container.style.display === "none") {
           return;
         }
@@ -4558,15 +4930,6 @@
         const isTvLayout = window.layoutManager && window.layoutManager.tv;
         const hasTvClass = document.documentElement.classList.contains('layout-tv') || document.body.classList.contains('layout-tv');
         const isTvMode = isTvDevice || isTvLayout || hasTvClass;
-
-        // Check Focus State
-        const isBodyFocused = activeElement === document.body;
-        const hasDirectFocus = container.contains(activeElement) || activeElement === container;
-
-        // Determine if we should handle navigation keys (Arrows, Space, M)
-        // TV Mode: Strict focus required (must be on slideshow)
-        // Desktop Mode: Loose focus allowed (slideshow OR body/nothing focused)
-        const canControlSlideshow = isTvMode ? hasDirectFocus : (hasDirectFocus || isBodyFocused);
 
         // Check for Input Fields (always ignore typing)
         const isInputElement = activeElement && (activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA' || activeElement.isContentEditable);
@@ -4578,39 +4941,75 @@
         const isVideoOpen = (videoPlayer && !videoPlayer.classList.contains('hide')) || (trailerPlayer && !trailerPlayer.classList.contains('hide'));
         if (isVideoOpen) return;
 
+        // 1. Try TV D-pad navigation first
+        if (isTvMode && this.TvNavigationEngine.handleTvKey(e, activeElement)) {
+          e.preventDefault();
+          e.stopPropagation();
+          return;
+        }
+
+        // 2. TV Remote Control & Desktop shortcuts
+        const isBodyFocused = activeElement === document.body;
+        const isContainerFocused = activeElement === container;
+        const isInsideContainer = container ? container.contains(activeElement) : false;
+        const isHomeView = window.location.hash === '#/home.html' || window.location.hash === '#/home' || !window.location.hash;
+        const canControlSlideshow = isContainerFocused || isInsideContainer || isBodyFocused || (isTvMode && isHomeView);
+
+        const key = e.key || "";
+        const code = e.code || "";
+        const keyCode = e.keyCode || e.which || 0;
+
+        // Remote / Keyboard Mute Key Detection
+        const isMuteKey = key === "AudioVolumeMute" || key === "VolumeMute" || key === "Mute" || key === "m" || key === "M" || code === "VolumeMute" || code === "KeyM" || keyCode === 173 || keyCode === 449;
+
+        // Remote / Keyboard Play & Pause Key Detection
+        const isPlayPauseKey = key === "MediaPlayPause" || key === "MediaPlay" || key === "MediaPause" || key === "Play" || key === "Pause" || key === "p" || key === "P" || key === " " || code === "MediaPlayPause" || code === "MediaPlay" || code === "MediaPause" || code === "KeyP" || code === "Space" || keyCode === 179 || keyCode === 415 || keyCode === 19;
+
+        if (isMuteKey && canControlSlideshow) {
+          SlideshowManager.toggleMute();
+          SlideshowManager.showOsdToast(
+            STATE.slideshow.isMuted ? 'volume_off' : 'volume_up',
+            STATE.slideshow.isMuted
+              ? LocalizationUtils.getCustomLocalizedString('toastMuted', 'Muted')
+              : LocalizationUtils.getCustomLocalizedString('toastUnmuted', 'Audio On')
+          );
+          e.preventDefault();
+          e.stopPropagation();
+          return;
+        }
+
+        if (isPlayPauseKey && canControlSlideshow) {
+          SlideshowManager.togglePause();
+          SlideshowManager.showOsdToast(
+            STATE.slideshow.isPaused ? 'pause' : 'play_arrow',
+            STATE.slideshow.isPaused
+              ? LocalizationUtils.getCustomLocalizedString('toastPaused', 'Slideshow Paused')
+              : LocalizationUtils.getCustomLocalizedString('toastResumed', 'Slideshow Resumed')
+          );
+          e.preventDefault();
+          e.stopPropagation();
+          return;
+        }
+
+        const canNavigateSlides = isContainerFocused || isInsideContainer || isBodyFocused;
+
         switch (e.key) {
           case "ArrowRight":
-            if (canControlSlideshow) {
+            if (canNavigateSlides) {
               SlideshowManager.nextSlide();
               e.preventDefault();
             }
             break;
 
           case "ArrowLeft":
-            if (canControlSlideshow) {
+            if (canNavigateSlides) {
               SlideshowManager.prevSlide();
               e.preventDefault();
             }
             break;
 
-          case " ": // Space bar
-            if (canControlSlideshow) {
-              this.togglePause();
-              e.preventDefault();
-            }
-            break;
-
-          case "m": // Mute toggle
-          case "M":
-            if (canControlSlideshow) {
-              this.toggleMute();
-              e.preventDefault();
-            }
-            break;
-
           case "Enter":
-            // Enter always requires direct focus on the slideshow to avoid conflicts
-            if (hasDirectFocus) {
+            if (isContainerFocused) {
               const currentItemId = STATE.slideshow.itemIds[STATE.slideshow.currentSlideIndex];
               if (currentItemId) {
                 if (window.Emby && window.Emby.Page) {
@@ -5111,17 +5510,27 @@
       }, 300);
     };
 
-    container.addEventListener("mouseenter", showArrows);
-    container.addEventListener("mouseleave", hideArrows);
+    const isTvDevice = window.browser && window.browser.tv;
+    const isTvLayout = window.layoutManager && window.layoutManager.tv;
+    const hasTvClass = document.documentElement.classList.contains('layout-tv') || document.body.classList.contains('layout-tv');
+    const isTvMode = isTvDevice || isTvLayout || hasTvClass;
+
+    if (isTvMode) {
+      document.body.classList.add('media-bar-tv-mode');
+      document.documentElement.classList.add('media-bar-tv-mode');
+    }
+
+    const alwaysShow = CONFIG.alwaysShowArrows || isTvMode;
+
+    if (alwaysShow) {
+      showArrows();
+    } else {
+      container.addEventListener("mouseenter", showArrows);
+      container.addEventListener("mouseleave", hideArrows);
+    }
+
     container.addEventListener("mouseenter", onMediaBarHoverAudioEnter);
     container.addEventListener("mouseleave", onMediaBarHoverAudioLeave);
-
-    if (CONFIG.alwaysShowArrows) {
-      showArrows();
-      // Remove listeners to keep them shown
-      container.removeEventListener("mouseenter", showArrows);
-      container.removeEventListener("mouseleave", hideArrows);
-    }
 
     let arrowTimeout;
     container.addEventListener(
@@ -5410,16 +5819,38 @@
             }
           }
 
-          // B) Profile Picture Popup Menu
-          const muiUserMenu = document.querySelector('#app-user-menu .MuiMenu-list')
-            || document.querySelector('#app-user-menu ul')
-            || document.querySelector('.MuiMenu-paper .MuiMenu-list')
-            || document.querySelector('.MuiMenu-paper ul')
-            || document.querySelector('.MuiPopover-paper ul')
-            || document.querySelector('.MuiModal-root ul')
-            || document.querySelector('div[role="presentation"] ul')
-            || document.querySelector('[role="menu"]')
-            || document.querySelector('.actionSheetScroller');
+          // B) Profile Picture Popup Menu (MUI <Menu id="app-user-menu">, Popovers, Modals)
+          const isElementHidden = (el) => {
+            if (!el) return true;
+            if (el.getAttribute('aria-hidden') === 'true') return true;
+            if (el.classList?.contains('MuiModal-hidden')) return true;
+            const popover = el.closest('#app-user-menu, .MuiPopover-root, .MuiModal-root, [role="presentation"]');
+            if (popover) {
+              if (popover.getAttribute('aria-hidden') === 'true') return true;
+              if (popover.classList?.contains('MuiModal-hidden')) return true;
+              const pStyle = window.getComputedStyle(popover);
+              if (pStyle.display === 'none' || pStyle.visibility === 'hidden' || pStyle.opacity === '0') return true;
+            }
+            const style = window.getComputedStyle(el);
+            return style.display === 'none' || style.visibility === 'hidden';
+          };
+
+          const userMenuCandidates = Array.from(document.querySelectorAll('#app-user-menu, #app-user-menu .MuiMenu-list, #app-user-menu ul, .MuiMenu-paper .MuiMenu-list, .MuiMenu-paper ul, .MuiPopover-paper ul, .MuiModal-root ul, div[role="presentation"] ul, [role="menu"]'));
+          let muiUserMenu = userMenuCandidates.find(menu => {
+            if (isElementHidden(menu)) return false;
+            if (menu.id === 'app-user-menu' || menu.closest('#app-user-menu')) return true;
+            const items = Array.from(menu.children);
+            return items.some(item => {
+              const href = (item.getAttribute('href') || item.querySelector('a')?.getAttribute('href') || '').toLowerCase();
+              const txt = (item.textContent || '').toLowerCase();
+              const action = (item.getAttribute('data-action') || '').toLowerCase();
+              return href.includes('mypreferences') || action.includes('mypreferences') || txt.includes('einstellungen') || txt.includes('settings') || item.classList.contains('btnLogout') || item.classList.contains('btnSettings');
+            });
+          });
+
+          if (muiUserMenu && muiUserMenu.tagName !== 'UL' && muiUserMenu.querySelector('ul')) {
+            muiUserMenu = muiUserMenu.querySelector('ul');
+          }
 
           if (muiUserMenu && !muiUserMenu.querySelector('.media-bar-usermenu-item')) {
             const li = document.createElement('li');
@@ -5445,13 +5876,18 @@
 
             // Position directly under Settings / mypreferences item
             const settingsItem = Array.from(muiUserMenu.children).find(el => {
-              const txt = el.textContent || '';
-              const href = el.getAttribute('href') || el.querySelector('a')?.getAttribute('href') || '';
-              return href.includes('mypreferences') || txt.includes('Settings') || txt.includes('Einstellungen');
+              const txt = (el.textContent || '').toLowerCase();
+              const href = (el.getAttribute('href') || el.querySelector('a')?.getAttribute('href') || '').toLowerCase();
+              const action = (el.getAttribute('data-action') || '').toLowerCase();
+              return href.includes('mypreferences') || action.includes('mypreferences') || txt.includes('settings') || txt.includes('einstellungen');
             });
 
-            if (settingsItem && settingsItem.nextSibling) {
-              muiUserMenu.insertBefore(li, settingsItem.nextSibling);
+            if (settingsItem) {
+              if (settingsItem.nextSibling) {
+                muiUserMenu.insertBefore(li, settingsItem.nextSibling);
+              } else {
+                muiUserMenu.appendChild(li);
+              }
             } else {
               muiUserMenu.appendChild(li);
             }
@@ -5507,18 +5943,22 @@
 
       observer.observe(document.body, {
         childList: true,
-        subtree: true
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['aria-hidden', 'class', 'style']
       });
 
       const handleUserAvatarTrigger = (e) => {
-        if (e.target && e.target.closest('.mainDrawerButton, [class*="mainDrawerButton"], .barsMenuButton, .headerUserButton, [class*="headerUserButton"], .btnMyUser, [class*="btnMyUser"], [aria-label*="UserMenu"], [aria-label*="Profile"], [aria-label*="Profil"], [aria-controls="app-user-menu"], .headerUserButtonImage, [class*="headerUserButtonImage"], [class*="UserAvatar"]')) {
-          setTimeout(tryInject, 50);
+        if (e.target && e.target.closest('button, a, [role="button"], .mainDrawerButton, [class*="mainDrawerButton"], .barsMenuButton, .headerUserButton, [class*="headerUserButton"], .btnMyUser, [class*="btnMyUser"], [aria-label*="UserMenu"], [aria-label*="Profile"], [aria-label*="Profil"], [aria-label*="Benutzer"], [aria-controls="app-user-menu"], .headerUserButtonImage, [class*="headerUserButtonImage"], [class*="UserAvatar"], .MuiAvatar-root, .MuiAvatar-img')) {
+          setTimeout(tryInject, 20);
+          setTimeout(tryInject, 100);
           setTimeout(tryInject, 250);
+          setTimeout(tryInject, 500);
         }
       };
 
-      document.addEventListener('click', handleUserAvatarTrigger);
-      document.addEventListener('touchstart', handleUserAvatarTrigger, { passive: true });
+      document.addEventListener('click', handleUserAvatarTrigger, true);
+      document.addEventListener('touchstart', handleUserAvatarTrigger, { passive: true, capture: true });
 
       // Initial injection attempt without waiting for mutations
       tryInject();
@@ -5586,19 +6026,19 @@
     </div>
     
     <div class="media-bar-client-tabs">
-        <button type="button" class="media-bar-client-tab active" data-tab="mb-client-tab-general">
+        <button type="button" class="media-bar-client-tab active" data-tab="mb-client-tab-general" tabindex="0">
             <svg style="width: 18px; height: 18px; fill: currentColor; flex-shrink: 0;" viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
             <span>${t.groupGeneral}</span>
         </button>
-        <button type="button" class="media-bar-client-tab" data-tab="mb-client-tab-trailers">
+        <button type="button" class="media-bar-client-tab" data-tab="mb-client-tab-trailers" tabindex="0">
             <svg style="width: 18px; height: 18px; fill: currentColor; flex-shrink: 0;" viewBox="0 0 24 24"><path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/></svg>
             <span>${t.groupTrailers.replace(' & ', ' &amp;<br>').replace(' y ', ' y<br>').replace(' et ', ' et<br>')}</span>
         </button>
-        <button type="button" class="media-bar-client-tab" data-tab="mb-client-tab-layout">
+        <button type="button" class="media-bar-client-tab" data-tab="mb-client-tab-layout" tabindex="0">
             <svg style="width: 18px; height: 18px; fill: currentColor; flex-shrink: 0;" viewBox="0 0 24 24"><path d="M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H3V5h18v14zM8 6h8v2H8zm-4 4h16v2H4zm3 4h10v2H7z"/></svg>
             <span>${t.groupLayout.replace(' & ', ' &amp;<br>').replace(' y ', ' y<br>').replace(' et ', ' et<br>')}</span>
         </button>
-        <button type="button" class="media-bar-client-tab" data-tab="mb-client-tab-libraries">
+        <button type="button" class="media-bar-client-tab" data-tab="mb-client-tab-libraries" tabindex="0">
             <svg style="width: 18px; height: 18px; fill: currentColor; flex-shrink: 0;" viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0-2-.9-2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg>
             <span>${t.groupLibraries || 'Libraries'}</span>
         </button>
@@ -5617,7 +6057,7 @@
               <span class="media-bar-toggle-label">${setting.label}</span>
               <span class="media-bar-toggle-desc">${setting.description}</span>
           </div>
-          <label class="media-bar-switch">
+          <label class="media-bar-switch" tabindex="0">
               <input id="mb-setting-${setting.key}" type="checkbox" ${isChecked ? 'checked' : ''} />
               <span class="media-bar-slider"></span>
           </label>
@@ -5647,7 +6087,7 @@
             <span class="media-bar-select-label">${t.activePlaylistLabel || 'Active Playlist'}</span>
             <span class="media-bar-select-desc">${t.activePlaylistDesc || 'Select which custom playlist to display.'}</span>
         </div>
-        <select id="mb-setting-activePlaylist" class="media-bar-select">
+        <select id="mb-setting-activePlaylist" class="media-bar-select" tabindex="0">
             ${playlistsOptions}
         </select>
     </div>
@@ -5665,7 +6105,7 @@
               <span class="media-bar-toggle-label">${setting.label}</span>
               <span class="media-bar-toggle-desc">${setting.description}</span>
           </div>
-          <label class="media-bar-switch">
+          <label class="media-bar-switch" tabindex="0">
               <input id="mb-setting-${setting.key}" type="checkbox" ${isChecked ? 'checked' : ''} />
               <span class="media-bar-slider"></span>
           </label>
@@ -5680,7 +6120,7 @@
             <span class="media-bar-select-label">${t.defaultTrailerVolumeLabel}</span>
             <span class="media-bar-select-desc">${t.defaultTrailerVolumeDesc}</span>
         </div>
-        <select id="mb-setting-defaultTrailerVolume" class="media-bar-select">
+        <select id="mb-setting-defaultTrailerVolume" class="media-bar-select" tabindex="0">
     `;
       for (let vol = 10; vol <= 100; vol += 10) {
         html += `<option value="${vol}" ${defaultVolumeVal === vol ? 'selected' : ''}>${vol}%</option>`;
@@ -5701,7 +6141,7 @@
             <span class="media-bar-select-label">${t.mobileModeLabel}</span>
             <span class="media-bar-select-desc">${t.mobileModeDesc}</span>
         </div>
-        <select id="mb-setting-mobileMode" class="media-bar-select">
+        <select id="mb-setting-mobileMode" class="media-bar-select" tabindex="0">
             <option value="Original" ${mobileModeVal === 'Original' ? 'selected' : ''}>${t.optionMobileModeOriginal || 'Original (65vh)'}</option>
             <option value="16:9" ${mobileModeVal === '16:9' ? 'selected' : ''}>${t.optionMobileMode16_9 || '16:9 (Compact)'}</option>
             <option value="4:3" ${mobileModeVal === '4:3' ? 'selected' : ''}>${t.optionMobileMode4_3 || '4:3 (Classic)'}</option>
@@ -5716,7 +6156,7 @@
             <span class="media-bar-select-label">${t.clientMenuLocationLabel}</span>
             <span class="media-bar-select-desc">${t.clientMenuLocationDesc}</span>
         </div>
-        <select id="mb-setting-menuLocation" class="media-bar-select">
+        <select id="mb-setting-menuLocation" class="media-bar-select" tabindex="0">
             <option value="Navbar" ${menuLocationVal === 'Navbar' ? 'selected' : ''}>${t.optionMenuLocationNavbar || 'Navbar'}</option>
             <option value="Sidebar" ${menuLocationVal === 'Sidebar' ? 'selected' : ''}>${t.optionMenuLocationSidebar || 'Sidebar'}</option>
             <option value="UserMenu" ${menuLocationVal === 'UserMenu' ? 'selected' : ''}>${t.optionMenuLocationUserMenu || 'User Menu'}</option>
@@ -5734,7 +6174,7 @@
             <span class="media-bar-select-label">${t.clientMenuLocationMobileLabel}</span>
             <span class="media-bar-select-desc">${t.clientMenuLocationMobileDesc}</span>
         </div>
-        <select id="mb-setting-menuLocationMobile" class="media-bar-select">
+        <select id="mb-setting-menuLocationMobile" class="media-bar-select" tabindex="0">
             <option value="Navbar" ${menuLocationMobileVal === 'Navbar' ? 'selected' : ''}>${t.optionMenuLocationNavbar || 'Navbar'}</option>
             <option value="Sidebar" ${menuLocationMobileVal === 'Sidebar' ? 'selected' : ''}>${t.optionMenuLocationSidebar || 'Sidebar'}</option>
             <option value="UserMenu" ${menuLocationMobileVal === 'UserMenu' ? 'selected' : ''}>${t.optionMenuLocationUserMenu || 'User Menu'}</option>
@@ -5752,7 +6192,7 @@
             <span class="media-bar-select-label">${t.transitionEffectLabel || 'Transition Effect'}</span>
             <span class="media-bar-select-desc">${t.transitionEffectDesc || 'Select the transition style between slides.'}</span>
         </div>
-        <select id="mb-setting-transitionEffect" class="media-bar-select">
+        <select id="mb-setting-transitionEffect" class="media-bar-select" tabindex="0">
             <option value="Fade" ${transitionEffectVal === 'Fade' ? 'selected' : ''}>${t.optionTransitionFade || 'Crossfade'}</option>
             <option value="SlideLeft" ${transitionEffectVal === 'SlideLeft' ? 'selected' : ''}>${t.optionTransitionSlideLeft || 'Slide Left'}</option>
             <option value="SlideRight" ${transitionEffectVal === 'SlideRight' ? 'selected' : ''}>${t.optionTransitionSlideRight || 'Slide Right'}</option>
@@ -5768,7 +6208,7 @@
             <span class="media-bar-select-label">${t.progressBarLocationLabel || 'Progress Bar Location'}</span>
             <span class="media-bar-select-desc">${t.progressBarLocationDesc || 'Select where to render the slide progress bar.'}</span>
         </div>
-        <select id="mb-setting-progressBarLocation" class="media-bar-select">
+        <select id="mb-setting-progressBarLocation" class="media-bar-select" tabindex="0">
             <option value="Dots" ${this.getSetting('progressBarLocation', CONFIG.progressBarLocation) === 'Dots' ? 'selected' : ''}>${t.progressBarLocationDots || 'Under Dots/Counter'}</option>
             <option value="Navbar" ${this.getSetting('progressBarLocation', CONFIG.progressBarLocation) === 'Navbar' ? 'selected' : ''}>${t.progressBarLocationNavbar || 'Top (Under Header)'}</option>
         </select>
@@ -5782,10 +6222,10 @@
     </div> <!-- .media-bar-settings-body -->
 
     <div class="media-bar-settings-buttons">
-        <button type="button" class="media-bar-btn media-bar-btn-cancel" id="mb-settings-reset" title="${t.resetTitle}">
+        <button type="button" class="media-bar-btn media-bar-btn-cancel" id="mb-settings-reset" title="${t.resetTitle}" tabindex="0">
             <span>${t.resetBtn}</span>
         </button>
-        <button type="button" class="media-bar-btn media-bar-btn-submit" id="mb-settings-save">
+        <button type="button" class="media-bar-btn media-bar-btn-submit" id="mb-settings-save" tabindex="0">
             <span>${t.saveBtn}</span>
         </button>
     </div>
@@ -5800,18 +6240,32 @@
 
       popup.innerHTML = html;
 
-      // Close button for mobile accessibility
+      // Close button for mobile & TV accessibility
       const closeBtn = document.createElement('button');
       closeBtn.type = 'button';
       closeBtn.className = 'media-bar-settings-close-button';
       closeBtn.setAttribute('aria-label', 'Close');
+      closeBtn.setAttribute('tabindex', '0');
       closeBtn.innerHTML = '<svg style="width: 16px; height: 16px; fill: currentColor;" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>';
       closeBtn.addEventListener('click', () => {
-        popup.remove();
-        if (overlay) overlay.remove();
-        document.removeEventListener('click', closeHandler);
+        closePopupFunc();
       });
       popup.appendChild(closeBtn);
+
+      // Keyboard switch toggle support for TV remotes
+      popup.querySelectorAll('.media-bar-switch').forEach(label => {
+        label.addEventListener('keydown', (e) => {
+          if (e.key === ' ' || e.key === 'Enter' || e.keyCode === 32 || e.keyCode === 13) {
+            const input = label.querySelector('input[type="checkbox"]');
+            if (input) {
+              input.checked = !input.checked;
+              input.dispatchEvent(new Event('change', { bubbles: true }));
+              e.preventDefault();
+              e.stopPropagation();
+            }
+          }
+        });
+      });
 
       // Client tab switcher
       const tabButtons = popup.querySelectorAll('.media-bar-client-tab');
@@ -5828,6 +6282,151 @@
           }
         });
       });
+
+      const closePopupFunc = () => {
+        popup.remove();
+        if (overlay) overlay.remove();
+        document.removeEventListener('click', closeHandler);
+        document.removeEventListener('focusin', popupFocusListener);
+        document.removeEventListener('keydown', keydownCloseHandler);
+        if (anchorElement && typeof anchorElement.focus === 'function') {
+          anchorElement.focus();
+        }
+      };
+
+      const popupFocusListener = (e) => {
+        if (document.body.contains(popup) && !popup.contains(e.target) && e.target !== anchorElement && (!anchorElement || !anchorElement.contains(e.target))) {
+          closePopupFunc();
+        }
+      };
+      setTimeout(() => {
+        document.addEventListener('focusin', popupFocusListener);
+      }, 150);
+
+      const isTvDevice = window.browser && window.browser.tv;
+      const isTvLayout = window.layoutManager && window.layoutManager.tv;
+      const hasTvClass = document.documentElement.classList.contains('layout-tv') || document.body.classList.contains('layout-tv');
+      const isTvMode = isTvDevice || isTvLayout || hasTvClass;
+
+      if (isTvMode) {
+        popup.classList.add('media-bar-tv-mode');
+
+        // Set initial focus to the first active tab in TV mode
+        setTimeout(() => {
+          const activeTab = popup.querySelector('.media-bar-client-tab.active');
+          if (activeTab) activeTab.focus();
+        }, 50);
+
+        // Full D-pad arrow key navigation inside popup (TV mode only)
+        popup.addEventListener('keydown', (e) => {
+          const active = document.activeElement;
+          if (!active || !popup.contains(active)) return;
+
+          const activeTabContent = popup.querySelector('.media-bar-client-tab-content:not([style*="display: none"])');
+          const focusableInTab = activeTabContent ? Array.from(activeTabContent.querySelectorAll('.media-bar-switch, .media-bar-select, select, input, button')).filter(el => {
+            const style = window.getComputedStyle(el);
+            return el.offsetWidth > 0 && el.offsetHeight > 0 && style.display !== 'none' && style.visibility !== 'hidden';
+          }) : [];
+
+          const tabButtons = Array.from(popup.querySelectorAll('.media-bar-client-tab'));
+          const actionButtons = Array.from(popup.querySelectorAll('.media-bar-settings-buttons button, .media-bar-settings-close-button'));
+
+          if (active.classList.contains('media-bar-client-tab')) {
+            const idx = tabButtons.indexOf(active);
+            if (e.key === 'ArrowRight' && idx < tabButtons.length - 1) {
+              tabButtons[idx + 1].focus();
+              tabButtons[idx + 1].click();
+              e.preventDefault();
+              e.stopPropagation();
+            } else if (e.key === 'ArrowLeft' && idx > 0) {
+              tabButtons[idx - 1].focus();
+              tabButtons[idx - 1].click();
+              e.preventDefault();
+              e.stopPropagation();
+            } else if ((e.key === 'ArrowLeft' && idx === 0) || e.key === 'ArrowUp') {
+              // Going Left on the 1st tab or Up on any tab closes the modal!
+              closePopupFunc();
+              e.preventDefault();
+              e.stopPropagation();
+            } else if (e.key === 'Enter' || e.key === ' ' || e.keyCode === 13 || e.keyCode === 32) {
+              // Pressing Enter confirms the tab selection and enters the settings inside
+              active.click();
+              if (focusableInTab.length > 0) {
+                focusableInTab[0].focus();
+                e.preventDefault();
+                e.stopPropagation();
+              }
+            } else if (e.key === 'ArrowDown') {
+              if (focusableInTab.length > 0) {
+                focusableInTab[0].focus();
+                e.preventDefault();
+                e.stopPropagation();
+              } else if (actionButtons.length > 0) {
+                actionButtons[0].focus();
+                e.preventDefault();
+                e.stopPropagation();
+              }
+            }
+          } else if (focusableInTab.includes(active)) {
+            const idx = focusableInTab.indexOf(active);
+
+            if (active.tagName === 'SELECT' || active.classList.contains('media-bar-select')) {
+              if (e.key === 'Enter' || e.key === ' ' || e.keyCode === 13 || e.keyCode === 32) {
+                try {
+                  if (typeof active.showPicker === 'function') {
+                    active.showPicker();
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return;
+                  }
+                } catch (err) { }
+              }
+            }
+
+            if (e.key === 'ArrowDown') {
+              if (idx < focusableInTab.length - 1) {
+                focusableInTab[idx + 1].focus();
+                e.preventDefault();
+                e.stopPropagation();
+              } else if (actionButtons.length > 0) {
+                actionButtons[0].focus();
+                e.preventDefault();
+                e.stopPropagation();
+              }
+            } else if (e.key === 'ArrowUp') {
+              if (idx > 0) {
+                focusableInTab[idx - 1].focus();
+                e.preventDefault();
+                e.stopPropagation();
+              } else {
+                const currentTabBtn = popup.querySelector('.media-bar-client-tab.active');
+                if (currentTabBtn) currentTabBtn.focus();
+                e.preventDefault();
+                e.stopPropagation();
+              }
+            }
+          } else if (actionButtons.includes(active)) {
+            const idx = actionButtons.indexOf(active);
+            if (e.key === 'ArrowRight' && idx < actionButtons.length - 1) {
+              actionButtons[idx + 1].focus();
+              e.preventDefault();
+              e.stopPropagation();
+            } else if (e.key === 'ArrowLeft' && idx > 0) {
+              actionButtons[idx - 1].focus();
+              e.preventDefault();
+              e.stopPropagation();
+            } else if (e.key === 'ArrowUp') {
+              const currentTabBtn = popup.querySelector('.media-bar-client-tab.active');
+              if (currentTabBtn) currentTabBtn.focus();
+              e.preventDefault();
+              e.stopPropagation();
+            } else if (e.key === 'ArrowDown') {
+              // Pressing Down Arrow from action buttons closes popup!
+              closePopupFunc();
+            }
+          }
+        });
+      }
 
       // Add Listeners
       const allSwitches = [...generalSettings, ...trailerSettings];
@@ -5919,21 +6518,28 @@
         }
       });
 
-      const closeHandler = (e) => {
-        if (!popup.contains(e.target) && e.target !== anchorElement && !anchorElement.contains(e.target)) {
-          popup.remove();
-          if (overlay) overlay.remove();
-          document.removeEventListener('click', closeHandler);
+
+
+      const keydownCloseHandler = (e) => {
+        if (e.key === 'Escape' || e.key === 'Back' || e.key === 'GoBack' || e.keyCode === 27 || e.keyCode === 10009 || e.keyCode === 461) {
+          closePopupFunc();
+          e.preventDefault();
+          e.stopPropagation();
         }
       };
-      setTimeout(() => document.addEventListener('click', closeHandler), 150);
+
+      const closeHandler = (e) => {
+        if (!popup.contains(e.target) && e.target !== anchorElement && !anchorElement.contains(e.target)) {
+          closePopupFunc();
+        }
+      };
+      setTimeout(() => {
+        document.addEventListener('click', closeHandler);
+        document.addEventListener('keydown', keydownCloseHandler);
+      }, 150);
 
       if (overlay) {
-        overlay.addEventListener('click', () => {
-          popup.remove();
-          overlay.remove();
-          document.removeEventListener('click', closeHandler);
-        });
+        overlay.addEventListener('click', closePopupFunc);
       }
 
       // Fetch and render libraries tab
@@ -5942,7 +6548,7 @@
         if (!container) return;
 
         try {
-          const viewsUrl = `${STATE.jellyfinData.serverAddress}/Items?IncludeItemTypes=CollectionFolder&userId=${STATE.jellyfinData.userId}`;
+          const viewsUrl = `${STATE.jellyfinData.serverAddress}/Users/${STATE.jellyfinData.userId}/Views`;
           const viewsResponse = await fetch(viewsUrl, { headers: ApiUtils.getAuthHeaders() });
           if (!viewsResponse.ok) throw new Error("Failed to fetch views");
           const viewsData = await viewsResponse.json();
