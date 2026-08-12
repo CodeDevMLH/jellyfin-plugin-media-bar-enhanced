@@ -183,7 +183,10 @@
       toastMuted: 'Muted',
       toastUnmuted: 'Audio On',
       toastPaused: 'Slideshow Paused',
-      toastResumed: 'Slideshow Resumed'
+      toastResumed: 'Slideshow Resumed',
+      seasonPrefix: 'Season {0}: ',
+      episodePrefix: 'Episode {0}: ',
+      seasonEpisodePrefix: 'Season {0}, Episode {1}: '
     },
     'de': {
       title: 'Media Bar Einstellungen',
@@ -252,7 +255,10 @@
       toastMuted: 'Stumm geschaltet',
       toastUnmuted: 'Ton aktiviert',
       toastPaused: 'Diashow pausiert',
-      toastResumed: 'Diashow fortgesetzt'
+      toastResumed: 'Diashow fortgesetzt',
+      seasonPrefix: 'Staffel {0}: ',
+      episodePrefix: 'Folge {0}: ',
+      seasonEpisodePrefix: 'Staffel {0}, Folge {1}: '
     },
     'es': {
       title: 'Ajustes de Media Bar',
@@ -321,7 +327,10 @@
       toastMuted: 'Silenciado',
       toastUnmuted: 'Sonido activado',
       toastPaused: 'Diapositivas en pausa',
-      toastResumed: 'Diapositivas en reproducción'
+      toastResumed: 'Diapositivas en reproducción',
+      seasonPrefix: 'Temporada {0}: ',
+      episodePrefix: 'Episodio {0}: ',
+      seasonEpisodePrefix: 'Temporada {0}, Episodio {1}: '
     },
     'fr': {
       title: 'Paramètres de Media Bar',
@@ -390,7 +399,10 @@
       toastMuted: 'Muet',
       toastUnmuted: 'Son activé',
       toastPaused: 'Diaporama en pause',
-      toastResumed: 'Reprise du diaporama'
+      toastResumed: 'Reprise du diaporama',
+      seasonPrefix: 'Saison {0}: ',
+      episodePrefix: 'Épisode {0}: ',
+      seasonEpisodePrefix: 'Saison {0}, Épisode {1}: '
     },
     'it': {
       title: 'Impostazioni Media Bar',
@@ -459,7 +471,10 @@
       toastMuted: 'Disattivato',
       toastUnmuted: 'Audio attivato',
       toastPaused: 'Presentazione in pausa',
-      toastResumed: 'Presentazione ripresa'
+      toastResumed: 'Presentazione ripresa',
+      seasonPrefix: 'Stagione {0}: ',
+      episodePrefix: 'Episodio {0}: ',
+      seasonEpisodePrefix: 'Stagione {0}, Episodio {1}: '
     }
   };
 
@@ -1257,21 +1272,8 @@
         className: 'video-modal-content'
       });
 
-      let videoId = null;
-      let isYoutube = false;
-
-      try {
-        const urlObj = new URL(url);
-        if (urlObj.hostname.includes('youtube.com') || urlObj.hostname.includes('youtu.be')) {
-          isYoutube = true;
-          videoId = urlObj.searchParams.get('v');
-          if (!videoId && urlObj.hostname.includes('youtu.be')) {
-            videoId = urlObj.pathname.substring(1);
-          }
-        }
-      } catch (e) {
-        console.warn("🎬 Media Bar:", "Invalid URL for modal:", url);
-      }
+      const videoId = ApiUtils.extractYouTubeId(url);
+      const isYoutube = !!videoId;
 
       if (isYoutube && videoId) {
         const ytIframe = this.createElement('iframe', {
@@ -1569,14 +1571,19 @@
       return translated;
     },
 
-    getCustomLocalizedString(key, fallback) {
+    getCustomLocalizedString(key, fallback, ...args) {
       let locale = this.cachedLocale || 'en';
       locale = locale.split('-')[0].toLowerCase();
       const dict = CLIENT_MENU_TRANSLATIONS[locale] || CLIENT_MENU_TRANSLATIONS['en'];
-      if (dict && dict[key]) {
-        return dict[key];
+      let translated = (dict && dict[key]) || this.getLocalizedString(key, fallback);
+
+      if (args.length > 0) {
+        for (let i = 0; i < args.length; i++) {
+          translated = translated.replace(new RegExp(`\\{${i}\\}`, 'g'), args[i]);
+        }
       }
-      return this.getLocalizedString(key, fallback);
+
+      return translated;
     }
   };
 
@@ -1608,6 +1615,42 @@
         }
 
         const itemData = await response.json();
+
+        // If Season or Episode, inherit missing metadata (Genres, Ratings, SeriesName, Logo) from parent Series
+        if ((itemData.Type === "Season" || itemData.Type === "Episode") && itemData.SeriesId) {
+          try {
+            const parentSeries = await this.fetchItemDetails(itemData.SeriesId);
+            if (parentSeries) {
+              if ((!itemData.Genres || itemData.Genres.length === 0) && parentSeries.Genres) {
+                itemData.Genres = parentSeries.Genres;
+              }
+              if (itemData.CommunityRating === undefined && parentSeries.CommunityRating !== undefined) {
+                itemData.CommunityRating = parentSeries.CommunityRating;
+              }
+              if (itemData.CriticRating === undefined && parentSeries.CriticRating !== undefined) {
+                itemData.CriticRating = parentSeries.CriticRating;
+              }
+              if (itemData.OfficialRating === undefined && parentSeries.OfficialRating !== undefined) {
+                itemData.OfficialRating = parentSeries.OfficialRating;
+              }
+              if (!itemData.PremiereDate && parentSeries.PremiereDate) {
+                itemData.PremiereDate = parentSeries.PremiereDate;
+              }
+              if (!itemData.ProductionYear && parentSeries.ProductionYear) {
+                itemData.ProductionYear = parentSeries.ProductionYear;
+              }
+              if (!itemData.SeriesName && parentSeries.Name) {
+                itemData.SeriesName = parentSeries.Name;
+              }
+              if (!itemData.ParentLogoImageTag && parentSeries.ImageTags && parentSeries.ImageTags.Logo) {
+                itemData.ParentLogoImageTag = parentSeries.ImageTags.Logo;
+                itemData.ParentLogoItemId = parentSeries.Id;
+              }
+            }
+          } catch (e) {
+            console.warn("🎬 Media Bar:", `Could not fetch parent series ${itemData.SeriesId} for metadata inheritance:`, e);
+          }
+        }
 
         STATE.slideshow.loadedItems[itemId] = itemData;
 
@@ -2204,8 +2247,8 @@
      * @param {string} videoId - YouTube Video ID
      * @returns {Promise<Object>} Object containing segments, calculated start time and end time
      */
-    async fetchSponsorBlockData(videoId) {
-      if (!CONFIG.useSponsorBlock) return { segments: [], startTime: 0, endTime: null };
+    async fetchSponsorBlockData(videoId, retries = 3) {
+      if (!CONFIG.useSponsorBlock || !videoId) return { segments: [], startTime: 0, endTime: null };
 
       // Return cached result if available
       if (!this._sponsorBlockCache) this._sponsorBlockCache = {};
@@ -2213,52 +2256,78 @@
         return this._sponsorBlockCache[videoId];
       }
 
-      try {
-        const categories = CONFIG.sponsorBlockCategories || "intro,outro,preview";
-        const catArray = categories.split(',').map(c => c.trim()).filter(Boolean);
-        const catParam = encodeURIComponent(JSON.stringify(catArray));
-        const response = await fetch(`https://sponsor.ajay.app/api/skipSegments?videoID=${videoId}&categories=${catParam}`);
-        if (!response.ok) {
-          const result = { segments: [], startTime: 0, endTime: null };
-          this._sponsorBlockCache[videoId] = result;
-          return result;
-        }
+      const categories = CONFIG.sponsorBlockCategories || "intro,outro,preview";
+      const catArray = categories.split(',').map(c => c.trim()).filter(Boolean);
+      const catParam = encodeURIComponent(JSON.stringify(catArray));
+      const url = `https://sponsor.ajay.app/api/skipSegments?videoID=${videoId}&categories=${catParam}`;
 
-        const segments = await response.json();
+      for (let attempt = 1; attempt <= retries; attempt++) {
+        try {
+          const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+          const timeoutId = controller ? setTimeout(() => controller.abort(), 3500) : null;
 
-        // 1. Calculate combined start skip (chaining from 0)
-        let startTime = 0;
-        let changed = true;
-        while (changed) {
-          changed = false;
-          for (const segment of segments) {
-            if (Array.isArray(segment.segment)) {
-              const segStart = segment.segment[0];
-              const segEnd = segment.segment[1];
-              if (segStart <= startTime + 1.5 && segEnd > startTime) {
-                startTime = segEnd;
-                changed = true;
-                break;
+          const fetchOptions = controller ? { signal: controller.signal } : {};
+          const response = await fetch(url, fetchOptions);
+          if (timeoutId) clearTimeout(timeoutId);
+
+          if (response.status === 404) {
+            // Video has no SponsorBlock segments - cache negative result
+            const result = { segments: [], startTime: 0, endTime: null };
+            this._sponsorBlockCache[videoId] = result;
+            return result;
+          }
+
+          if (!response.ok) {
+            console.warn("🎬 Media Bar:", `SponsorBlock API returned HTTP ${response.status} (attempt ${attempt}/${retries})`);
+            if (attempt < retries) {
+              await new Promise(res => setTimeout(res, attempt * 400));
+              continue;
+            }
+            // Do NOT cache 5xx / 429 server errors permanently
+            return { segments: [], startTime: 0, endTime: null };
+          }
+
+          const segments = await response.json();
+
+          // 1. Calculate combined start skip (chaining from 0)
+          let startTime = 0;
+          let changed = true;
+          while (changed) {
+            changed = false;
+            for (const segment of segments) {
+              if (Array.isArray(segment.segment)) {
+                const segStart = segment.segment[0];
+                const segEnd = segment.segment[1];
+                if (segStart <= startTime + 1.5 && segEnd > startTime) {
+                  startTime = segEnd;
+                  changed = true;
+                  break;
+                }
               }
             }
           }
-        }
 
-        // 2. Find end skip (outro or other end segments)
-        let endTime = null;
-        segments.forEach(segment => {
-          if (segment.category === "outro" && Array.isArray(segment.segment)) {
-            endTime = segment.segment[0];
+          // 2. Find end skip (outro or other end segments)
+          let endTime = null;
+          segments.forEach(segment => {
+            if (segment.category === "outro" && Array.isArray(segment.segment)) {
+              endTime = segment.segment[0];
+            }
+          });
+
+          const result = { segments, startTime, endTime };
+          this._sponsorBlockCache[videoId] = result;
+          return result;
+        } catch (error) {
+          console.warn("🎬 Media Bar:", `SponsorBlock fetch attempt ${attempt}/${retries} failed for ${videoId}:`, error.name === 'AbortError' ? 'Timeout' : error.message);
+          if (attempt < retries) {
+            await new Promise(res => setTimeout(res, attempt * 400));
           }
-        });
-
-        const result = { segments, startTime, endTime };
-        this._sponsorBlockCache[videoId] = result;
-        return result;
-      } catch (error) {
-        console.warn("🎬 Media Bar:", 'Error fetching SponsorBlock data:', error);
-        return { segments: [], startTime: 0, endTime: null };
+        }
       }
+
+      // If all retries failed due to network error/timeout, return empty without permanently caching
+      return { segments: [], startTime: 0, endTime: null };
     },
 
     /**
@@ -2330,26 +2399,158 @@
     },
 
     /**
-     * Fetches the first local trailer for an item
-     * @param {string} itemId - Item ID
-     * @returns {Promise<Object|null>} Trailer data object {id, url} or null
+     * Extracts YouTube Video ID from any YouTube URL (watch, embed, short links)
+     * @param {string|Object} url - YouTube URL or trailer object
+     * @returns {string|null} 11-character YouTube video ID or null
      */
-    async fetchLocalTrailer(itemId) {
+    extractYouTubeId(url) {
+      if (!url) return null;
       try {
-        const response = await fetch(
-          `${STATE.jellyfinData.serverAddress}/Users/${STATE.jellyfinData.userId}/Items/${itemId}/LocalTrailers`,
-          {
-            headers: this.getAuthHeaders(),
-          }
-        );
+        const urlToCheck = typeof url === 'object' && url.url ? url.url : url;
+        const urlObj = new URL(urlToCheck);
+        const host = urlObj.hostname.replace(/^www\./, "");
 
-        if (!response.ok) {
-          return null;
+        let videoId = null;
+        if (host === "youtu.be") {
+          const pathId = urlObj.pathname.split("/")[1] || urlObj.pathname.substring(1);
+          videoId = pathId ? pathId.split("?")[0] : null;
+        } else if ((host === "youtube.com" || host === "m.youtube.com" || host === "youtube-nocookie.com") && urlObj.pathname.startsWith("/embed/")) {
+          videoId = urlObj.pathname.split("/")[2] || null;
+        } else if (host.includes("youtube.com") || host.includes("youtu.be") || host.includes("youtube-nocookie.com")) {
+          videoId = urlObj.searchParams.get("v") || null;
         }
 
-        const trailers = await response.json();
-        if (trailers && trailers.length > 0) {
+        if (!videoId) {
+          console.warn("🎬 Media Bar:", "Could not extract YouTube Video ID from URL:", urlToCheck);
+        }
+        return videoId;
+      } catch (e) {
+        console.warn("🎬 Media Bar:", "Failed to parse YouTube URL:", url, e);
+      }
+      return null;
+    },
 
+    /**
+     * Ranks and selects the best remote trailer URL from item.RemoteTrailers
+     * @param {Array} remoteTrailers - RemoteTrailers array from item
+     * @returns {string|null} Best trailer URL or null
+     */
+    selectBestRemoteTrailer(remoteTrailers) {
+      if (!Array.isArray(remoteTrailers) || remoteTrailers.length === 0) {
+        return null;
+      }
+
+      const alternateCutTerms = [
+        "sign language", "asl trailer", "audio description",
+        "audio described", "described audio", "vertical"
+      ];
+
+      const rankName = (name) => {
+        const text = (name || "").toLowerCase();
+        const isAlternateCut = alternateCutTerms.some((term) => text.includes(term));
+
+        let rank;
+        if (text.includes("official trailer")) rank = 5;
+        else if (text.includes("final trailer") || text.includes("main trailer")) rank = 4;
+        else if (text.includes("trailer")) rank = 3;
+        else if (text.includes("teaser")) rank = 2;
+        else rank = 1;
+
+        return isAlternateCut ? rank - 0.5 : rank;
+      };
+
+      let best = null;
+
+      for (const trailer of remoteTrailers) {
+        if (!trailer || !trailer.Url) continue;
+
+        const videoId = this.extractYouTubeId(trailer.Url);
+        if (!videoId) continue;
+
+        const rank = rankName(trailer.Name);
+        if (!best || rank > best.rank) {
+          best = { url: trailer.Url, rank };
+        }
+      }
+
+      return best ? best.url : remoteTrailers[0].Url;
+    },
+
+    /**
+     * Fetches the first local trailer for an item
+     * @param {Object|string} itemOrId - Item object or ID
+     * @returns {Promise<Object|null>} Trailer data object {id, url} or null
+     */
+    async fetchLocalTrailer(itemOrId) {
+      try {
+        const item = typeof itemOrId === 'object' ? itemOrId : null;
+        const itemId = item ? item.Id : itemOrId;
+        const seriesId = item ? item.SeriesId : null;
+        const seasonId = item ? item.SeasonId : null;
+        const itemType = item ? item.Type : null;
+
+        let trailers = null;
+
+        // 1. If Episode: check Season first (if seasonId exists), then Series
+        if (itemType === 'Episode') {
+          if (seasonId) {
+            const response = await fetch(
+              `${STATE.jellyfinData.serverAddress}/Users/${STATE.jellyfinData.userId}/Items/${seasonId}/LocalTrailers`,
+              { headers: this.getAuthHeaders() }
+            );
+            if (response.ok) {
+              trailers = await response.json();
+            }
+          }
+          if ((!trailers || trailers.length === 0) && seriesId) {
+            const response = await fetch(
+              `${STATE.jellyfinData.serverAddress}/Users/${STATE.jellyfinData.userId}/Items/${seriesId}/LocalTrailers`,
+              { headers: this.getAuthHeaders() }
+            );
+            if (response.ok) {
+              trailers = await response.json();
+            }
+          }
+        }
+        // 2. If Season: check Season first, then Series
+        else if (itemType === 'Season') {
+          let response = await fetch(
+            `${STATE.jellyfinData.serverAddress}/Users/${STATE.jellyfinData.userId}/Items/${itemId}/LocalTrailers`,
+            { headers: this.getAuthHeaders() }
+          );
+          trailers = response.ok ? await response.json() : null;
+
+          if ((!trailers || trailers.length === 0) && seriesId) {
+            response = await fetch(
+              `${STATE.jellyfinData.serverAddress}/Users/${STATE.jellyfinData.userId}/Items/${seriesId}/LocalTrailers`,
+              { headers: this.getAuthHeaders() }
+            );
+            if (response.ok) {
+              trailers = await response.json();
+            }
+          }
+        }
+        // 3. For Series or Movie: check primary item ID directly
+        else {
+          const response = await fetch(
+            `${STATE.jellyfinData.serverAddress}/Users/${STATE.jellyfinData.userId}/Items/${itemId}/LocalTrailers`,
+            { headers: this.getAuthHeaders() }
+          );
+          trailers = response.ok ? await response.json() : null;
+
+          if ((!trailers || trailers.length === 0) && (seasonId || seriesId)) {
+            const fallbackId = seasonId || seriesId;
+            const fbResp = await fetch(
+              `${STATE.jellyfinData.serverAddress}/Users/${STATE.jellyfinData.userId}/Items/${fallbackId}/LocalTrailers`,
+              { headers: this.getAuthHeaders() }
+            );
+            if (fbResp.ok) {
+              trailers = await fbResp.json();
+            }
+          }
+        }
+
+        if (trailers && trailers.length > 0) {
           let trailer;
           if (CONFIG.randomizeLocalTrailers && trailers.length > 1) {
             const randomIndex = Math.floor(Math.random() * trailers.length);
@@ -2368,7 +2569,7 @@
         }
         return null;
       } catch (error) {
-        console.error("🎬 Media Bar:", `Error fetching local trailer for ${itemId}:`, error);
+        console.error("🎬 Media Bar:", `Error fetching local trailer for ${itemOrId}:`, error);
         return null;
       }
     },
@@ -2596,7 +2797,7 @@
      * @returns {string} Image URL with tag parameter (and quality if tag available), or quality-only fallback
      */
     buildImageUrl(item, imageType, index, serverAddress, quality) {
-      const itemId = item.Id;
+      let itemId = item.Id;
       let tag = null;
 
       // Handle Backdrop images
@@ -2616,6 +2817,13 @@
         // For other image types (Logo, Primary, etc.), use ImageTags
         if (item.ImageTags && item.ImageTags[imageType]) {
           tag = item.ImageTags[imageType];
+        } else if (imageType === "Logo" && item.ParentLogoImageTag) {
+          tag = item.ParentLogoImageTag;
+          if (item.ParentLogoItemId) {
+            itemId = item.ParentLogoItemId;
+          } else if (item.SeriesId) {
+            itemId = item.SeriesId;
+          }
         }
       }
 
@@ -2723,18 +2931,18 @@
         console.log("🎬 Media Bar:", `Using theme video (local backdrop) for ${itemId}: ${trailerUrl.url || trailerUrl}`);
       }
       // 1c. Check Local Trailer if preferred or restricted to only local
-      else if ((CONFIG.preferLocalTrailers || onlyLocal) && item.LocalTrailerCount > 0 && item.localTrailerUrl) {
+      else if ((CONFIG.preferLocalTrailers || onlyLocal) && item.localTrailerUrl) {
         trailerUrl = item.localTrailerUrl;
-        console.log("🎬 Media Bar:", `Using local trailer for ${itemId}: ${trailerUrl}`);
+        console.log("🎬 Media Bar:", `Using local trailer for ${itemId}: ${trailerUrl.url || trailerUrl}`);
       }
       // 1d. Fallback to Remote Trailer (only if not restricted to only local)
       else if (!onlyLocal && item.RemoteTrailers && item.RemoteTrailers.length > 0) {
-        trailerUrl = item.RemoteTrailers[0].Url;
+        trailerUrl = ApiUtils.selectBestRemoteTrailer(item.RemoteTrailers);
       }
       // 1e. Final Fallback to Local Trailer (even if not preferred)
-      else if (item.LocalTrailerCount > 0 && item.localTrailerUrl) {
+      else if (item.localTrailerUrl) {
         trailerUrl = item.localTrailerUrl;
-        console.log("🎬 Media Bar:", `Using local trailer fallback for ${itemId}: ${trailerUrl}`);
+        console.log("🎬 Media Bar:", `Using local trailer fallback for ${itemId}: ${trailerUrl.url || trailerUrl}`);
       }
 
       const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
@@ -2748,26 +2956,8 @@
       if (trailerUrl && shouldPlayVideo) {
         STATE.slideshow.hasTrailer = STATE.slideshow.hasTrailer || {};
         STATE.slideshow.hasTrailer[itemId] = true;
-        let isYoutube = false;
-        let videoId = null;
-
-        try {
-          let urlToCheck = trailerUrl;
-          if (typeof trailerUrl === 'object' && trailerUrl.url) {
-            urlToCheck = trailerUrl.url;
-          }
-
-          const urlObjChecked = new URL(urlToCheck);
-          if (urlObjChecked.hostname.includes('youtube.com') || urlObjChecked.hostname.includes('youtu.be')) {
-            isYoutube = true;
-            videoId = urlObjChecked.searchParams.get('v');
-            if (!videoId && urlObjChecked.hostname.includes('youtu.be')) {
-              videoId = urlObjChecked.pathname.substring(1);
-            }
-          }
-        } catch (e) {
-          console.warn("🎬 Media Bar:", "Invalid trailer URL:", trailerUrl);
-        }
+        let videoId = ApiUtils.extractYouTubeId(trailerUrl);
+        let isYoutube = !!videoId;
 
         const isLowPower = isLowPowerDevice();
         const isIOSApp = /iPhone|iPad|iPod/i.test(navigator.userAgent);
@@ -3191,7 +3381,10 @@
         backdropContainer.appendChild(videoBackdrop);
       }
 
-      const hasLogo = !!(item.ImageTags && item.ImageTags.Logo);
+      const hasLogo = !!(
+        (item.ImageTags && item.ImageTags.Logo) ||
+        item.ParentLogoImageTag
+      );
 
       const logoContainer = SlideUtils.createElement("div", {
         className: "logo-container",
@@ -3199,7 +3392,10 @@
 
       // Helper to create the title fallback only when needed (optimization)
       const createTitleFallback = () => {
-        const titleText = item.Name || "";
+        let titleText = item.Name || "";
+        if ((item.Type === "Season" || item.Type === "Episode") && item.SeriesName) {
+          titleText = `${item.SeriesName} - ${item.Name}`;
+        }
         // Break the title into a new line after a colon or hyphen/dash if followed by a space
         let formattedTitle = titleText
           .replace(/:\s+/g, ':<br>')
@@ -3247,7 +3443,20 @@
         title
       );
 
-      const plot = item.Overview || "No overview available";
+      let plot = item.Overview || "No overview available";
+      if (item.Type === "Season" && item.IndexNumber != null) {
+        const prefix = LocalizationUtils.getCustomLocalizedString('seasonPrefix', 'Season {0}: ', item.IndexNumber);
+        plot = prefix + plot;
+      } else if (item.Type === "Episode") {
+        if (item.ParentIndexNumber != null && item.IndexNumber != null) {
+          const prefix = LocalizationUtils.getCustomLocalizedString('seasonEpisodePrefix', 'Season {0}, Episode {1}: ', item.ParentIndexNumber, item.IndexNumber);
+          plot = prefix + plot;
+        } else if (item.IndexNumber != null) {
+          const prefix = LocalizationUtils.getCustomLocalizedString('episodePrefix', 'Episode {0}: ', item.IndexNumber);
+          plot = prefix + plot;
+        }
+      }
+
       const plotElement = SlideUtils.createElement(
         "div",
         {
@@ -3383,7 +3592,7 @@
           const milliseconds = runtime / 10000;
           const currentTime = new Date();
           const endTime = new Date(currentTime.getTime() + milliseconds);
-          const options = { hour: "2-digit", minute: "2-digit", hour12: false };
+          const options = { hour: "2-digit", minute: "2-digit" };
           const formattedEndTime = endTime.toLocaleTimeString([], options);
           const endsAtText = LocalizationUtils.getLocalizedString('EndsAtValue', 'Ends at {0}', formattedEndTime);
           container.innerText = endsAtText;
@@ -3540,13 +3749,23 @@
 
         // Pre-fetch local trailer URL if needed
         const onlyLocal = MediaBarEnhancedSettingsManager.getSetting('onlyLocalTrailers', CONFIG.onlyLocalTrailers);
-        if ((CONFIG.preferLocalTrailers || onlyLocal) && item.LocalTrailerCount > 0) {
-          item.localTrailerUrl = await ApiUtils.fetchLocalTrailer(itemId);
+        const canHaveLocalTrailer = (item.LocalTrailerCount && item.LocalTrailerCount > 0) ||
+          item.Type === 'Series' || item.Type === 'Season' || item.Type === 'Episode';
+        if (CONFIG.preferLocalTrailers || onlyLocal || canHaveLocalTrailer) {
+          item.localTrailerUrl = await ApiUtils.fetchLocalTrailer(item);
         }
 
         // Pre-fetch theme video URL if needed
         if (CONFIG.preferLocalBackdrops) {
           item.themeVideoUrl = await ApiUtils.fetchThemeVideos(itemId);
+        }
+
+        // Pre-fetch SponsorBlock data early for remote YouTube trailers
+        if (CONFIG.useSponsorBlock && !onlyLocal && item.RemoteTrailers && item.RemoteTrailers.length > 0) {
+          const ytId = ApiUtils.extractYouTubeId(item.RemoteTrailers[0].Url);
+          if (ytId) {
+            ApiUtils.fetchSponsorBlockData(ytId); // Trigger background pre-fetch into cache
+          }
         }
 
         const slideElement = this.createSlideElement(
