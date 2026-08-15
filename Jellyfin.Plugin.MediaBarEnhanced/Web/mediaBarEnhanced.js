@@ -30,7 +30,7 @@
   window.mediaBarEnhancedLoaded = true;
 
   // MARK: Version
-  const PLUGIN_VERSION = "3.4.0.0";
+  const PLUGIN_VERSION = "3.5.1.0";
 
   //Core Module Configuration
   const CONFIG = {
@@ -2532,11 +2532,42 @@
         }
         // 3. For Series or Movie: check primary item ID directly
         else {
-          const response = await fetch(
+          let response = await fetch(
             `${STATE.jellyfinData.serverAddress}/Users/${STATE.jellyfinData.userId}/Items/${itemId}/LocalTrailers`,
             { headers: this.getAuthHeaders() }
           );
           trailers = response.ok ? await response.json() : null;
+
+          // If Series has no direct local trailer, check child Seasons of the Series (Season 1, Season 2, etc.)
+          if ((!trailers || trailers.length === 0) && itemType === 'Series') {
+            try {
+              const seasonsResp = await fetch(
+                `${STATE.jellyfinData.serverAddress}/Shows/${itemId}/Seasons?userId=${STATE.jellyfinData.userId}`,
+                { headers: this.getAuthHeaders() }
+              );
+              if (seasonsResp.ok) {
+                const seasonsData = await seasonsResp.json();
+                const seasons = (seasonsData.Items || []).sort((a, b) => (a.IndexNumber ?? 0) - (b.IndexNumber ?? 0));
+                for (const season of seasons) {
+                  const seasonTrailersResp = await fetch(
+                    `${STATE.jellyfinData.serverAddress}/Users/${STATE.jellyfinData.userId}/Items/${season.Id}/LocalTrailers`,
+                    { headers: this.getAuthHeaders() }
+                  );
+                  if (seasonTrailersResp.ok) {
+                    const seasonTrailers = await seasonTrailersResp.json();
+                    if (seasonTrailers && seasonTrailers.length > 0) {
+                      trailers = trailers ? trailers.concat(seasonTrailers) : seasonTrailers;
+                      if (!CONFIG.randomizeLocalTrailers) {
+                        break; // Stop after finding the first available season's trailer (e.g. Season 1)
+                      }
+                    }
+                  }
+                }
+              }
+            } catch (e) {
+              console.warn("🎬 Media Bar:", `Could not fetch season trailers fallback for series ${itemId}:`, e);
+            }
+          }
 
           if ((!trailers || trailers.length === 0) && (seasonId || seriesId)) {
             const fallbackId = seasonId || seriesId;
