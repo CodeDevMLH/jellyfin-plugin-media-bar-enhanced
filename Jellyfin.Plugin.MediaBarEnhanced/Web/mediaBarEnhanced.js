@@ -30,7 +30,7 @@
   window.mediaBarEnhancedLoaded = true;
 
   // MARK: Version
-  const PLUGIN_VERSION = "3.5.1.0";
+  const PLUGIN_VERSION = "3.5.2.0";
 
   //Core Module Configuration
   const CONFIG = {
@@ -515,6 +515,8 @@
       trailerStartByItem: {},
       failsafeTimeout: null,
       isVideoPlaying: false,
+      wasOnDetailsPage: false,
+      wasHomeButtonClicked: false,
     },
   };
 
@@ -2410,23 +2412,26 @@
         const urlObj = new URL(urlToCheck);
         const host = urlObj.hostname.replace(/^www\./, "");
 
+        const isYouTubeHost = host === "youtu.be" || host.includes("youtube.com") || host.includes("youtube-nocookie.com");
+        if (!isYouTubeHost) {
+          return null; // Silent return for non-YouTube URLs (local trailers, mp4 streams, etc.)
+        }
+
         let videoId = null;
         if (host === "youtu.be") {
           const pathId = urlObj.pathname.split("/")[1] || urlObj.pathname.substring(1);
           videoId = pathId ? pathId.split("?")[0] : null;
         } else if ((host === "youtube.com" || host === "m.youtube.com" || host === "youtube-nocookie.com") && urlObj.pathname.startsWith("/embed/")) {
           videoId = urlObj.pathname.split("/")[2] || null;
-        } else if (host.includes("youtube.com") || host.includes("youtu.be") || host.includes("youtube-nocookie.com")) {
+        } else {
           videoId = urlObj.searchParams.get("v") || null;
         }
 
         if (!videoId) {
-          console.warn("🎬 Media Bar:", "Could not extract YouTube Video ID from URL:", urlToCheck);
+          console.warn("🎬 Media Bar:", "Could not extract YouTube Video ID from YouTube URL:", urlToCheck);
         }
         return videoId;
-      } catch (e) {
-        console.warn("🎬 Media Bar:", "Failed to parse YouTube URL:", url, e);
-      }
+      } catch (e) {}
       return null;
     },
 
@@ -2500,6 +2505,9 @@
             );
             if (response.ok) {
               trailers = await response.json();
+              if (trailers && trailers.length > 0) {
+                console.log("🎬 Media Bar:", `Found local trailer on season fallback (${seasonId}) for episode ${itemId}`);
+              }
             }
           }
           if ((!trailers || trailers.length === 0) && seriesId) {
@@ -2509,6 +2517,9 @@
             );
             if (response.ok) {
               trailers = await response.json();
+              if (trailers && trailers.length > 0) {
+                console.log("🎬 Media Bar:", `Found local trailer on series fallback (${seriesId}) for episode ${itemId}`);
+              }
             }
           }
         }
@@ -2527,6 +2538,9 @@
             );
             if (response.ok) {
               trailers = await response.json();
+              if (trailers && trailers.length > 0) {
+                console.log("🎬 Media Bar:", `Found local trailer on series fallback (${seriesId}) for season ${itemId}`);
+              }
             }
           }
         }
@@ -2556,6 +2570,7 @@
                   if (seasonTrailersResp.ok) {
                     const seasonTrailers = await seasonTrailersResp.json();
                     if (seasonTrailers && seasonTrailers.length > 0) {
+                      console.log("🎬 Media Bar:", `Found local trailer in season folder ${season.Name || season.Id} for series ${itemId}`);
                       trailers = trailers ? trailers.concat(seasonTrailers) : seasonTrailers;
                       if (!CONFIG.randomizeLocalTrailers) {
                         break; // Stop after finding the first available season's trailer (e.g. Season 1)
@@ -2757,11 +2772,20 @@
 
       if (isVisible && !this.wasVisible) {
         if (isTvMode()) {
-          setTimeout(() => {
-            if (container && container.style.display !== 'none') {
-              container.focus({ preventScroll: true });
-            }
-          }, 300);
+          const isReturningFromDetails = STATE.slideshow.wasOnDetailsPage;
+          const wasHomeClicked = STATE.slideshow.wasHomeButtonClicked;
+          STATE.slideshow.wasOnDetailsPage = false;
+          STATE.slideshow.wasHomeButtonClicked = false;
+
+          // Focus Media Bar on initial startup, fresh home load, or when Home button was clicked.
+          // Do not focus Media Bar when backing out from a details page via back remote/arrow.
+          if (!isReturningFromDetails || wasHomeClicked) {
+            setTimeout(() => {
+              if (container && container.style.display !== 'none') {
+                container.focus({ preventScroll: true });
+              }
+            }, 300);
+          }
         }
 
         if (STATE.slideshow.hasInitialized && STATE.slideshow.itemIds.length > 0) {
@@ -2772,6 +2796,12 @@
           SlideshowManager.resumeActivePlayback();
         }
       } else if (!isVisible && this.wasVisible) {
+        // Track if user left home screen for a details page (TV mode only)
+        if (isTvMode()) {
+          const currentHash = window.location.hash || "";
+          STATE.slideshow.wasOnDetailsPage = currentHash.includes("details") || currentHash.includes("item");
+        }
+
         if (STATE.slideshow.slideInterval) {
           STATE.slideshow.slideInterval.stop();
         }
@@ -2969,6 +2999,7 @@
       // 1d. Fallback to Remote Trailer (only if not restricted to only local)
       else if (!onlyLocal && item.RemoteTrailers && item.RemoteTrailers.length > 0) {
         trailerUrl = ApiUtils.selectBestRemoteTrailer(item.RemoteTrailers);
+        console.log("🎬 Media Bar:", `Using remote trailer for ${itemId}: ${trailerUrl}`);
       }
       // 1e. Final Fallback to Local Trailer (even if not preferred)
       else if (item.localTrailerUrl) {
@@ -5179,6 +5210,24 @@
           }
         } catch (err) { }
       });
+
+      // Listen for Home button clicks (navbar/sidebar house icon) or Home key press to redirect focus to Media Bar (TV mode only)
+      document.addEventListener("click", (e) => {
+        if (!isTvMode()) return;
+        const homeBtn = e.target.closest('a[href*="home"], .btnHeaderHome, [data-action="home"], .headerHomeButton, .navMenuOption[href*="home"]');
+        if (homeBtn) {
+          STATE.slideshow.wasHomeButtonClicked = true;
+          STATE.slideshow.wasOnDetailsPage = false;
+        }
+      }, true);
+
+      document.addEventListener("keydown", (e) => {
+        if (!isTvMode()) return;
+        if (e.key === "Home") {
+          STATE.slideshow.wasHomeButtonClicked = true;
+          STATE.slideshow.wasOnDetailsPage = false;
+        }
+      }, true);
 
       document.addEventListener("keydown", (e) => {
         const container = this.TvNavigationEngine.getContainer();
