@@ -107,8 +107,7 @@
                                     </div>
                                 </div>
                                 <div class="selectContainer" style="margin-top: 1em;">
-                                    <label class="selectLabel" for="ClientMenuLocation">Client Settings Menu
-                                        Location</label>
+                                    <label class="selectLabel" for="ClientMenuLocation">Client Settings Menu Location</label>
                                     <select is="emby-select" id="ClientMenuLocation" name="ClientMenuLocation"
                                         class="selectLayout emby-select-withcolor emby-select"
                                         style="width: 100%; -webkit-appearance: menulist; appearance: menulist;">
@@ -119,12 +118,10 @@
                                         <option value="Navbar+UserMenu">Navbar + User Menu</option>
                                         <option value="All">All Locations (Everywhere)</option>
                                     </select>
-                                    <div class="fieldDescription">Choose where the client-side settings menu can be
-                                        accessed.</div>
+                                    <div class="fieldDescription">Choose where the client-side settings menu can be accessed.</div>
                                 </div>
                                 <div class="selectContainer" style="margin-top: 1em;">
-                                    <label class="selectLabel" for="ClientMenuLocationMobile">Client Settings Menu
-                                        Location (Mobile)</label>
+                                    <label class="selectLabel" for="ClientMenuLocationMobile">Client Settings Menu Location (Mobile)</label>
                                     <select is="emby-select" id="ClientMenuLocationMobile"
                                         name="ClientMenuLocationMobile"
                                         class="selectLayout emby-select-withcolor emby-select"
@@ -136,8 +133,7 @@
                                         <option value="Navbar+UserMenu">Navbar + User Menu</option>
                                         <option value="All">All Locations (Everywhere)</option>
                                     </select>
-                                    <div class="fieldDescription">Choose where the client-side settings menu can be
-                                        accessed on mobile devices.</div>
+                                    <div class="fieldDescription">Choose where the client-side settings menu can be accessed on mobile devices.</div>
                                 </div>
                             </div>
 
@@ -413,17 +409,14 @@
                                         <input is="emby-input" type="number" id="TrailerStartOffset"
                                             name="TrailerStartOffset" min="0" />
                                         <div class="fieldDescription">Skip the first part of every trailer, e.g. a
-                                            studio logo. YouTube trailers skip in whole seconds; SponsorBlock wins if it
-                                            skips further. Default is 0 (disabled).</div>
+                                            studio logo. YouTube trailers skip in whole seconds; SponsorBlock wins if it skips further. Default is 0 (disabled).</div>
                                     </div>
                                     <div class="inputContainer">
                                         <label class="inputLabel inputLabelUnfocused" for="TrailerEndOffset">Trailer
                                             End Offset (ms)</label>
                                         <input is="emby-input" type="number" id="TrailerEndOffset"
                                             name="TrailerEndOffset" min="0" />
-                                        <div class="fieldDescription">Trim the end of every trailer, e.g. end credits.
-                                            YouTube trailers trim in whole seconds; SponsorBlock wins if it skips
-                                            further. Default is 0 (disabled).</div>
+                                        <div class="fieldDescription">Trim the end of every trailer, e.g. end credits. YouTube trailers trim in whole seconds; SponsorBlock wins if it skips further. Default is 0 (disabled).</div>
                                     </div>
                                 </div>
                             </div>
@@ -500,6 +493,14 @@
                                         </label>
                                         <div class="fieldDescription">Displays a thin progress bar representing timer
                                             duration.</div>
+                                    </div>
+                                    <div class="checkboxContainer checkboxContainer-withDescription">
+                                        <label>
+                                            <input is="emby-checkbox" type="checkbox" id="SyncPageBackdrop"
+                                                name="SyncPageBackdrop" />
+                                            <span>Sync Page Backdrop</span>
+                                        </label>
+                                        <div class="fieldDescription">Mirrors the featured slide background image into Jellyfin's page background.</div>
                                     </div>
                                 </div>
 
@@ -1252,9 +1253,6 @@
                 toggleSetting('TrailerStartOffset', isTrailerEnabled);
                 toggleSetting('TrailerEndOffset', isTrailerEnabled);
 
-
-
-
                 // 3. Custom Media IDs and Seasonal settings are kept editable per user request!
 
                 // 4. Custom Overlay settings
@@ -1324,7 +1322,7 @@
                             'CustomOverlayPositionX', 'CustomOverlayPositionY', 'CustomOverlayScale',
                             'BackdropVideoDelay', 'TrailerStartOffset', 'TrailerEndOffset', 'ConstrainPlotWidth', 'MobileCompactMode', 'DefaultTrailerVolume', 'HoverAudioFadeMs',
                             'ClientMenuLocation', 'ClientMenuLocationMobile', 'CustomPlaylists', 'TransitionEffect',
-                            'ShowProgressBar', 'ProgressBarLocation', 'ExcludedLibraries', 'YoYoProgressBar'
+                            'ShowProgressBar', 'ProgressBarLocation', 'ExcludedLibraries', 'YoYoProgressBar', 'SyncPageBackdrop'
                         ];
 
                         // Manual mapping for MediaBarIsEnabled -> IsEnabled, to avoid conflicts with other plugins
@@ -1666,7 +1664,7 @@
                         'CustomOverlayPositionX', 'CustomOverlayPositionY', 'CustomOverlayScale',
                         'BackdropVideoDelay', 'TrailerStartOffset', 'TrailerEndOffset', 'ConstrainPlotWidth', 'MobileCompactMode', 'DefaultTrailerVolume', 'HoverAudioFadeMs',
                         'ClientMenuLocation', 'ClientMenuLocationMobile', 'CustomPlaylists', 'TransitionEffect',
-                        'ShowProgressBar', 'ProgressBarLocation', 'ExcludedLibraries', 'YoYoProgressBar'
+                        'ShowProgressBar', 'ProgressBarLocation', 'ExcludedLibraries', 'YoYoProgressBar', 'SyncPageBackdrop'
                     ];
 
                     var numberDefaults = {
