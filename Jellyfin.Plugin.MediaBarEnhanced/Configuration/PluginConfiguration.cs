@@ -83,5 +83,6 @@ namespace Jellyfin.Plugin.MediaBarEnhanced.Configuration
         public string ExcludedLibraries { get; set; } = "";
         public bool OnlyLocalTrailers { get; set; } = false;
         public bool YoYoProgressBar { get; set; } = true;
+        public bool SyncPageBackdrop { get; set; } = false;
     }
 }
