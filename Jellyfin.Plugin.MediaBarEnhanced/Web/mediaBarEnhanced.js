@@ -30,7 +30,7 @@
   window.mediaBarEnhancedLoaded = true;
 
   // MARK: Version
-  const PLUGIN_VERSION = "3.5.1.0";
+  const PLUGIN_VERSION = "3.5.2.0";
 
   //Core Module Configuration
   const CONFIG = {
@@ -113,6 +113,7 @@
     excludedLibraries: "",
     onlyLocalTrailers: false,
     yoYoProgressBar: true,
+    syncPageBackdrop: false,
   };
 
   const CLIENT_MENU_TRANSLATIONS = {
@@ -180,6 +181,8 @@
       randomTrailerStartDesc: 'Start each backdrop trailer at a random time instead of the beginning (only active when "Wait For Trailer To End" is disabled). On by default for the media bar; turn off to always start from the beginning.',
       yoYoProgressBarLabel: 'Yo-Yo Progress Bar',
       yoYoProgressBarDesc: 'Empty progress bar from left to right on alternating slides instead of resetting.',
+      syncPageBackdropLabel: 'Sync Page Backdrop',
+      syncPageBackdropDesc: 'Mirrors the featured slide background image into Jellyfin\'s page background.',
       toastMuted: 'Muted',
       toastUnmuted: 'Audio On',
       toastPaused: 'Slideshow Paused',
@@ -252,6 +255,8 @@
       randomTrailerStartDesc: 'Startet jeden Hintergrund-Trailer an einer zufälligen Position statt am Anfang (greift nur, wenn "Auf Trailer-Ende warten" deaktiviert ist). Für die Media Bar standardmäßig aktiv; deaktivieren, um immer am Anfang zu starten.',
       yoYoProgressBarLabel: 'Yo-Yo-Ladebalken',
       yoYoProgressBarDesc: 'Ladebalken bei abwechselnden Folien von links nach rechts leeren anstatt zurückzuspringen.',
+      syncPageBackdropLabel: 'Seiten-Hintergrund synchronisieren',
+      syncPageBackdropDesc: 'Spiegelt das Hintergrundbild der aktuellen Folie in den Seiten-Hintergrund von Jellyfin.',
       toastMuted: 'Stumm geschaltet',
       toastUnmuted: 'Ton aktiviert',
       toastPaused: 'Diashow pausiert',
@@ -324,6 +329,8 @@
       randomTrailerStartDesc: 'Inicia cada tráiler de fondo en un momento aleatorio en lugar del principio (solo activo si "Esperar a que termine el tráiler" está desactivado). Activado por defecto en la barra de medios; desactívalo para empezar siempre desde el principio.',
       yoYoProgressBarLabel: 'Barra de progreso Yo-Yo',
       yoYoProgressBarDesc: 'Vaciar la barra de progreso de izquierda a derecha en diapositivas alternas en lugar de reiniciar.',
+      syncPageBackdropLabel: 'Sincronizar fondo de página',
+      syncPageBackdropDesc: 'Refleja la imagen de fondo de la diapositiva en el fondo de página de Jellyfin.',
       toastMuted: 'Silenciado',
       toastUnmuted: 'Sonido activado',
       toastPaused: 'Diapositivas en pausa',
@@ -396,6 +403,8 @@
       randomTrailerStartDesc: 'Démarre chaque bande-annonce en arrière-plan à un moment aléatoire au lieu du début (actif uniquement si "Attendre la fin de la bande-annonce" est désactivé). Activé par défaut pour la barre multimédia ; désactivez pour toujours démarrer du début.',
       yoYoProgressBarLabel: 'Barre de progression Yo-Yo',
       yoYoProgressBarDesc: 'Vider la barre de progression de gauche à droite sur les diapositives alternées au lieu de réinitialiser.',
+      syncPageBackdropLabel: 'Synchroniser l\'arrière-plan de la page',
+      syncPageBackdropDesc: 'Répète l\'image d\'arrière-plan de la diapositive active dans l\'arrière-plan de la page Jellyfin.',
       toastMuted: 'Muet',
       toastUnmuted: 'Son activé',
       toastPaused: 'Diaporama en pause',
@@ -468,6 +477,8 @@
       randomTrailerStartDesc: 'Avvia ciascun trailer in background in un punto casuale anziché dall\'inizio (attivo solo se "Attendi fine trailer" è disattivato). Attivo per impostazione predefinita per la barra multimediale; disattiva per iniziare sempre dall\'inizio.',
       yoYoProgressBarLabel: 'Barra di avanzamento Yo-Yo',
       yoYoProgressBarDesc: 'Svuota la barra di avanzamento da sinistra a destra nelle diapositive alternate invece di ripristinare.',
+      syncPageBackdropLabel: 'Sincronizza sfondo pagina',
+      syncPageBackdropDesc: 'Riflette l\'immagine di sfondo della diapositiva corrente nello sfondo della pagina di Jellyfin.',
       toastMuted: 'Disattivato',
       toastUnmuted: 'Audio attivato',
       toastPaused: 'Presentazione in pausa',
@@ -515,6 +526,8 @@
       trailerStartByItem: {},
       failsafeTimeout: null,
       isVideoPlaying: false,
+      wasOnDetailsPage: false,
+      wasHomeButtonClicked: false,
     },
   };
 
@@ -2410,23 +2423,26 @@
         const urlObj = new URL(urlToCheck);
         const host = urlObj.hostname.replace(/^www\./, "");
 
+        const isYouTubeHost = host === "youtu.be" || host.includes("youtube.com") || host.includes("youtube-nocookie.com");
+        if (!isYouTubeHost) {
+          return null; // Silent return for non-YouTube URLs (local trailers, mp4 streams, etc.)
+        }
+
         let videoId = null;
         if (host === "youtu.be") {
           const pathId = urlObj.pathname.split("/")[1] || urlObj.pathname.substring(1);
           videoId = pathId ? pathId.split("?")[0] : null;
         } else if ((host === "youtube.com" || host === "m.youtube.com" || host === "youtube-nocookie.com") && urlObj.pathname.startsWith("/embed/")) {
           videoId = urlObj.pathname.split("/")[2] || null;
-        } else if (host.includes("youtube.com") || host.includes("youtu.be") || host.includes("youtube-nocookie.com")) {
+        } else {
           videoId = urlObj.searchParams.get("v") || null;
         }
 
         if (!videoId) {
-          console.warn("🎬 Media Bar:", "Could not extract YouTube Video ID from URL:", urlToCheck);
+          console.warn("🎬 Media Bar:", "Could not extract YouTube Video ID from YouTube URL:", urlToCheck);
         }
         return videoId;
-      } catch (e) {
-        console.warn("🎬 Media Bar:", "Failed to parse YouTube URL:", url, e);
-      }
+      } catch (e) {}
       return null;
     },
 
@@ -2500,6 +2516,9 @@
             );
             if (response.ok) {
               trailers = await response.json();
+              if (trailers && trailers.length > 0) {
+                console.log("🎬 Media Bar:", `Found local trailer on season fallback (${seasonId}) for episode ${itemId}`);
+              }
             }
           }
           if ((!trailers || trailers.length === 0) && seriesId) {
@@ -2509,6 +2528,9 @@
             );
             if (response.ok) {
               trailers = await response.json();
+              if (trailers && trailers.length > 0) {
+                console.log("🎬 Media Bar:", `Found local trailer on series fallback (${seriesId}) for episode ${itemId}`);
+              }
             }
           }
         }
@@ -2527,6 +2549,9 @@
             );
             if (response.ok) {
               trailers = await response.json();
+              if (trailers && trailers.length > 0) {
+                console.log("🎬 Media Bar:", `Found local trailer on series fallback (${seriesId}) for season ${itemId}`);
+              }
             }
           }
         }
@@ -2556,6 +2581,7 @@
                   if (seasonTrailersResp.ok) {
                     const seasonTrailers = await seasonTrailersResp.json();
                     if (seasonTrailers && seasonTrailers.length > 0) {
+                      console.log("🎬 Media Bar:", `Found local trailer in season folder ${season.Name || season.Id} for series ${itemId}`);
                       trailers = trailers ? trailers.concat(seasonTrailers) : seasonTrailers;
                       if (!CONFIG.randomizeLocalTrailers) {
                         break; // Stop after finding the first available season's trailer (e.g. Season 1)
@@ -2757,11 +2783,20 @@
 
       if (isVisible && !this.wasVisible) {
         if (isTvMode()) {
-          setTimeout(() => {
-            if (container && container.style.display !== 'none') {
-              container.focus({ preventScroll: true });
-            }
-          }, 300);
+          const isReturningFromDetails = STATE.slideshow.wasOnDetailsPage;
+          const wasHomeClicked = STATE.slideshow.wasHomeButtonClicked;
+          STATE.slideshow.wasOnDetailsPage = false;
+          STATE.slideshow.wasHomeButtonClicked = false;
+
+          // Focus Media Bar on initial startup, fresh home load, or when Home button was clicked.
+          // Do not focus Media Bar when backing out from a details page via back remote/arrow.
+          if (!isReturningFromDetails || wasHomeClicked) {
+            setTimeout(() => {
+              if (container && container.style.display !== 'none') {
+                container.focus({ preventScroll: true });
+              }
+            }, 300);
+          }
         }
 
         if (STATE.slideshow.hasInitialized && STATE.slideshow.itemIds.length > 0) {
@@ -2771,28 +2806,38 @@
           STATE.slideshow.slideInterval.start();
           SlideshowManager.resumeActivePlayback();
         }
-      } else if (!isVisible && this.wasVisible) {
-        if (STATE.slideshow.slideInterval) {
-          STATE.slideshow.slideInterval.stop();
-        }
-        SlideshowManager.stopAllPlayback();
+      } else if (!isVisible) {
+        if (this.wasVisible) {
+          // Track if user left home screen for a details page (TV mode only)
+          if (isTvMode()) {
+            const currentHash = window.location.hash || "";
+            STATE.slideshow.wasOnDetailsPage = currentHash.includes("details") || currentHash.includes("item");
+          }
 
-        // Free memory: destroy players and slides
-        if (STATE.slideshow.videoPlayers) {
-          Object.values(STATE.slideshow.videoPlayers).forEach((player) => {
-            if (player) {
-              if (typeof player.destroy === "function") {
-                try { player.destroy(); } catch (e) { }
-              } else if (player.tagName === 'VIDEO') {
-                try { player.removeAttribute('src'); player.load(); player.remove(); } catch (e) { }
+          if (STATE.slideshow.slideInterval) {
+            STATE.slideshow.slideInterval.stop();
+          }
+          SlideshowManager.stopAllPlayback();
+
+          // Free memory: destroy players and slides
+          if (STATE.slideshow.videoPlayers) {
+            Object.values(STATE.slideshow.videoPlayers).forEach((player) => {
+              if (player) {
+                if (typeof player.destroy === "function") {
+                  try { player.destroy(); } catch (e) { }
+                } else if (player.tagName === 'VIDEO') {
+                  try { player.removeAttribute('src'); player.load(); player.remove(); } catch (e) { }
+                }
               }
-            }
-          });
-          STATE.slideshow.videoPlayers = {};
+            });
+            STATE.slideshow.videoPlayers = {};
+          }
+          container.querySelectorAll(".slide").forEach((slide) => slide.remove());
+          STATE.slideshow.createdSlides = {};
+          STATE.slideshow.hasTrailer = {};
         }
-        container.querySelectorAll(".slide").forEach((slide) => slide.remove());
-        STATE.slideshow.createdSlides = {};
-        STATE.slideshow.hasTrailer = {};
+
+        PageBackdrop.clear();
       }
 
       this.wasVisible = isVisible;
@@ -2811,6 +2856,126 @@
       document.addEventListener("viewshow", () => this.updateVisibility());
 
       this.updateVisibility();
+    },
+  };
+
+  /**
+   * Mirrors the featured slide into Jellyfin's own page backdrop layer, so the
+   * background behind the home page follows whatever the slideshow is showing
+   * instead of staying on unrelated library art.
+   *
+   * Reuses the exact backdrop URL the active slide already requested, so the
+   * browser serves it from cache and no extra image is fetched.
+   *
+   * Only active while the slideshow is visible and if Jellyfin backdrops are enabled.
+   * Disabled by default (default off). Enable with CONFIG.syncPageBackdrop.
+   */
+  const PageBackdrop = {
+    LAYER_CLASS: "slideshow-page-backdrop",
+    observer: null,
+    currentItemId: null,
+
+    getOrCreateContainer() {
+      let container = document.querySelector(".backdropContainer");
+      if (!container) {
+        container = SlideUtils.createElement("div", {
+          className: "backdropContainer",
+        });
+        document.body.insertBefore(container, document.body.firstChild);
+      }
+      return container;
+    },
+
+    startObserver() {
+      if (this.observer) return;
+
+      const bgContainer = document.querySelector(".backgroundContainer");
+      if (!bgContainer) return;
+
+      this.observer = new MutationObserver(() => {
+        // If our backdrop layer is active, ensure backgroundContainer retains withBackdrop
+        const hasOurLayer = document.querySelector(`.${this.LAYER_CLASS}`);
+        if (hasOurLayer && bgContainer && !bgContainer.classList.contains("withBackdrop")) {
+          bgContainer.classList.add("withBackdrop");
+        }
+      });
+
+      this.observer.observe(bgContainer, { attributes: true, attributeFilter: ["class"] });
+    },
+
+    stopObserver() {
+      if (!this.observer) return;
+      this.observer.disconnect();
+      this.observer = null;
+    },
+
+    update(itemId) {
+      const isSyncEnabled = MediaBarEnhancedSettingsManager.getSetting('syncPageBackdrop', CONFIG.syncPageBackdrop);
+      const isHome = (window.location.hash === "#/home.html" || window.location.hash === "#/home");
+      if (!isSyncEnabled || !isHome) {
+        this.clear();
+        return;
+      }
+
+      const item = STATE.slideshow.loadedItems[itemId];
+      if (!item) return;
+
+      const src = SlideCreator.buildImageUrl(
+        item,
+        "Backdrop",
+        0,
+        STATE.jellyfinData.serverAddress,
+        60
+      );
+      if (!src) return;
+      if (this.currentItemId === itemId) return;
+
+      const container = this.getOrCreateContainer();
+      const duration = CONFIG.fadeTransitionDuration || 500;
+      const existingLayers = Array.from(container.querySelectorAll(`.${this.LAYER_CLASS}`));
+      const newBg = `url("${src.replace(/"/g, "%22")}")`;
+
+      // Create new layer on top using Jellyfin's native backdropImage classes
+      const newLayer = SlideUtils.createElement("div", {
+        className: `backdropImage displayingBackdropImage ${this.LAYER_CLASS}`,
+        style: {
+          backgroundImage: newBg,
+          opacity: "0",
+          transition: `opacity ${duration}ms ease-in-out`,
+        },
+      });
+      newLayer.setAttribute("data-url", src);
+
+      container.appendChild(newLayer);
+
+      // Force reflow and trigger opacity fade-in
+      void newLayer.offsetWidth;
+      newLayer.style.opacity = "1";
+      this.currentItemId = itemId;
+
+      // Clean up previous layers after crossfade completes
+      setTimeout(() => {
+        existingLayers.forEach((oldLayer) => {
+          if (oldLayer && oldLayer.isConnected) {
+            oldLayer.remove();
+          }
+        });
+      }, duration + 50);
+
+      const bgContainer = document.querySelector(".backgroundContainer");
+      if (bgContainer) {
+        bgContainer.classList.add("withBackdrop");
+      }
+
+      this.startObserver();
+    },
+
+    clear() {
+      this.stopObserver();
+      this.currentItemId = null;
+
+      const layers = document.querySelectorAll(`.${this.LAYER_CLASS}`);
+      layers.forEach((layer) => layer.remove());
     },
   };
 
@@ -2843,6 +3008,20 @@
         // Fallback to ImageTags.Backdrop if BackdropImageTags not available
         if (!tag && item.ImageTags && item.ImageTags.Backdrop) {
           tag = item.ImageTags.Backdrop;
+        }
+        // Parent Backdrop Fallback (for Season or Episode inheriting from Series)
+        if (!tag) {
+          if (item.ParentBackdropImageTags && Array.isArray(item.ParentBackdropImageTags) && item.ParentBackdropImageTags.length > 0) {
+            const backdropIndex = index !== undefined ? index : 0;
+            if (backdropIndex < item.ParentBackdropImageTags.length) {
+              tag = item.ParentBackdropImageTags[backdropIndex];
+            }
+          }
+          if (tag) {
+            itemId = item.ParentBackdropItemId || item.SeriesId || itemId;
+          } else if (item.SeriesId) {
+            itemId = item.SeriesId;
+          }
         }
       } else {
         // For other image types (Logo, Primary, etc.), use ImageTags
@@ -2969,6 +3148,7 @@
       // 1d. Fallback to Remote Trailer (only if not restricted to only local)
       else if (!onlyLocal && item.RemoteTrailers && item.RemoteTrailers.length > 0) {
         trailerUrl = ApiUtils.selectBestRemoteTrailer(item.RemoteTrailers);
+        console.log("🎬 Media Bar:", `Using remote trailer for ${itemId}: ${trailerUrl}`);
       }
       // 1e. Final Fallback to Local Trailer (even if not preferred)
       else if (item.localTrailerUrl) {
@@ -4095,6 +4275,7 @@
         void currentSlide.offsetWidth;
         currentSlide.classList.add("active");
         STATE.slideshow.playSignals[currentItemId] = false;
+        PageBackdrop.update(currentItemId);
 
         // Restore focus to equivalent button or container on the new active slide
         if (focusedButtonSelector && currentSlide) {
@@ -5179,6 +5360,24 @@
           }
         } catch (err) { }
       });
+
+      // Listen for Home button clicks (navbar/sidebar house icon) or Home key press to redirect focus to Media Bar (TV mode only)
+      document.addEventListener("click", (e) => {
+        if (!isTvMode()) return;
+        const homeBtn = e.target.closest('a[href*="home"], .btnHeaderHome, [data-action="home"], .headerHomeButton, .navMenuOption[href*="home"]');
+        if (homeBtn) {
+          STATE.slideshow.wasHomeButtonClicked = true;
+          STATE.slideshow.wasOnDetailsPage = false;
+        }
+      }, true);
+
+      document.addEventListener("keydown", (e) => {
+        if (!isTvMode()) return;
+        if (e.key === "Home") {
+          STATE.slideshow.wasHomeButtonClicked = true;
+          STATE.slideshow.wasOnDetailsPage = false;
+        }
+      }, true);
 
       document.addEventListener("keydown", (e) => {
         const container = this.TvNavigationEngine.getContainer();
@@ -6267,6 +6466,9 @@
         { key: 'randomTrailerStart', label: t.randomTrailerStartLabel || 'Random Trailer Start Position', description: t.randomTrailerStartDesc || 'Start each backdrop trailer at a random time instead of the beginning.', default: CONFIG.randomTrailerStartOffset },
         { key: 'hoverAudioFade', label: t.hoverAudioFadeLabel || 'Hover Audio Fade', description: t.hoverAudioFadeDesc || 'While muted, hover the media bar to fade sound in; leave to fade out.', default: CONFIG.hoverAudioFade },
       ];
+      const layoutSettings = [
+        { key: 'syncPageBackdrop', label: t.syncPageBackdropLabel || 'Sync Page Backdrop', description: t.syncPageBackdropDesc || 'Mirrors the featured slide background image into Jellyfin\'s page background.', default: CONFIG.syncPageBackdrop },
+      ];
 
       let html = `
     <div class="media-bar-settings-header">
@@ -6462,6 +6664,17 @@
             <option value="Navbar" ${this.getSetting('progressBarLocation', CONFIG.progressBarLocation) === 'Navbar' ? 'selected' : ''}>${t.progressBarLocationNavbar || 'Top (Under Header)'}</option>
         </select>
     </div>
+
+    <div class="media-bar-toggle-container" style="margin-top: 0.5em;">
+        <div class="media-bar-toggle-info">
+            <span class="media-bar-toggle-label">${t.syncPageBackdropLabel || 'Sync Page Backdrop'}</span>
+            <span class="media-bar-toggle-desc">${t.syncPageBackdropDesc || 'Mirrors the featured slide background image into Jellyfin\'s page background.'}</span>
+        </div>
+        <label class="media-bar-switch" tabindex="0">
+            <input id="mb-setting-syncPageBackdrop" type="checkbox" ${this.getSetting('syncPageBackdrop', CONFIG.syncPageBackdrop) ? 'checked' : ''} />
+            <span class="media-bar-slider"></span>
+        </label>
+    </div>
         </div>
         
         <!-- LIBRARIES TAB -->
@@ -6516,10 +6729,16 @@
         });
       });
 
+      // Prevent clicks inside popup from bubbling up to document click handlers
+      popup.addEventListener('click', (e) => {
+        e.stopPropagation();
+      });
+
       // Client tab switcher
       const tabButtons = popup.querySelectorAll('.media-bar-client-tab');
       tabButtons.forEach(tBtn => {
-        tBtn.addEventListener('click', () => {
+        tBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
           tabButtons.forEach(b => b.classList.remove('active'));
           tBtn.classList.add('active');
 
@@ -6544,7 +6763,7 @@
       };
 
       const popupFocusListener = (e) => {
-        if (document.body.contains(popup) && !popup.contains(e.target) && e.target !== anchorElement && (!anchorElement || !anchorElement.contains(e.target))) {
+        if (!isModal && document.body.contains(popup) && !popup.contains(e.target) && e.target !== anchorElement && (!anchorElement || !anchorElement.contains(e.target))) {
           closePopupFunc();
         }
       };
@@ -6673,7 +6892,7 @@
       }
 
       // Add Listeners
-      const allSwitches = [...generalSettings, ...trailerSettings];
+      const allSwitches = [...generalSettings, ...trailerSettings, ...layoutSettings];
       allSwitches.forEach(setting => {
         const checkbox = popup.querySelector(`#mb-setting-${setting.key}`);
         if (checkbox) {
@@ -6773,7 +6992,7 @@
       };
 
       const closeHandler = (e) => {
-        if (!popup.contains(e.target) && e.target !== anchorElement && !anchorElement.contains(e.target)) {
+        if (!isModal && !popup.contains(e.target) && e.target !== anchorElement && (!anchorElement || !anchorElement.contains(e.target))) {
           closePopupFunc();
         }
       };

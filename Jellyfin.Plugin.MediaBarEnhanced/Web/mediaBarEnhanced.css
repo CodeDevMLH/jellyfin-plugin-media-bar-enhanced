@@ -2922,3 +2922,8 @@ body:has(.videoPlayerContainer:not(.hide)) .media-bar-settings-button,
 body:has(.videoPlayerContainer-onTop) .media-bar-settings-button {
   display: none !important;
 }
+
+/* Page Backdrop Sync Layer */
+.slideshow-page-backdrop {
+  opacity: 1;
+}
