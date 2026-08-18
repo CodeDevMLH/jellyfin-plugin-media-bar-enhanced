@@ -111,6 +111,7 @@
     customPlaylists: "[]",
     forceSlideCounter: false,
     excludedLibraries: "",
+    trailerEnabledLibraries: "",
     onlyLocalTrailers: false,
     yoYoProgressBar: true,
     syncPageBackdrop: false,
@@ -1705,6 +1706,41 @@
       }
     },
 
+    async resolveItemLibraryId(item) {
+      if (!item || !item.Id) return null;
+
+      if (item.MediaBarLibraryId) return item.MediaBarLibraryId;
+
+      try {
+        const libraryMap = await this.fetchLibraryIds() || {};
+        const libraryIds = [...new Set(Object.values(libraryMap))];
+
+        if (item.ParentId && libraryIds.includes(item.ParentId)) {
+          item.MediaBarLibraryId = item.ParentId;
+          return item.MediaBarLibraryId;
+        }
+
+        const ancestorsUrl = `${STATE.jellyfinData.serverAddress}/Items/${item.Id}/Ancestors`;
+        const response = await fetch(ancestorsUrl, { headers: this.getAuthHeaders() });
+        if (!response.ok) {
+          throw new Error(`Failed to fetch ancestors: ${response.statusText}`);
+        }
+
+        const ancestors = await response.json();
+        const libraryAncestor = (ancestors || []).find(ancestor => libraryIds.includes(ancestor.Id));
+
+        if (libraryAncestor) {
+          item.MediaBarLibraryId = libraryAncestor.Id;
+          return item.MediaBarLibraryId;
+        }
+
+        console.warn(`🎬 Media Bar: Could not resolve top-level library for ${item.Id}`);
+        return null;
+      } catch (e) {
+        console.warn(`🎬 Media Bar: Error resolving library for ${item.Id}:`, e);
+        return null;
+      }
+    },
     async applyLibraryFilters(items) {
       if (!items || items.length === 0) return items;
 
@@ -3162,7 +3198,15 @@
       const enableVideo = MediaBarEnhancedSettingsManager.getSetting('videoBackdrops', CONFIG.enableVideoBackdrop);
       const enableMobileVideo = MediaBarEnhancedSettingsManager.getSetting('mobileVideo', CONFIG.enableMobileVideo);
 
-      const shouldPlayVideo = enableVideo && (!isMobile || enableMobileVideo);
+      const trailerEnabledLibraryIds = (CONFIG.trailerEnabledLibraries || '')
+        .split(',')
+        .map(id => id.trim())
+        .filter(id => id);
+
+      const libraryAllowsTrailer = !!item.MediaBarLibraryId &&
+        trailerEnabledLibraryIds.includes(item.MediaBarLibraryId);
+
+      const shouldPlayVideo = enableVideo && libraryAllowsTrailer && (!isMobile || enableMobileVideo);
 
       if (trailerUrl && shouldPlayVideo) {
         STATE.slideshow.hasTrailer = STATE.slideshow.hasTrailer || {};
@@ -3958,6 +4002,8 @@
           return null;
         }
 
+        // Resolve the item's top-level Jellyfin library for per-library trailer rules
+        item.MediaBarLibraryId = await ApiUtils.resolveItemLibraryId(item);
         // Pre-fetch local trailer URL if needed
         const onlyLocal = MediaBarEnhancedSettingsManager.getSetting('onlyLocalTrailers', CONFIG.onlyLocalTrailers);
         const canHaveLocalTrailer = (item.LocalTrailerCount && item.LocalTrailerCount > 0) ||
