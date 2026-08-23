@@ -2025,6 +2025,9 @@
         let keptItems = [];
 
         for (const item of items) {
+          if ((movieCount + showCount) >= CONFIG.maxItems) {
+            break;
+          }
           if (item.Type === 'Movie') {
             if (movieCount < CONFIG.maxMovies) {
               movieCount++;
