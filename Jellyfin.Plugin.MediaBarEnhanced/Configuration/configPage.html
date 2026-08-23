@@ -1093,6 +1093,18 @@
                                     </div>
                                 </div>
                                 <input type="hidden" id="ExcludedLibraries" name="ExcludedLibraries" />
+
+                                <div class="inputContainer" style="margin-top: 1.5em; width: 100%;">
+                                    <label class="inputLabel">Libraries allowed to play trailer backdrops</label>
+                                    <div class="fieldDescription">
+                                        Only checked libraries may autoplay trailer/video backdrops. Unchecked libraries will still appear in Media Bar with static backdrops.
+                                    </div>
+                                    <div id="admin-trailer-libraries-list"
+                                        style="display: flex; flex-direction: column; gap: 0.5em; border: 1px solid #3f3f3f; border-radius: 4px; padding: 0.8em; margin-top: 0.5em;">
+                                        <div class="fieldDescription">Loading libraries...</div>
+                                    </div>
+                                </div>
+                                <input type="hidden" id="TrailerEnabledLibraries" name="TrailerEnabledLibraries" />
                                 <div class="checkboxContainer checkboxContainer-withDescription"
                                     style="margin-top: 1.5em;">
                                     <label>
@@ -1322,7 +1334,7 @@
                             'CustomOverlayPositionX', 'CustomOverlayPositionY', 'CustomOverlayScale',
                             'BackdropVideoDelay', 'TrailerStartOffset', 'TrailerEndOffset', 'ConstrainPlotWidth', 'MobileCompactMode', 'DefaultTrailerVolume', 'HoverAudioFadeMs',
                             'ClientMenuLocation', 'ClientMenuLocationMobile', 'CustomPlaylists', 'TransitionEffect',
-                            'ShowProgressBar', 'ProgressBarLocation', 'ExcludedLibraries', 'YoYoProgressBar', 'SyncPageBackdrop'
+                            'ShowProgressBar', 'ProgressBarLocation', 'ExcludedLibraries', 'TrailerEnabledLibraries', 'YoYoProgressBar', 'SyncPageBackdrop'
                         ];
 
                         // Manual mapping for MediaBarIsEnabled -> IsEnabled, to avoid conflicts with other plugins
@@ -1391,6 +1403,48 @@
                                 }
                             }).catch(function (err) {
                                 console.error('Error fetching libraries in admin panel:', err);
+                                listContainer.innerHTML = '<div class="fieldDescription" style="color: #ff3b30;">Failed to load libraries.</div>';
+                            });
+                        })();
+
+                        // Load and render trailer-enabled library checkboxes
+                        (function () {
+                            var listContainer = page.querySelector('#admin-trailer-libraries-list');
+                            var hiddenInput = page.querySelector('#TrailerEnabledLibraries');
+                            if (!listContainer || !hiddenInput) return;
+
+                            var enabledStr = hiddenInput.value || '';
+                            var enabledIds = enabledStr.split(',').filter(function (id) { return id; });
+                            var isConfigured = enabledStr.trim().length > 0;
+
+                            var viewsUrl = ApiClient.serverAddress() + '/Items?IncludeItemTypes=CollectionFolder&userId=' + ApiClient.getCurrentUserId();
+                            fetch(viewsUrl, {
+                                headers: {
+                                    'Authorization': 'MediaBrowser Client="' + ApiClient.appName() + '", Device="' + ApiClient.deviceName() + '", DeviceId="' + ApiClient.deviceId() + '", Version="' + ApiClient.appVersion() + '", Token="' + ApiClient.accessToken() + '"'
+                                }
+                            }).then(function (response) {
+                                return response.json();
+                            }).then(function (data) {
+                                var views = data.Items || [];
+                                var html = '';
+
+                                views.forEach(function (view) {
+                                    var isChecked = !isConfigured || enabledIds.indexOf(view.Id) !== -1;
+                                    html += '<div class="checkboxContainer checkboxContainer-withDescription" style="margin: 0.3em 0;">' +
+                                        '<label>' +
+                                        '<input is="emby-checkbox" type="checkbox" class="admin-trailer-library-checkbox" data-id="' + view.Id + '" ' + (isChecked ? 'checked' : '') + ' />' +
+                                        '<span>' + view.Name + '</span>' +
+                                        '</label>' +
+                                        '</div>';
+                                });
+
+                                if (html === '') {
+                                    listContainer.innerHTML = '<div class="fieldDescription">No libraries found.</div>';
+                                } else {
+                                    listContainer.innerHTML = html;
+                                }
+                            }).catch(function (err) {
+                                console.error('Error fetching trailer libraries in admin panel:', err);
                                 listContainer.innerHTML = '<div class="fieldDescription" style="color: #ff3b30;">Failed to load libraries.</div>';
                             });
                         })();
@@ -1623,6 +1677,17 @@
                     var excludedInput = page.querySelector('#ExcludedLibraries');
                     if (excludedInput) excludedInput.value = uncheckedIds.join(',');
 
+                    // Trailer-enabled Libraries: checked checkboxes are allowed to autoplay trailer backdrops
+                    var trailerCheckboxes = page.querySelectorAll('.admin-trailer-library-checkbox');
+                    var enabledTrailerLibraryIds = [];
+                    trailerCheckboxes.forEach(function (cb) {
+                        if (cb.checked) {
+                            enabledTrailerLibraryIds.push(cb.getAttribute('data-id'));
+                        }
+                    });
+                    var trailerEnabledInput = page.querySelector('#TrailerEnabledLibraries');
+                    if (trailerEnabledInput) trailerEnabledInput.value = enabledTrailerLibraryIds.join(',');
+
                     // Sync hidden input from SponsorBlock checkboxes
                     (function () {
                         var checkedCats = [];
@@ -1664,7 +1729,7 @@
                         'CustomOverlayPositionX', 'CustomOverlayPositionY', 'CustomOverlayScale',
                         'BackdropVideoDelay', 'TrailerStartOffset', 'TrailerEndOffset', 'ConstrainPlotWidth', 'MobileCompactMode', 'DefaultTrailerVolume', 'HoverAudioFadeMs',
                         'ClientMenuLocation', 'ClientMenuLocationMobile', 'CustomPlaylists', 'TransitionEffect',
-                        'ShowProgressBar', 'ProgressBarLocation', 'ExcludedLibraries', 'YoYoProgressBar', 'SyncPageBackdrop'
+                        'ShowProgressBar', 'ProgressBarLocation', 'ExcludedLibraries', 'TrailerEnabledLibraries', 'YoYoProgressBar', 'SyncPageBackdrop'
                     ];
 
                     var numberDefaults = {
