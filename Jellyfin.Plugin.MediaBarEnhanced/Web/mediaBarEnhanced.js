@@ -1885,6 +1885,35 @@
               return new Date(item.DateCreated) >= pastDate;
             });
           }
+          
+          // filter to max items and max types
+          let movieCount = 0
+          let showCount = 0
+          let keptItems = []
+          for (const item of items) {
+            if((movieCount+showCount) >= CONFIG.maxItems){
+              break;
+            }
+            if (item.Type === 'Movie') {
+              if (movieCount < CONFIG.maxMovies) {
+                movieCount++;
+                keptItems.push(item);
+              }
+            } else if (item.Type === 'Series' || item.Type === 'Season' || item.Type === 'Episode') {
+              if (showCount < CONFIG.maxTvShows) {
+                showCount++;
+                keptItems.push(item);
+              }
+            } else {
+              keptItems.push(item);
+            }
+          }
+          items = keptItems;
+
+          // reshuffle if there are different max number for movies and TV
+          if ((CONFIG.maxMovies != CONFIG.maxTvShows) && (CONFIG.sortBy === 'Random' || CONFIG.sortBy === 'Original')) {
+            items.sort(() => Math.random() - 0.5);
+          }
 
           // Fallback if no items in date range
           if (items.length === 0 && dateFilter !== '') {
