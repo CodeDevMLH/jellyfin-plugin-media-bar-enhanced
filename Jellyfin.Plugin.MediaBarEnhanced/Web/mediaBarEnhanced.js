@@ -1,7 +1,7 @@
 /*
  * Jellyfin Slideshow by M0RPH3US v4.0.1
  * Modified by CodeDevMLH
- * 
+ *
  * New features:
  * - optional Trailer background video support (youtube or local trailer/backdrop videos)
  * - option to make video backdrops full width
@@ -796,6 +796,8 @@
     const finishLoading = () => {
       clearInterval(progressInterval);
       clearInterval(checkInterval);
+      window.removeEventListener("hashchange", leavePageHandler);
+      window.removeEventListener("popstate", leavePageHandler);
       progressBar.style.transition = "width 300ms ease-in-out";
       progressBar.style.width = "100%";
       unfilledBar.style.width = "0%";
@@ -812,6 +814,18 @@
         });
       });
     };
+
+    // If the user navigates away from home before loading finishes, tear the
+    // overlay down immediately instead of leaving it running/visible on other pages.
+    const leavePageHandler = () => {
+      const hash = window.location.hash.toLowerCase();
+      const stillHome = hash === "#/home.html" || hash === "#/home" || hash === "";
+      if (!stillHome) {
+        finishLoading();
+      }
+    };
+    window.addEventListener("hashchange", leavePageHandler);
+    window.addEventListener("popstate", leavePageHandler);
 
     // Global Failsafe, force remove loading screen after 15 seconds to prevent infinite lockouts
     setTimeout(() => {
@@ -3111,55 +3125,60 @@
 
       const onlyLocal = MediaBarEnhancedSettingsManager.getSetting('onlyLocalTrailers', CONFIG.onlyLocalTrailers);
 
-      // 1. Check for Remote/Local Trailers
+      // Client Setting Overrides
+      const enableVideo = MediaBarEnhancedSettingsManager.getSetting('videoBackdrops', CONFIG.enableVideoBackdrop);
+      const showTrailerBtnCheck = MediaBarEnhancedSettingsManager.getSetting('trailerButton', CONFIG.showTrailerButton);
+      const needsTrailerUrl = enableVideo || showTrailerBtnCheck;
+
+      // 1. Check for Remote/Local Trailers (skip entirely if neither video backdrops
+      // nor the trailer button are enabled, nothing would ever use trailerUrl)
       // Priority: Custom Config URL > (PreferLocal -> Local) > Metadata RemoteTrailer
+      if (needsTrailerUrl) {
+        // 1a. Custom URL override
+        if (STATE.slideshow.customTrailerUrls && STATE.slideshow.customTrailerUrls[itemId]) {
+          const customValue = STATE.slideshow.customTrailerUrls[itemId];
 
-      // 1a. Custom URL override
-      if (STATE.slideshow.customTrailerUrls && STATE.slideshow.customTrailerUrls[itemId]) {
-        const customValue = STATE.slideshow.customTrailerUrls[itemId];
+          // Check if the custom value is a Jellyfin Item ID (GUID)
+          const guidMatch = customValue.match(/^([0-9a-f]{32})$/i);
 
-        // Check if the custom value is a Jellyfin Item ID (GUID)
-        const guidMatch = customValue.match(/^([0-9a-f]{32})$/i);
+          if (guidMatch) {
+            const videoId = guidMatch[1];
+            console.log("🎬 Media Bar:", `Using custom local video ID for ${itemId}: ${videoId}`);
 
-        if (guidMatch) {
-          const videoId = guidMatch[1];
-          console.log("🎬 Media Bar:", `Using custom local video ID for ${itemId}: ${videoId}`);
-
-          trailerUrl = {
-            id: videoId,
-            url: `${STATE.jellyfinData.serverAddress}/Videos/${videoId}/stream.mp4?api_key=${STATE.jellyfinData.accessToken}&static=true`
-          };
-        } else {
-          // Assume it's a standard URL (YouTube, etc.)
-          trailerUrl = customValue;
-          console.log("🎬 Media Bar:", `Using custom trailer URL for ${itemId}: ${trailerUrl}`);
+            trailerUrl = {
+              id: videoId,
+              url: `${STATE.jellyfinData.serverAddress}/Videos/${videoId}/stream.mp4?api_key=${STATE.jellyfinData.accessToken}&static=true`
+            };
+          } else {
+            // Assume it's a standard URL (YouTube, etc.)
+            trailerUrl = customValue;
+            console.log("🎬 Media Bar:", `Using custom trailer URL for ${itemId}: ${trailerUrl}`);
+          }
         }
-      }
-      // 1b. Check Theme Video if preferred (Local Backdrop)
-      else if (CONFIG.preferLocalBackdrops && item.themeVideoUrl) {
-        trailerUrl = item.themeVideoUrl;
-        console.log("🎬 Media Bar:", `Using theme video (local backdrop) for ${itemId}: ${trailerUrl.url || trailerUrl}`);
-      }
-      // 1c. Check Local Trailer if preferred or restricted to only local
-      else if ((CONFIG.preferLocalTrailers || onlyLocal) && item.localTrailerUrl) {
-        trailerUrl = item.localTrailerUrl;
-        console.log("🎬 Media Bar:", `Using local trailer for ${itemId}: ${trailerUrl.url || trailerUrl}`);
-      }
-      // 1d. Fallback to Remote Trailer (only if not restricted to only local)
-      else if (!onlyLocal && item.RemoteTrailers && item.RemoteTrailers.length > 0) {
-        trailerUrl = ApiUtils.selectBestRemoteTrailer(item.RemoteTrailers);
-        console.log("🎬 Media Bar:", `Using remote trailer for ${itemId}: ${trailerUrl}`);
-      }
-      // 1e. Final Fallback to Local Trailer (even if not preferred)
-      else if (item.localTrailerUrl) {
-        trailerUrl = item.localTrailerUrl;
-        console.log("🎬 Media Bar:", `Using local trailer fallback for ${itemId}: ${trailerUrl.url || trailerUrl}`);
+        // 1b. Check Theme Video if preferred (Local Backdrop)
+        else if (CONFIG.preferLocalBackdrops && item.themeVideoUrl) {
+          trailerUrl = item.themeVideoUrl;
+          console.log("🎬 Media Bar:", `Using theme video (local backdrop) for ${itemId}: ${trailerUrl.url || trailerUrl}`);
+        }
+        // 1c. Check Local Trailer if preferred or restricted to only local
+        else if ((CONFIG.preferLocalTrailers || onlyLocal) && item.localTrailerUrl) {
+          trailerUrl = item.localTrailerUrl;
+          console.log("🎬 Media Bar:", `Using local trailer for ${itemId}: ${trailerUrl.url || trailerUrl}`);
+        }
+        // 1d. Fallback to Remote Trailer (only if not restricted to only local)
+        else if (!onlyLocal && item.RemoteTrailers && item.RemoteTrailers.length > 0) {
+          trailerUrl = ApiUtils.selectBestRemoteTrailer(item.RemoteTrailers);
+          console.log("🎬 Media Bar:", `Using remote trailer for ${itemId}: ${trailerUrl}`);
+        }
+        // 1e. Final Fallback to Local Trailer (even if not preferred)
+        else if (item.localTrailerUrl) {
+          trailerUrl = item.localTrailerUrl;
+          console.log("🎬 Media Bar:", `Using local trailer fallback for ${itemId}: ${trailerUrl.url || trailerUrl}`);
+        }
       }
 
       const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
-      // Client Setting Overrides
-      const enableVideo = MediaBarEnhancedSettingsManager.getSetting('videoBackdrops', CONFIG.enableVideoBackdrop);
       const enableMobileVideo = MediaBarEnhancedSettingsManager.getSetting('mobileVideo', CONFIG.enableMobileVideo);
 
       const shouldPlayVideo = enableVideo && (!isMobile || enableMobileVideo);
@@ -3958,21 +3977,27 @@
           return null;
         }
 
+        // Trailer/theme-video data is only ever consumed for video backdrops or the trailer button popup
+        // skip all of these lookups when both are disabled.
+        const enableVideo = MediaBarEnhancedSettingsManager.getSetting('videoBackdrops', CONFIG.enableVideoBackdrop);
+        const showTrailerBtn = MediaBarEnhancedSettingsManager.getSetting('trailerButton', CONFIG.showTrailerButton);
+        const needsTrailerData = enableVideo || showTrailerBtn;
+
         // Pre-fetch local trailer URL if needed
         const onlyLocal = MediaBarEnhancedSettingsManager.getSetting('onlyLocalTrailers', CONFIG.onlyLocalTrailers);
         const canHaveLocalTrailer = (item.LocalTrailerCount && item.LocalTrailerCount > 0) ||
           item.Type === 'Series' || item.Type === 'Season' || item.Type === 'Episode';
-        if (CONFIG.preferLocalTrailers || onlyLocal || canHaveLocalTrailer) {
+        if (needsTrailerData && (CONFIG.preferLocalTrailers || onlyLocal || canHaveLocalTrailer)) {
           item.localTrailerUrl = await ApiUtils.fetchLocalTrailer(item);
         }
 
         // Pre-fetch theme video URL if needed
-        if (CONFIG.preferLocalBackdrops) {
+        if (needsTrailerData && CONFIG.preferLocalBackdrops) {
           item.themeVideoUrl = await ApiUtils.fetchThemeVideos(itemId);
         }
 
         // Pre-fetch SponsorBlock data early for remote YouTube trailers
-        if (CONFIG.useSponsorBlock && !onlyLocal && item.RemoteTrailers && item.RemoteTrailers.length > 0) {
+        if (needsTrailerData && CONFIG.useSponsorBlock && !onlyLocal && item.RemoteTrailers && item.RemoteTrailers.length > 0) {
           const ytId = ApiUtils.extractYouTubeId(item.RemoteTrailers[0].Url);
           if (ytId) {
             ApiUtils.fetchSponsorBlockData(ytId); // Trigger background pre-fetch into cache
@@ -4091,7 +4116,7 @@
 
       const totalItems = STATE.slideshow.totalItems || 0;
 
-      // dynamically lower the max dots threshold on small screens 
+      // dynamically lower the max dots threshold on small screens
       let effectiveMaxDots = CONFIG.maxPaginationDots;
       if (window.matchMedia("(max-width: 767px) and (orientation: portrait)").matches) {
         const availableWidth = window.innerWidth * 0.9;
@@ -5504,11 +5529,11 @@
      *  - Return Default Custom IDs.
      * If no Custom Media IDs are enabled:
      *  - Return empty result (triggering random fallback).
-     * 
+     *
      * Supports special prefixes in the ID field:
      *  - genre:Action  --> filter by genre
      *  - tag:2000s     --> filter by tag
-     * 
+     *
      * @returns {{ ids: string[], genres: string[], tags: string[] }} Parsed result
      */
     parseIdsString(idsString) {
@@ -5635,7 +5660,7 @@
         }
       }
 
-      // If NOT using seasonal content (disabled or no match), 
+      // If NOT using seasonal content (disabled or no match),
       // Custom IDs are disabled, return empty to skip to random
       if (!usingSeasonal && !CONFIG.enableCustomMediaIds) {
         return { ids: [], genres: [], tags: [] };
@@ -6475,7 +6500,7 @@
         <img src="${STATE.jellyfinData.serverAddress}/MediaBarEnhanced/Resources/assets/logo_SW.svg" draggable="false" class="media-bar-settings-logo" />
         <h3 class="media-bar-settings-title">${t.title}</h3>
     </div>
-    
+
     <div class="media-bar-client-tabs">
         <button type="button" class="media-bar-client-tab active" data-tab="mb-client-tab-general" tabindex="0">
             <svg style="width: 18px; height: 18px; fill: currentColor; flex-shrink: 0;" viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
@@ -6543,7 +6568,7 @@
         </select>
     </div>
         </div>
-        
+
         <!-- TRAILERS TAB -->
         <div id="mb-client-tab-trailers" class="media-bar-client-tab-content" style="display: none;">
     `;
@@ -6580,7 +6605,7 @@
         </select>
     </div>
         </div>
-        
+
         <!-- LAYOUT TAB -->
         <div id="mb-client-tab-layout" class="media-bar-client-tab-content" style="display: none;">
     `;
@@ -6676,7 +6701,7 @@
         </label>
     </div>
         </div>
-        
+
         <!-- LIBRARIES TAB -->
         <div id="mb-client-tab-libraries" class="media-bar-client-tab-content" style="display: none; flex-direction: column; gap: 0.5rem; max-height: 250px; overflow-y: auto; padding: 0.5rem; width: 100%; box-sizing: border-box;">
             <div class="media-bar-loading-libraries" style="text-align: center; color: var(--text-muted); padding: 1rem;">Loading libraries...</div>
