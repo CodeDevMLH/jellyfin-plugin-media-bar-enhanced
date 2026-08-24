@@ -107,7 +107,8 @@
                                     </div>
                                 </div>
                                 <div class="selectContainer" style="margin-top: 1em;">
-                                    <label class="selectLabel" for="ClientMenuLocation">Client Settings Menu Location</label>
+                                    <label class="selectLabel" for="ClientMenuLocation">Client Settings Menu
+                                        Location</label>
                                     <select is="emby-select" id="ClientMenuLocation" name="ClientMenuLocation"
                                         class="selectLayout emby-select-withcolor emby-select"
                                         style="width: 100%; -webkit-appearance: menulist; appearance: menulist;">
@@ -118,10 +119,12 @@
                                         <option value="Navbar+UserMenu">Navbar + User Menu</option>
                                         <option value="All">All Locations (Everywhere)</option>
                                     </select>
-                                    <div class="fieldDescription">Choose where the client-side settings menu can be accessed.</div>
+                                    <div class="fieldDescription">Choose where the client-side settings menu can be
+                                        accessed.</div>
                                 </div>
                                 <div class="selectContainer" style="margin-top: 1em;">
-                                    <label class="selectLabel" for="ClientMenuLocationMobile">Client Settings Menu Location (Mobile)</label>
+                                    <label class="selectLabel" for="ClientMenuLocationMobile">Client Settings Menu
+                                        Location (Mobile)</label>
                                     <select is="emby-select" id="ClientMenuLocationMobile"
                                         name="ClientMenuLocationMobile"
                                         class="selectLayout emby-select-withcolor emby-select"
@@ -133,7 +136,8 @@
                                         <option value="Navbar+UserMenu">Navbar + User Menu</option>
                                         <option value="All">All Locations (Everywhere)</option>
                                     </select>
-                                    <div class="fieldDescription">Choose where the client-side settings menu can be accessed on mobile devices.</div>
+                                    <div class="fieldDescription">Choose where the client-side settings menu can be
+                                        accessed on mobile devices.</div>
                                 </div>
                             </div>
 
@@ -409,14 +413,17 @@
                                         <input is="emby-input" type="number" id="TrailerStartOffset"
                                             name="TrailerStartOffset" min="0" />
                                         <div class="fieldDescription">Skip the first part of every trailer, e.g. a
-                                            studio logo. YouTube trailers skip in whole seconds; SponsorBlock wins if it skips further. Default is 0 (disabled).</div>
+                                            studio logo. YouTube trailers skip in whole seconds; SponsorBlock wins if it
+                                            skips further. Default is 0 (disabled).</div>
                                     </div>
                                     <div class="inputContainer">
                                         <label class="inputLabel inputLabelUnfocused" for="TrailerEndOffset">Trailer
                                             End Offset (ms)</label>
                                         <input is="emby-input" type="number" id="TrailerEndOffset"
                                             name="TrailerEndOffset" min="0" />
-                                        <div class="fieldDescription">Trim the end of every trailer, e.g. end credits. YouTube trailers trim in whole seconds; SponsorBlock wins if it skips further. Default is 0 (disabled).</div>
+                                        <div class="fieldDescription">Trim the end of every trailer, e.g. end credits.
+                                            YouTube trailers trim in whole seconds; SponsorBlock wins if it skips
+                                            further. Default is 0 (disabled).</div>
                                     </div>
                                 </div>
                             </div>
@@ -500,7 +507,8 @@
                                                 name="SyncPageBackdrop" />
                                             <span>Sync Page Backdrop</span>
                                         </label>
-                                        <div class="fieldDescription">Mirrors the featured slide background image into Jellyfin's page background.</div>
+                                        <div class="fieldDescription">Mirrors the featured slide background image into
+                                            Jellyfin's page background.</div>
                                     </div>
                                 </div>
 
@@ -1093,6 +1101,16 @@
                                     </div>
                                 </div>
                                 <input type="hidden" id="ExcludedLibraries" name="ExcludedLibraries" />
+
+                                <div class="inputContainer" style="margin-top: 1.5em; width: 100%;">
+                                    <label class="inputLabel">Libraries allowed to play trailer backdrops (unchecked
+                                        libraries will use static backdrops)</label>
+                                    <div id="admin-trailer-libraries-list"
+                                        style="display: flex; flex-direction: column; gap: 0.5em; border: 1px solid #3f3f3f; border-radius: 4px; padding: 0.8em; margin-top: 0.5em;">
+                                        <div class="fieldDescription">Loading libraries...</div>
+                                    </div>
+                                </div>
+                                <input type="hidden" id="TrailerEnabledLibraries" name="TrailerEnabledLibraries" />
                                 <div class="checkboxContainer checkboxContainer-withDescription"
                                     style="margin-top: 1.5em;">
                                     <label>
@@ -1320,9 +1338,10 @@
                             'EnableCustomOverlay', 'CustomOverlayText', 'CustomOverlayImageUrl',
                             'CustomOverlayStyle', 'CustomOverlayImageStyle', 'CustomOverlayPriority',
                             'CustomOverlayPositionX', 'CustomOverlayPositionY', 'CustomOverlayScale',
-                            'BackdropVideoDelay', 'TrailerStartOffset', 'TrailerEndOffset', 'ConstrainPlotWidth', 'MobileCompactMode', 'DefaultTrailerVolume', 'HoverAudioFadeMs',
-                            'ClientMenuLocation', 'ClientMenuLocationMobile', 'CustomPlaylists', 'TransitionEffect',
-                            'ShowProgressBar', 'ProgressBarLocation', 'ExcludedLibraries', 'YoYoProgressBar', 'SyncPageBackdrop'
+                            'BackdropVideoDelay', 'TrailerStartOffset', 'TrailerEndOffset', 'ConstrainPlotWidth', 'MobileCompactMode',
+                            'DefaultTrailerVolume', 'HoverAudioFadeMs', 'ClientMenuLocation', 'ClientMenuLocationMobile',
+                            'CustomPlaylists', 'TransitionEffect', 'ShowProgressBar', 'ProgressBarLocation', 'ExcludedLibraries',
+                            'TrailerEnabledLibraries', 'YoYoProgressBar', 'SyncPageBackdrop'
                         ];
 
                         // Manual mapping for MediaBarIsEnabled -> IsEnabled, to avoid conflicts with other plugins
@@ -1354,6 +1373,34 @@
 
                         })();
 
+                        // Helper to fetch libraries across all Jellyfin versions (including v12)
+                        var fetchServerViews = function () {
+                            var userId = ApiClient.getCurrentUserId();
+                            if (typeof ApiClient.getUserViews === 'function') {
+                                return ApiClient.getUserViews(userId).then(function (data) {
+                                    return (data && data.Items) ? data.Items : [];
+                                });
+                            }
+                            var viewsUrl = ApiClient.getUrl ? ApiClient.getUrl('Users/' + userId + '/Views') : (ApiClient.serverAddress() + '/Users/' + userId + '/Views');
+                            return fetch(viewsUrl, {
+                                headers: {
+                                    'Authorization': 'MediaBrowser Client="' + ApiClient.appName() + '", Device="' + ApiClient.deviceName() + '", DeviceId="' + ApiClient.deviceId() + '", Version="' + ApiClient.appVersion() + '", Token="' + ApiClient.accessToken() + '"'
+                                }
+                            }).then(function (res) {
+                                if (!res.ok) throw new Error('Failed to fetch views');
+                                return res.json();
+                            }).then(function (data) {
+                                return (data && data.Items) ? data.Items : [];
+                            }).catch(function (e) {
+                                var fallbackUrl = ApiClient.serverAddress() + '/Items?IncludeItemTypes=CollectionFolder&userId=' + userId;
+                                return fetch(fallbackUrl, {
+                                    headers: {
+                                        'Authorization': 'MediaBrowser Client="' + ApiClient.appName() + '", Device="' + ApiClient.deviceName() + '", DeviceId="' + ApiClient.deviceId() + '", Version="' + ApiClient.appVersion() + '", Token="' + ApiClient.accessToken() + '"'
+                                    }
+                                }).then(function (r) { return r.json(); }).then(function (d) { return (d && d.Items) ? d.Items : []; });
+                            });
+                        };
+
                         // Load and render admin libraries checkboxes
                         (function () {
                             var listContainer = page.querySelector('#admin-libraries-list');
@@ -1363,15 +1410,7 @@
                             var excludedStr = hiddenInput.value || '';
                             var excludedIds = excludedStr.split(',').filter(function (id) { return id; });
 
-                            var viewsUrl = ApiClient.serverAddress() + '/Items?IncludeItemTypes=CollectionFolder&userId=' + ApiClient.getCurrentUserId();
-                            fetch(viewsUrl, {
-                                headers: {
-                                    'Authorization': 'MediaBrowser Client="' + ApiClient.appName() + '", Device="' + ApiClient.deviceName() + '", DeviceId="' + ApiClient.deviceId() + '", Version="' + ApiClient.appVersion() + '", Token="' + ApiClient.accessToken() + '"'
-                                }
-                            }).then(function (response) {
-                                return response.json();
-                            }).then(function (data) {
-                                var views = data.Items || [];
+                            fetchServerViews().then(function (views) {
                                 var html = '';
 
                                 views.forEach(function (view) {
@@ -1391,6 +1430,41 @@
                                 }
                             }).catch(function (err) {
                                 console.error('Error fetching libraries in admin panel:', err);
+                                listContainer.innerHTML = '<div class="fieldDescription" style="color: #ff3b30;">Failed to load libraries.</div>';
+                            });
+                        })();
+
+                        // Load and render trailer-enabled library checkboxes
+                        (function () {
+                            var listContainer = page.querySelector('#admin-trailer-libraries-list');
+                            var hiddenInput = page.querySelector('#TrailerEnabledLibraries');
+                            if (!listContainer || !hiddenInput) return;
+
+                            var enabledStr = (hiddenInput.value || '').trim();
+                            var isConfigured = enabledStr.length > 0;
+                            var isNone = enabledStr.toLowerCase() === 'none';
+                            var enabledIds = enabledStr.split(',').map(function (id) { return id.trim(); }).filter(function (id) { return id; });
+
+                            fetchServerViews().then(function (views) {
+                                var html = '';
+
+                                views.forEach(function (view) {
+                                    var isChecked = !isConfigured ? true : (isNone ? false : enabledIds.indexOf(view.Id) !== -1);
+                                    html += '<div class="checkboxContainer checkboxContainer-withDescription" style="margin: 0.3em 0;">' +
+                                        '<label>' +
+                                        '<input is="emby-checkbox" type="checkbox" class="admin-trailer-library-checkbox" data-id="' + view.Id + '" ' + (isChecked ? 'checked' : '') + ' />' +
+                                        '<span>' + view.Name + '</span>' +
+                                        '</label>' +
+                                        '</div>';
+                                });
+
+                                if (html === '') {
+                                    listContainer.innerHTML = '<div class="fieldDescription">No libraries found.</div>';
+                                } else {
+                                    listContainer.innerHTML = html;
+                                }
+                            }).catch(function (err) {
+                                console.error('Error fetching trailer libraries in admin panel:', err);
                                 listContainer.innerHTML = '<div class="fieldDescription" style="color: #ff3b30;">Failed to load libraries.</div>';
                             });
                         })();
@@ -1623,6 +1697,23 @@
                     var excludedInput = page.querySelector('#ExcludedLibraries');
                     if (excludedInput) excludedInput.value = uncheckedIds.join(',');
 
+                    // Trailer-enabled Libraries: checked checkboxes are allowed to autoplay trailer backdrops
+                    var trailerCheckboxes = page.querySelectorAll('.admin-trailer-library-checkbox');
+                    var enabledTrailerLibraryIds = [];
+                    trailerCheckboxes.forEach(function (cb) {
+                        if (cb.checked) {
+                            enabledTrailerLibraryIds.push(cb.getAttribute('data-id'));
+                        }
+                    });
+                    var trailerEnabledInput = page.querySelector('#TrailerEnabledLibraries');
+                    if (trailerEnabledInput) {
+                        if (trailerCheckboxes.length > 0 && enabledTrailerLibraryIds.length === 0) {
+                            trailerEnabledInput.value = "none";
+                        } else {
+                            trailerEnabledInput.value = enabledTrailerLibraryIds.join(',');
+                        }
+                    }
+
                     // Sync hidden input from SponsorBlock checkboxes
                     (function () {
                         var checkedCats = [];
@@ -1662,9 +1753,10 @@
                         'EnableCustomOverlay', 'CustomOverlayText', 'CustomOverlayImageUrl',
                         'CustomOverlayStyle', 'CustomOverlayImageStyle', 'CustomOverlayPriority',
                         'CustomOverlayPositionX', 'CustomOverlayPositionY', 'CustomOverlayScale',
-                        'BackdropVideoDelay', 'TrailerStartOffset', 'TrailerEndOffset', 'ConstrainPlotWidth', 'MobileCompactMode', 'DefaultTrailerVolume', 'HoverAudioFadeMs',
-                        'ClientMenuLocation', 'ClientMenuLocationMobile', 'CustomPlaylists', 'TransitionEffect',
-                        'ShowProgressBar', 'ProgressBarLocation', 'ExcludedLibraries', 'YoYoProgressBar', 'SyncPageBackdrop'
+                        'BackdropVideoDelay', 'TrailerStartOffset', 'TrailerEndOffset', 'ConstrainPlotWidth', 'MobileCompactMode',
+                        'DefaultTrailerVolume', 'HoverAudioFadeMs', 'ClientMenuLocation', 'ClientMenuLocationMobile',
+                        'CustomPlaylists', 'TransitionEffect', 'ShowProgressBar', 'ProgressBarLocation', 'ExcludedLibraries',
+                        'TrailerEnabledLibraries', 'YoYoProgressBar', 'SyncPageBackdrop'
                     ];
 
                     var numberDefaults = {
@@ -2711,8 +2803,9 @@
                 transition: all 0.2s !important;
             }
 
-            /* Spacing overrides for the admin library list */
-            #MediaBarEnhancedConfigurationPage #admin-libraries-list .checkboxContainer {
+            /* Spacing overrides for library and category checkbox lists */
+            #MediaBarEnhancedConfigurationPage #admin-libraries-list .checkboxContainer,
+            #MediaBarEnhancedConfigurationPage #admin-trailer-libraries-list .checkboxContainer {
                 margin-top: 0.2em !important;
                 margin-bottom: 0.2em !important;
             }
