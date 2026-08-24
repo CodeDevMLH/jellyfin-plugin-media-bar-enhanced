@@ -9,6 +9,14 @@
     "imageUrl": "https://raw.githubusercontent.com/CodeDevMLH/jellyfin-plugin-media-bar-enhanced/refs/heads/main/logo.png",
     "versions": [
       {
+        "version": "3.6.0.0",
+        "changelog": "- feat: Add per-library trailer backdrop autoplay controls with static backdrop fallback (#117)\n- fix: Enforce global CONFIG.maxItems limit across multi-library queries (#119)\n- fix: Skip trailer lookups when video is disabled and tear down loading screen on route departure (#121)\n- fix: Fix library fetching in admin dashboard for Jellyfin v12 compatibility",
+        "targetAbi": "10.11.0.0",
+        "sourceUrl": "https://github.com/CodeDevMLH/jellyfin-plugin-media-bar-enhanced/releases/download/v3.5.2.0/Jellyfin.Plugin.MediaBarEnhanced.zip",
+        "checksum": "344e806cbcddde9e41927b9dd9fec8bd",
+        "timestamp": "2026-08-17T00:04:01Z"
+      },
+      {
         "version": "3.5.2.0",
         "changelog": "- feat: Add Sync Page Backdrop option to mirror active slide background in Jellyfin's page background (from upstream with fixes)\n- feat: Add parent series backdrop image fallback for Season and Episode slides\n- fix: Prevent TV mode autofocus from stealing focus when returning from details pages\n- fix: Prevent unintended close events in client settings popup",
         "targetAbi": "10.11.0.0",
