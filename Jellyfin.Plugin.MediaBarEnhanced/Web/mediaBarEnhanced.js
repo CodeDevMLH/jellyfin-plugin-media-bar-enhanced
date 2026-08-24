@@ -30,7 +30,7 @@
   window.mediaBarEnhancedLoaded = true;
 
   // MARK: Version
-  const PLUGIN_VERSION = "3.5.2.0";
+  const PLUGIN_VERSION = "3.6.0.0";
 
   //Core Module Configuration
   const CONFIG = {
@@ -1935,13 +1935,13 @@
               return new Date(item.DateCreated) >= pastDate;
             });
           }
-          
+
           // filter to max items and max types
           let movieCount = 0
           let showCount = 0
           let keptItems = []
           for (const item of items) {
-            if((movieCount+showCount) >= CONFIG.maxItems){
+            if ((movieCount + showCount) >= CONFIG.maxItems) {
               break;
             }
             if (item.Type === 'Movie') {
@@ -2524,7 +2524,7 @@
           console.warn("🎬 Media Bar:", "Could not extract YouTube Video ID from YouTube URL:", urlToCheck);
         }
         return videoId;
-      } catch (e) {}
+      } catch (e) { }
       return null;
     },
 
@@ -3249,14 +3249,17 @@
 
       const enableMobileVideo = MediaBarEnhancedSettingsManager.getSetting('mobileVideo', CONFIG.enableMobileVideo);
 
-      const trailerEnabledLibraryIds = (CONFIG.trailerEnabledLibraries || '')
+      const rawTrailerLibs = (CONFIG.trailerEnabledLibraries || '').trim();
+      const trailerEnabledLibraryIds = rawTrailerLibs
         .split(',')
         .map(id => id.trim())
         .filter(id => id);
 
-      const libraryAllowsTrailer = !CONFIG.trailerEnabledLibraries ||
-        trailerEnabledLibraryIds.length === 0 ||
-        (!!item.MediaBarLibraryId && trailerEnabledLibraryIds.includes(item.MediaBarLibraryId));
+      const libraryAllowsTrailer = rawTrailerLibs === ''
+        ? true
+        : rawTrailerLibs.toLowerCase() === 'none'
+          ? false
+          : (!!item.MediaBarLibraryId && trailerEnabledLibraryIds.includes(item.MediaBarLibraryId));
 
       const shouldPlayVideo = enableVideo && libraryAllowsTrailer && (!isMobile || enableMobileVideo);
 
