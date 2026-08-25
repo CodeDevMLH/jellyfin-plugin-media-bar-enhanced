@@ -1,6 +1,6 @@
 # Jellyfin Media Bar Enhanced Plugin
 
-Media Bar Enhanced is a plugin for Jellyfin that introduces a customizable and interactive media bar to your dashboard view on Jellyfin web.
+**Media Bar Enhanced (MBE)** is a plugin for Jellyfin that introduces a customizable and interactive media bar to your dashboard view on Jellyfin web.
 
 This plugin is a fork and enhancement of the original [Media Bar by MakD](https://github.com/MakD/Jellyfin-Media-Bar) and my previous work on [Jellyfin-Featured-Content-Bar](https://github.com/CodeDevMLH/Jellyfin-Featured-Content-Bar), but can be installed as plugin for easier installation and management/configuration.
 
@@ -25,7 +25,7 @@ This plugin is a fork and enhancement of the original [Media Bar by MakD](https:
     - [Advanced Settings](#advanced-settings)
       - [Time Settings](#time-settings)
       - [Content Sorting](#content-sorting)
-      - [Content Limits](#content-limits)
+      - [Content Limits & Library Filters](#content-limits--library-filters)
   - [Build The Plugin By Yourself](#build-the-plugin-by-yourself)
   - [Troubleshooting](#troubleshooting)
     - [Effects Not Showing](#effects-not-showing)
@@ -97,58 +97,33 @@ Supported languages (English, German, Spanish, French, Italian)
 This plugin builds upon the original Media Bar with new capabilities and improvements:
 
 ### New Features & Enhancements
-*   **Video Backdrop Support**: Play trailer as background video directly in the slideshow.
-*   **SponsorBlock Integration**: Automatically skip intro/outro segments in YouTube trailers.
-*   **Mobile Compact Aspect Ratio Modes**:
-    *   **16:9 Compact Wide** & **4:3 Compact Classic** aspect ratio options designed specifically for portrait mobile screens.
-    *   Aligns navigation arrows vertically to the center of the scaled banner.
-    *   Stacks year, age rating, and end times vertically on the right to prevent horizontal overflows.
-    *   Automatically limits font sizes and wraps logo title fallback text to fit cleanly.
-    *   Fades out the static background image when the video backdrop is playing so it doesn't bleed through.
-*   **Flexible Client Settings Location**:
+*   **Cinematic Video Backdrops**:
+    *   Full-width background video playback for YouTube and local video streams.
+    *   Smart trailer selection prioritizes official main trailers over teasers and clips.
+    *   **SponsorBlock & Offsets**: Automatically skip sponsored segments, intro logos, and trim end credits.
+    *   **Sync Page Backdrop**: Ambiently mirrors the active slide backdrop into Jellyfin's full page background.
+    *   **Hover Audio Fade**: Hover over the media bar to smoothly fade sound in while muted without changing persistent mute state.
+*   **Trailer & Metadata Fallbacks**:
+    *   TV Series, Season, and Episode slides automatically inherit parent Season or Series local trailers, logos, genres, and ratings when direct assets are missing.
+*   **Per-Library Granular Control**:
+    *   Choose specifically which libraries appear in Media Bar and which libraries are allowed to autoplay video trailers.
+*   **Mobile-Optimized Experience**:
+    *   **16:9 Wide** & **4:3 Classic** compact aspect ratio modes designed specifically for mobile portrait screens.
+    *   Responsive layouts with vertical metadata stacking and touch swipe gestures.
+*   **Per-Device Client-Side Settings**:
+    *   Allows individual users on your server to override volume, aspect ratio, audio fade, and library filters on their own device.
     *   Choose where the client-side configuration button appears (Navbar header gear icon, Sidebar navigation drawer, or Both).
-    *   Allows freeing up valuable navigation header space on small mobile phone screens.
-*   **Premium Dialog Modals & Animations**:
-    *   Opening client settings via the sidebar closes the drawer automatically and renders the options in a centered dialog modal.
-    *   Features a blurred, dimmed backdrop overlay (`backdrop-filter: blur(4px)`) and smooth pop-in and fade transitions.
-*   **Trailer Volume Controls**:
-    *   Choose a default volume level (10% - 100%) for background trailer playback.
-    *   Applies seamlessly to both YouTube and HTML5 local video players.
-*   **Advanced Collection & Library Support**:
-    *   Input a folder ID, BoxSet ID, or even a full Library ID (like a Collection Folder or UserView) and the plugin will recursively fetch and display all matching films and series items.
+    *   Supporting 5 languages (English, German, Spanish, French, Italian).
+*   **Custom Content & Seasonal Scheduling**:
+    *   Display custom BoxSets, Playlists, or dynamic filters like `genre:Action` and `tag:Christmas`.
+    *   Schedule automated seasonal holiday themes with custom date ranges and priority rules.
 *   **Enhanced Controls**:
     *   Keyboard shortcuts (Arrow keys to navigate, Space to pause, M to mute).
-    *   Option to always show navigation arrows.
-    *   Standalone "Trailer" button (opens in a modal) if video backdrops are disabled.
-*   **Smarter Playback**:
-    *   Option to wait for the trailer to end before advancing the slide.
-    *   Mute/Unmute controls.
 *   **Override Trailers**: Manually specify a custom trailer URL for any item via the Custom Media IDs list.
-*   **Customization**:
-    *   **Custom Media IDs**: Manually specify which items to display. Easily configurable via the plugin settings.
-    *   **Seasonal Content Mode**: Define date-based lists for holidays and seasons (e.g., Halloween, Christmas).
-    *   Pagination dots turn into a counter (e.g., 1/20) if the limit is exceeded.
-        <details>
-        <summary>Have a look:</summary>
-        <img width="167" height="142" alt="PagDots_Number" src="https://github.com/user-attachments/assets/6a0a5040-cf13-4d9c-ae96-f50ec249c3f1" />
-        </details>
-    *   Option to disable the loading screen.
-    *   Client Settings: Optionally allow users to set selected media bar settings from their client.
-        <details>
-        <summary>Have a look:</summary>
-        <img width="513" height="575" alt="Client-Settings" src="https://github.com/user-attachments/assets/3e29a84f-f8ea-4b7b-b561-80493cb1535b" />
-        </details>
-    *   **Local Trailers Preference**: Option to prefer local trailers (from the media item) over online sources.
-    *   **Theme Video Support**: Option to prefer local theme videos (backdrops) over trailers.
-    *   **Randomization**: Options to randomize theme videos and local trailers if multiple versions exist.
-    *   **Include Watched Content**: Option to include watched items in the random slideshow.
-    *   **Content Sorting Options**: Sort content by various criteria such as PremiereDate, ProductionYear, Random, or Original order.
-    *   **Genre & Tag Filtering**: Fetch library items dynamically by specifying e.g. `genre:Action` or `tag:2000s` in the Custom Media IDs list.
-    *   **Custom Slideshow Overlays**: 
-        *   Display floating text or images over the slideshow, e.g. for seasonal greetings or special events.
-        *   Choose from 15+ animated styles (Neon, VHS, Matrix, etc.).
-        *   Upload custom overlay images directly via the configuration page.
-    *   **Client-Side Settings**: Allow users to override settings locally on their device.
+*   **Customizable Floating Overlays**:
+    *   Display custom branding, holiday greetings, or promotional badges.
+    *   Choose from 15+ animated CSS styles (Neon, Cyberpunk Glitch, Matrix, VHS, etc.) with custom image upload support.
+*  **Manny more settings**: Just install the plugin and check out the settings in the Jellyfin admin panel to see all the options.
 
 ### Core Features
 *   **Immersive Slideshow**: Rotates through your media library.
@@ -201,8 +176,9 @@ Configure the plugin via **Dashboard** > **Plugins** > **Media Bar Enhanced**.
 ### General Settings
 *   **Enable Media Bar Enhanced Plugin**: Master switch to toggle the plugin.
 *   **Enable Video Backdrops**: Dynamically plays trailers in the background.
+*   **Sync Page Backdrop**: Mirrors the active slide background image into Jellyfin's page background.
 *   **Wait For Trailer To End**: Prevents slide transition until the video finishes.
-*   **Enable Trailer on Mobile**: specific setting to allow video playback on mobile devices (disabled by default to save data/battery).
+*   **Enable Trailer on Mobile**: Specific setting to allow video playback on mobile devices (disabled by default to save data/battery).
 *   **Show Trailer Button**: Adds a button to open the trailer in a popup modal if video backdrops are disabled (e.g. on mobile if trailers are disabled there).
 *   **Prefer Local Trailers**: If enabled, local trailers will be preferred over remote (YouTube) trailers.
 *   **Prefer Local Backdrops / Theme Videos**: If enabled, local backdrop videos (Theme Videos) will be preferred over remote and local trailers.
@@ -228,6 +204,7 @@ Define exactly what shows up in your bar.
         ```
     *   **Automatic ID Extraction**: Simply paste full Jellyfin item URLs (e.g., `.../details?id=XXXX...`) and the IDs will be automatically extracted.
     *   Example Collection Name: `Halloween Collection [https://...] | My Description` (Note: Use `|` to separate description from name if using a name instead of an ID)
+*   **Custom Playlists**: Enter playlist names or IDs to directly display items from Jellyfin playlists.
 *   **Apply Limits to Custom IDs**: If enabled, the "Content Limits" (see below) will also apply to your Custom Media IDs list. By default, custom lists show all listed items regardless of limits.
 *   **Enable Seasonal Content Mode**: Advanced date-based scheduling.
     *   **GUI Configuration**: You can easily add "Seasons" via the **Add Season** button.
@@ -247,10 +224,10 @@ Add a global hover element to your slideshow for special events, seasonal greeti
 Simply copy the URL of an item in the web interface and paste it into the "Custom Media IDs" field. The plugin will handle the rest!
 Alternatively, check the URL: `.../web/#/details?id=YOUR_ITEM_ID_IS_HERE&...`
 
-
-
 ### Advanced Settings
 *   **Slide Animations**: Enable/disable the "Zoom In" effect.
+*   **Transition Effect**: Choose between `Fade`, `Slide`, or `None` for slide transitions.
+*   **Show Progress Bar**: Display an animated progress bar indicating time remaining on the active slide (`Top`, `Bottom`, or `Disabled`).
 *   **Client-Side Settings**: Allow users to customize their own experience by enabling client-side overrides for certain settings.
 *   **Randomize Backdrop Video/Local Trailer**: If multiple videos are available, randomly select one instead of always using the first, if backdrop videos or local trailers are enabled.
 *   **Use SponsorBlock**: Skips non-content segments in YouTube trailers (if the data exists).
@@ -270,6 +247,7 @@ Alternatively, check the URL: `.../web/#/details?id=YOUR_ITEM_ID_IS_HERE&...`
 *   **Shuffle Interval (ms)**: Time each slide is displayed before transitioning to the next (only active on trailer slides if "Wait For Trailer To End" is disabled).
 *   **Backdrop Video Delay (ms)**: Time to wait before playing background videos (leaves static backdrop visible longer).
 *   **Trailer Start Offset (ms)**: Skip the first part of every trailer, e.g. a studio logo. YouTube trailers can only be skipped in whole seconds, and SponsorBlock still wins if it skips further. Default is `0` (disabled).
+*   **Trailer End Offset (ms)**: Trim the end of every trailer, e.g. end credits. Default is `0` (disabled).
 *   **Random Trailer Start Position**: Start each backdrop trailer at a random point (between 10% and 75% of usable length). Only active when "Wait For Trailer To End" is disabled to improve variety on short slideshow rotations. Default is enabled when "Wait For Trailer To End" is disabled.
 
 #### Content Sorting
@@ -282,12 +260,14 @@ Customize the order of slides in the Media Bar.
 *   **Max Days Recent**: Only show items added to your library in the last X days.
 *   **Include Watched Content**: If enabled, the random slideshow will also include items that you have already watched (by default, watched items are excluded from random selection to keep the content fresh).
 
-#### Content Limits
-Fine-tune performance by limiting the number of items fetched from the server.
+#### Content Limits & Library Filters
+Fine-tune performance by limiting the number of items fetched from the server and filtering libraries.
 
 *   **Total Max Items**: Maximum total items to fetch (combined).
 *   **Max Movies**: Maximum movies to include (for random selection).
 *   **Max Tv Shows**: Maximum TV shows to include (for random selection).
+*   **Libraries to Include in Media Bar**: Multi-select library checkboxes to include or exclude specific libraries from the Media Bar.
+*   **Libraries Allowed to Play Trailer Backdrops**: Select specifically which libraries may autoplay video backdrops (unselected libraries will show static backdrops).
 *   **Preload Count**: Number of slides to preload for smooth transitions (does not apply to low end devices like TVs or iPhones to prevent performance issues).
     *   *Intelligent Preloading*: The plugin uses a safe preloading strategy that respects this count but handles small lists gracefully to avoid playback issues.
 *   **Show Pagination Dots**: Toggle the dots/counter visibility.
