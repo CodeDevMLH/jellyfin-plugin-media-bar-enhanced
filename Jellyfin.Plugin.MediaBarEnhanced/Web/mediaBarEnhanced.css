@@ -54,11 +54,11 @@
 
 @keyframes kenBurnsZoomIn {
   from {
-    transform: scale3d(1, 1, 0);
+    transform: scale3d(1, 1, 1);
   }
 
   to {
-    transform: scale3d(1.1, 1.1, 0.1);
+    transform: scale3d(1.1, 1.1, 1);
   }
 }
 
@@ -147,7 +147,7 @@
 
 .backdrop.low-quality {
   filter: blur(0.5px);
-  transform: scale(1.01);
+  transform: scale3d(1.01, 1.01, 1);
   transition:
     filter 0.3s ease-in-out,
     transform 0.3s ease-in-out;
@@ -155,7 +155,7 @@
 
 .backdrop.high-quality {
   filter: blur(0);
-  transform: scale(1);
+  transform: scale3d(1, 1, 1);
   transition:
     filter 0.3s ease-in-out,
     transform 0.3s ease-in-out;
@@ -2300,9 +2300,16 @@
 
 /* Jellyfin 10.11.x Blue Hover */
 .media-bar-settings-button:hover {
-  color: var(--jf-palette-primary-main, var(--theme-primary-color, #00a4e4)) !important;
-  background-color: rgba(0, 165, 220, 0.400) !important;
+  background-color: rgba(0, 164, 220, 0.2) !important;
+  color: #00a4dc !important;
   border-radius: 50% !important;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .media-bar-settings-button:hover:not(:disabled) {
+    background-color: rgba(0, 164, 220, 0.2) !important;
+    color: #00a4dc !important;
+  }
 }
 
 /* Jellyfin v12 Full Header Height Grey Hover */
