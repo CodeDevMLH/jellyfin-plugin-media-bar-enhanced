@@ -17,6 +17,7 @@ This plugin is a fork and enhancement of the original [Media Bar by MakD](https:
     - [Core Features](#core-features)
   - [Installation](#installation)
   - [Client Compatibility](#client-compatibility)
+  - [Content Display Priority Hierarchy](#content-display-priority-hierarchy)
   - [Configuration](#configuration)
     - [General Settings](#general-settings)
     - [Custom Content](#custom-content)
@@ -25,7 +26,7 @@ This plugin is a fork and enhancement of the original [Media Bar by MakD](https:
     - [Advanced Settings](#advanced-settings)
       - [Time Settings](#time-settings)
       - [Content Sorting](#content-sorting)
-      - [Content Limits & Library Filters](#content-limits--library-filters)
+      - [Content Limits \& Library Filters](#content-limits--library-filters)
   - [Build The Plugin By Yourself](#build-the-plugin-by-yourself)
   - [Troubleshooting](#troubleshooting)
     - [Effects Not Showing](#effects-not-showing)
@@ -97,13 +98,17 @@ Supported languages (English, German, Spanish, French, Italian)
 This plugin builds upon the original Media Bar with new capabilities and improvements:
 
 ### New Features & Enhancements
+*   **Personalized Recommendation Engine**:
+    *   Integrates per-user recommendations tailored to watch history via Jellyfin's Suggestions API.
+    *   Includes automatic fallback to standard library content if a user has no watch history.
 *   **Cinematic Video Backdrops**:
     *   Full-width background video playback for YouTube and local video streams.
     *   Smart trailer selection prioritizes official main trailers over teasers and clips.
     *   **SponsorBlock & Offsets**: Automatically skip sponsored segments, intro logos, and trim end credits.
     *   **Sync Page Backdrop**: Ambiently mirrors the active slide backdrop into Jellyfin's full page background.
     *   **Hover Audio Fade**: Hover over the media bar to smoothly fade sound in while muted without changing persistent mute state.
-*   **Trailer & Metadata Fallbacks**:
+*   **Title Logo Controls & Fallbacks**:
+    *   **Require Title Logo Filter**: Optional toggle to only include media with dedicated transparent logos, bypassing text fallbacks when desired.
     *   TV Series, Season, and Episode slides automatically inherit parent Season or Series local trailers, logos, genres, and ratings when direct assets are missing.
 *   **Per-Library Granular Control**:
     *   Choose specifically which libraries appear in Media Bar and which libraries are allowed to autoplay video trailers.
@@ -111,7 +116,7 @@ This plugin builds upon the original Media Bar with new capabilities and improve
     *   **16:9 Wide** & **4:3 Classic** compact aspect ratio modes designed specifically for mobile portrait screens.
     *   Responsive layouts with vertical metadata stacking and touch swipe gestures.
 *   **Per-Device Client-Side Settings**:
-    *   Allows individual users on your server to override volume, aspect ratio, audio fade, and library filters on their own device.
+    *   Allows individual users on your server to override volume, aspect ratio, audio fade, recommendations, and library filters on their own device.
     *   Choose where the client-side configuration button appears (Navbar header gear icon, Sidebar navigation drawer, or Both).
     *   Supporting 5 languages (English, German, Spanish, French, Italian).
 *   **Custom Content & Seasonal Scheduling**:
@@ -123,7 +128,7 @@ This plugin builds upon the original Media Bar with new capabilities and improve
 *   **Customizable Floating Overlays**:
     *   Display custom branding, holiday greetings, or promotional badges.
     *   Choose from 15+ animated CSS styles (Neon, Cyberpunk Glitch, Matrix, VHS, etc.) with custom image upload support.
-*  **Manny more settings**: Just install the plugin and check out the settings in the Jellyfin admin panel to see all the options.
+*  **Many more settings**: Just install the plugin and check out the settings in the Jellyfin admin panel to see all the options.
 
 ### Core Features
 *   **Immersive Slideshow**: Rotates through your media library.
@@ -165,6 +170,22 @@ Because this plugin relies on injecting JavaScript and CSS into the web interfac
 | **Roku** | ❌ | **Not supported.** Uses a native UI. |
 | **Swiftfin** (iOS/tvOS) | ❌ | **Not supported.** Uses a native Swift UI. |
 | **Kodi** (via Jellyfin Addon) | ❌ | **Not supported.** Uses Kodi's native skinning engine. |
+
+## Content Display Priority Hierarchy
+
+Media Bar Enhanced supports multiple content sources (from automated per-user recommendations and seasonal holiday themes to custom box sets and random library rotations). When multiple sources are active, they are evaluated in a defined order of priority:
+
+| Priority | Level | Source | Description |
+| :---: | :---: | :--- | :--- |
+| **1** | 👤 Client | **Forced Custom Playlist** | When a user explicitly selects a playlist from the client settings menu (e.g. `Playlist: Marvel`), it takes top priority on their device. |
+| **2** | 👤 Client | **Personalized Recommendations** | When a user turns ON *Personalized Recommendations* in their client menu, it overrides server-wide static custom IDs and shows suggestions tailored to their watch history. |
+| **3** | 🖥️ Server | **Seasonal Content Mode** | Scheduled seasonal sections (e.g. Halloween, Christmas) automatically activate when enabled and the current calendar date matches the configured period. |
+| **4** | 🖥️ Server | **Custom Media IDs** | Fixed list of item IDs, collections, `genre:`, or `tag:` filters configured by the server administrator. |
+| **5** | 🖥️ Server | **Server Default Recommendations** | When *Enable Personalized Recommendations* is turned ON globally in the Admin Dashboard, users on `Default` receive watch-history recommendations. |
+| **6** | 🖥️ Server | **Random / Recent Library Content** | Default dynamic rotation of library items (with parental rating, age limit, and library inclusion/exclusion filters applied). |
+
+*Note: If a user has no watch history (0 played items), recommendations automatically fall back to standard library content to ensure the Media Bar is never empty.*
+
 
 ## Configuration
 

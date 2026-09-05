@@ -565,6 +565,13 @@
                                     </svg>
                                     <span>Custom Media IDs</span>
                                 </div>
+                                <div class="info-banner" style="margin-top: 0;">
+                                    <i class="material-icons" style="color: #00a4dc; font-size: 24px;">info</i>
+                                    <div>
+                                        <strong>Content Priority:</strong> Forced Playlist &gt; Client Recs &gt; Seasonal &gt; Custom IDs &gt; Server Recs &gt; Random Library.
+                                        <a href="https://github.com/CodeDevMLH/jellyfin-plugin-media-bar-enhanced#content-display-priority-hierarchy" target="_blank" rel="noopener noreferrer" style="color: #00a4dc; text-decoration: underline; margin-left: 4px;">Learn more</a>
+                                    </div>
+                                </div>
                                 <div class="highlight-setting-card">
                                     <div class="checkboxContainer checkboxContainer-withDescription">
                                         <label>
@@ -1040,6 +1047,23 @@
                                     <div class="fieldDescription">Include watched content in the selection results.
                                     </div>
                                 </div>
+                                <div class="checkboxContainer checkboxContainer-withDescription"
+                                    style="margin-top: 1.5em;">
+                                    <label>
+                                        <input is="emby-checkbox" type="checkbox" id="UseRecommendations"
+                                            name="UseRecommendations" />
+                                        <span>Enable Personalized Recommendations</span>
+                                    </label>
+                                    <div class="fieldDescription">Show personalized suggestions tailored to the current user's watch history instead of random items.
+                                    </div>
+                                </div>
+                                <div class="info-banner" style="margin-top: 1.5em; margin-bottom: 0;">
+                                    <i class="material-icons" style="color: #00a4dc; font-size: 24px;">info</i>
+                                    <div>
+                                        <strong>Content Priority:</strong> Forced Playlist &gt; Client Recs &gt; Seasonal &gt; Custom IDs &gt; Server Recs &gt; Random Library.
+                                        <a href="https://github.com/CodeDevMLH/jellyfin-plugin-media-bar-enhanced#content-display-priority-hierarchy" target="_blank" rel="noopener noreferrer" style="color: #00a4dc; text-decoration: underline; margin-left: 4px;">Learn more</a>
+                                    </div>
+                                </div>
                             </div>
 
                             <!-- Card 3: Limits & Pagination -->
@@ -1130,6 +1154,16 @@
                                     </label>
                                     <div class="fieldDescription">Force numeric slide counter instead of dots,
                                         regardless of slide count.
+                                    </div>
+                                </div>
+                                <div class="checkboxContainer checkboxContainer-withDescription"
+                                    style="margin-top: 1.5em;">
+                                    <label>
+                                        <input is="emby-checkbox" type="checkbox" id="RequireLogo"
+                                            name="RequireLogo" />
+                                        <span>Require Title Logo</span>
+                                    </label>
+                                    <div class="fieldDescription">Only include items with a dedicated transparent title logo. Items without a logo will be skipped (ignoring text fallback).
                                     </div>
                                 </div>
                             </div>
@@ -1341,7 +1375,7 @@
                             'BackdropVideoDelay', 'TrailerStartOffset', 'TrailerEndOffset', 'ConstrainPlotWidth', 'MobileCompactMode',
                             'DefaultTrailerVolume', 'HoverAudioFadeMs', 'ClientMenuLocation', 'ClientMenuLocationMobile',
                             'CustomPlaylists', 'TransitionEffect', 'ShowProgressBar', 'ProgressBarLocation', 'ExcludedLibraries',
-                            'TrailerEnabledLibraries', 'YoYoProgressBar', 'SyncPageBackdrop'
+                            'TrailerEnabledLibraries', 'YoYoProgressBar', 'SyncPageBackdrop', 'UseRecommendations', 'RequireLogo'
                         ];
 
                         // Manual mapping for MediaBarIsEnabled -> IsEnabled, to avoid conflicts with other plugins
@@ -1756,7 +1790,7 @@
                         'BackdropVideoDelay', 'TrailerStartOffset', 'TrailerEndOffset', 'ConstrainPlotWidth', 'MobileCompactMode',
                         'DefaultTrailerVolume', 'HoverAudioFadeMs', 'ClientMenuLocation', 'ClientMenuLocationMobile',
                         'CustomPlaylists', 'TransitionEffect', 'ShowProgressBar', 'ProgressBarLocation', 'ExcludedLibraries',
-                        'TrailerEnabledLibraries', 'YoYoProgressBar', 'SyncPageBackdrop'
+                        'TrailerEnabledLibraries', 'YoYoProgressBar', 'SyncPageBackdrop', 'UseRecommendations', 'RequireLogo'
                     ];
 
                     var numberDefaults = {

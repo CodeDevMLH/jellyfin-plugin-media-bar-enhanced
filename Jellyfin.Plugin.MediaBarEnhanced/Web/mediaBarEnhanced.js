@@ -30,7 +30,7 @@
   window.mediaBarEnhancedLoaded = true;
 
   // MARK: Version
-  const PLUGIN_VERSION = "3.6.0.0";
+  const PLUGIN_VERSION = "3.7.0.0";
 
   //Core Module Configuration
   const CONFIG = {
@@ -115,6 +115,8 @@
     onlyLocalTrailers: false,
     yoYoProgressBar: true,
     syncPageBackdrop: false,
+    useRecommendations: false,
+    requireLogo: false,
   };
 
   const CLIENT_MENU_TRANSLATIONS = {
@@ -184,6 +186,10 @@
       yoYoProgressBarDesc: 'Empty progress bar from left to right on alternating slides instead of resetting.',
       syncPageBackdropLabel: 'Sync Page Backdrop',
       syncPageBackdropDesc: 'Mirrors the featured slide background image into Jellyfin\'s page background.',
+      useRecommendationsLabel: 'Personalized Recommendations',
+      useRecommendationsDesc: 'Show recommendations based on your watch history.',
+      requireLogoLabel: 'Require Title Logo',
+      requireLogoDesc: 'Only include items that have a title logo.',
       toastMuted: 'Muted',
       toastUnmuted: 'Audio On',
       toastPaused: 'Slideshow Paused',
@@ -258,6 +264,10 @@
       yoYoProgressBarDesc: 'Ladebalken bei abwechselnden Folien von links nach rechts leeren anstatt zurückzuspringen.',
       syncPageBackdropLabel: 'Seiten-Hintergrund synchronisieren',
       syncPageBackdropDesc: 'Spiegelt das Hintergrundbild der aktuellen Folie in den Seiten-Hintergrund von Jellyfin.',
+      useRecommendationsLabel: 'Personalisierte Empfehlungen',
+      useRecommendationsDesc: 'Zeigt Vorschläge basierend auf deinem bisherigen Sehverlauf.',
+      requireLogoLabel: 'Titel-Logo erforderlich',
+      requireLogoDesc: 'Nur Medien anzeigen, für die ein Titel-Logo vorhanden ist.',
       toastMuted: 'Stumm geschaltet',
       toastUnmuted: 'Ton aktiviert',
       toastPaused: 'Diashow pausiert',
@@ -332,6 +342,10 @@
       yoYoProgressBarDesc: 'Vaciar la barra de progreso de izquierda a derecha en diapositivas alternas en lugar de reiniciar.',
       syncPageBackdropLabel: 'Sincronizar fondo de página',
       syncPageBackdropDesc: 'Refleja la imagen de fondo de la diapositiva en el fondo de página de Jellyfin.',
+      useRecommendationsLabel: 'Recomendaciones personalizadas',
+      useRecommendationsDesc: 'Muestra recomendaciones basadas en tu historial de reproducción.',
+      requireLogoLabel: 'Requerir logo de título',
+      requireLogoDesc: 'Solo incluir elementos que tengan un logo de título.',
       toastMuted: 'Silenciado',
       toastUnmuted: 'Sonido activado',
       toastPaused: 'Diapositivas en pausa',
@@ -406,6 +420,10 @@
       yoYoProgressBarDesc: 'Vider la barre de progression de gauche à droite sur les diapositives alternées au lieu de réinitialiser.',
       syncPageBackdropLabel: 'Synchroniser l\'arrière-plan de la page',
       syncPageBackdropDesc: 'Répète l\'image d\'arrière-plan de la diapositive active dans l\'arrière-plan de la page Jellyfin.',
+      useRecommendationsLabel: 'Recommandations personnalisées',
+      useRecommendationsDesc: 'Afficher des recommandations basées sur votre historique de visionnage.',
+      requireLogoLabel: 'Exiger le logo du titre',
+      requireLogoDesc: 'N\'inclure que les éléments disposant d\'un logo de titre.',
       toastMuted: 'Muet',
       toastUnmuted: 'Son activé',
       toastPaused: 'Diaporama en pause',
@@ -480,6 +498,10 @@
       yoYoProgressBarDesc: 'Svuota la barra di avanzamento da sinistra a destra nelle diapositive alternate invece di ripristinare.',
       syncPageBackdropLabel: 'Sincronizza sfondo pagina',
       syncPageBackdropDesc: 'Riflette l\'immagine di sfondo della diapositiva corrente nello sfondo della pagina di Jellyfin.',
+      useRecommendationsLabel: 'Raccomandazioni personalizzate',
+      useRecommendationsDesc: 'Mostra suggerimenti basati sulla tua cronologia di visione.',
+      requireLogoLabel: 'Richiedi logo del titolo',
+      requireLogoDesc: 'Includi solo elementi che hanno un logo di titolo.',
       toastMuted: 'Disattivato',
       toastUnmuted: 'Audio attivato',
       toastPaused: 'Presentazione in pausa',
@@ -1781,28 +1803,194 @@
     },
 
     /**
-     * Fetches random items from the server
-     * @returns {Promise<Array>} Array of item objects
+     * Fetches personalized recommendations from the server
+     * @returns {Promise<Array>} Array of item IDs
+     */
+    async fetchRecommendationsFromServer() {
+      try {
+        if (
+          !STATE.jellyfinData.accessToken ||
+          STATE.jellyfinData.accessToken === "Not Found" ||
+          !STATE.jellyfinData.serverAddress ||
+          STATE.jellyfinData.serverAddress === "Not Found" ||
+          !STATE.jellyfinData.userId
+        ) {
+          return [];
+        }
+
+        let itemTypes = [];
+        if (CONFIG.maxMovies > 0) itemTypes.push("Movie");
+        if (CONFIG.maxTvShows > 0) itemTypes.push("Series");
+        if (itemTypes.length === 0) return [];
+
+        const libraryMap = await this.fetchLibraryIds() || {};
+        const allLibraryIds = [...new Set(Object.values(libraryMap))];
+        const clientExcludedStr = localStorage.getItem('mediaBarEnhanced-excludedLibraries');
+        let allExcludedIds = [];
+
+        if (clientExcludedStr !== null) {
+          allExcludedIds = clientExcludedStr.split(',').filter(id => id);
+        } else {
+          const serverExcludedNames = CONFIG.excludedLibraries ? CONFIG.excludedLibraries.split(',').map(s => s.trim().toLowerCase()).filter(s => s) : [];
+          if (serverExcludedNames.length > 0) {
+            allExcludedIds = serverExcludedNames.map(name => libraryMap[name]).filter(id => id);
+          }
+        }
+        const includedIds = allLibraryIds.filter(id => !allExcludedIds.includes(id));
+        const requireLogo = MediaBarEnhancedSettingsManager.getSetting('requireLogo', CONFIG.requireLogo);
+
+        console.log("🎬 Media Bar:", `Fetching personalized suggestions for user ${STATE.jellyfinData.userId}...`);
+        const recsLimit = Math.max((CONFIG.maxItems || 10) * 3, 30);
+        let candidates = [];
+
+        // A) Query /Movies/Recommendations (powers "Because you watched..." in Movie library)
+        try {
+          const moviesRecsUrl = `${STATE.jellyfinData.serverAddress}/Movies/Recommendations?userId=${STATE.jellyfinData.userId}&categoryLimit=6&itemLimit=10&fields=Id,Type,DateCreated,ImageTags,ParentLogoImageTag,ParentBackdropImageTags,BackdropImageTags,OfficialRating,ParentId,SeriesId`;
+          const recsResp = await fetch(moviesRecsUrl, { headers: this.getAuthHeaders() });
+          if (recsResp.ok) {
+            const recGroups = await recsResp.json();
+            if (Array.isArray(recGroups)) {
+              recGroups.forEach(group => {
+                if (Array.isArray(group.Items)) {
+                  candidates.push(...group.Items);
+                }
+              });
+            }
+          }
+        } catch (e) {
+          console.warn("🎬 Media Bar:", "Error fetching /Movies/Recommendations:", e);
+        }
+
+        // B) Query /Users/{userId}/Suggestions (general suggestions endpoint)
+        try {
+          const userSugUrl = `${STATE.jellyfinData.serverAddress}/Users/${STATE.jellyfinData.userId}/Suggestions?limit=${recsLimit}&fields=Id,Type,DateCreated,ImageTags,ParentLogoImageTag,ParentBackdropImageTags,BackdropImageTags,OfficialRating,ParentId,SeriesId`;
+          const sugResp = await fetch(userSugUrl, { headers: this.getAuthHeaders() });
+          if (sugResp.ok) {
+            const sugData = await sugResp.json();
+            if (Array.isArray(sugData.Items)) {
+              candidates.push(...sugData.Items);
+            }
+          }
+        } catch (e) {
+          console.warn("🎬 Media Bar:", "Error fetching /Users/Suggestions:", e);
+        }
+
+        // C) Query /Items/{id}/Similar for the 3 most recently played items (Movie or TV)
+        try {
+          const playedUrl = `${STATE.jellyfinData.serverAddress}/Users/${STATE.jellyfinData.userId}/Items?SortBy=DatePlayed&SortOrder=Descending&Limit=3&Filters=IsPlayed&Recursive=true&fields=Id`;
+          const playedResp = await fetch(playedUrl, { headers: this.getAuthHeaders() });
+          if (playedResp.ok) {
+            const playedData = await playedResp.json();
+            const playedItems = playedData.Items || [];
+            const simPromises = playedItems.map(async (pItem) => {
+              try {
+                const simUrl = `${STATE.jellyfinData.serverAddress}/Items/${pItem.Id}/Similar?userId=${STATE.jellyfinData.userId}&limit=10&fields=Id,Type,DateCreated,ImageTags,ParentLogoImageTag,ParentBackdropImageTags,BackdropImageTags,OfficialRating,ParentId,SeriesId`;
+                const simResp = await fetch(simUrl, { headers: this.getAuthHeaders() });
+                if (simResp.ok) {
+                  const simData = await simResp.json();
+                  return simData.Items || (Array.isArray(simData) ? simData : []);
+                }
+              } catch (err) { }
+              return [];
+            });
+            const simResults = await Promise.all(simPromises);
+            simResults.forEach(simList => candidates.push(...simList));
+          }
+        } catch (e) {
+          console.warn("🎬 Media Bar:", "Error fetching similar items for recently played:", e);
+        }
+
+        // Deduplicate candidates by Id
+        const seenIds = new Set();
+        candidates = candidates.filter(item => {
+          if (!item || !item.Id || seenIds.has(item.Id)) return false;
+          seenIds.add(item.Id);
+          return true;
+        });
+
+        // Filter candidate item types
+        candidates = candidates.filter(i => itemTypes.includes(i.Type));
+
+        // Parental rating filter
+        if (CONFIG.maxParentalRating) {
+          candidates = candidates.filter(item => {
+            if (!item.OfficialRating) return true;
+            const ratingNum = parseInt(item.OfficialRating.replace(/\D/g, ''), 10);
+            return isNaN(ratingNum) || ratingNum <= CONFIG.maxParentalRating;
+          });
+        }
+
+        // Library inclusion / exclusion filter
+        if (includedIds.length > 0 && includedIds.length < allLibraryIds.length) {
+          candidates = candidates.filter(item => !item.ParentId || includedIds.includes(item.ParentId));
+        } else if (allExcludedIds.length > 0) {
+          candidates = candidates.filter(item => !item.ParentId || !allExcludedIds.includes(item.ParentId));
+        }
+
+        // Watched content filter
+        if (!CONFIG.includeWatchedContent) {
+          candidates = candidates.filter(item => !item.UserData || !item.UserData.Played);
+        }
+
+        // Require Title Logo filter
+        if (requireLogo) {
+          candidates = candidates.filter(item => (item.ImageTags && item.ImageTags.Logo) || item.ParentLogoImageTag);
+        }
+
+        if (candidates.length === 0) {
+          console.log("🎬 Media Bar:", "No personalized suggestions matched filters.");
+          return [];
+        }
+
+        if (CONFIG.sortBy === 'Random' || CONFIG.sortBy === 'Original') {
+          candidates.sort(() => Math.random() - 0.5);
+        }
+
+        // Apply Content Limits (MaxMovies, MaxTvShows, MaxItems)
+        let movieCount = 0;
+        let showCount = 0;
+        let keptItems = [];
+
+        for (const item of candidates) {
+          if ((movieCount + showCount) >= CONFIG.maxItems) break;
+          if (item.Type === 'Movie') {
+            if (movieCount < CONFIG.maxMovies) {
+              movieCount++;
+              keptItems.push(item);
+            }
+          } else if (item.Type === 'Series' || item.Type === 'Season' || item.Type === 'Episode') {
+            if (showCount < CONFIG.maxTvShows) {
+              showCount++;
+              keptItems.push(item);
+            }
+          } else {
+            keptItems.push(item);
+          }
+        }
+
+        console.log("🎬 Media Bar:", `Loaded ${keptItems.length} personalized recommendations (Movies: ${movieCount}, Shows: ${showCount}).`);
+        return keptItems.map(i => i.Id);
+      } catch (error) {
+        console.error("🎬 Media Bar:", "Error fetching recommendations:", error);
+        return [];
+      }
+    },
+
+    /**
+     * Fetches random library items from the server
+     * @returns {Promise<Array>} Array of item IDs
      */
     async fetchItemIdsFromServer() {
       try {
         if (
           !STATE.jellyfinData.accessToken ||
-          STATE.jellyfinData.accessToken === "Not Found"
-        ) {
-          console.warn("🎬 Media Bar:", "Access token not available. Delaying API request...");
-          return [];
-        }
-
-        if (
+          STATE.jellyfinData.accessToken === "Not Found" ||
           !STATE.jellyfinData.serverAddress ||
           STATE.jellyfinData.serverAddress === "Not Found"
         ) {
-          console.warn("🎬 Media Bar:", "Server address not available. Delaying API request...");
+          console.warn("🎬 Media Bar:", "Access token or server address not available.");
           return [];
         }
-
-        console.log("🎬 Media Bar:", "Fetching random items from server...");
 
         let itemTypes = [];
         if (CONFIG.maxMovies > 0) itemTypes.push("Movie");
@@ -1870,9 +2058,12 @@
           }
         }
 
+        const requireLogo = MediaBarEnhancedSettingsManager.getSetting('requireLogo', CONFIG.requireLogo);
+
         const fetchItems = async (currentDateFilter, parentId = '') => {
           const parentParam = parentId ? `&parentId=${parentId}` : '';
-          const url = `${STATE.jellyfinData.serverAddress}/Items?IncludeItemTypes=${itemTypes.join(",")}&Recursive=true&hasOverview=true&imageTypes=Logo,Backdrop&${sortParams}${playedFilter}${parentalFilter}${currentDateFilter}${excludeFilter}${parentParam}&enableUserData=true&Limit=${CONFIG.maxItems}&fields=Id,Type,DateCreated`;
+          const fetchLimit = Math.max((CONFIG.maxItems || 10) * 3, 30);
+          const url = `${STATE.jellyfinData.serverAddress}/Items?IncludeItemTypes=${itemTypes.join(",")}&Recursive=true&hasOverview=true&imageTypes=Logo,Backdrop&${sortParams}${playedFilter}${parentalFilter}${currentDateFilter}${excludeFilter}${parentParam}&enableUserData=true&Limit=${fetchLimit}&fields=Id,Type,DateCreated,ImageTags,ParentLogoImageTag,ParentBackdropItemId,SeriesId`;
           const resp = await fetch(url, { headers: this.getAuthHeaders() });
           return resp;
         };
@@ -1895,6 +2086,7 @@
         const includedIds = allLibraryIds.filter(id => !allExcludedIds.includes(id));
 
         let items = [];
+
         if (allLibraryIds.length > 0 && includedIds.length === 0) {
           // All libraries excluded
           return [];
@@ -1934,35 +2126,6 @@
               if (!item.DateCreated) return true;
               return new Date(item.DateCreated) >= pastDate;
             });
-          }
-
-          // filter to max items and max types
-          let movieCount = 0
-          let showCount = 0
-          let keptItems = []
-          for (const item of items) {
-            if ((movieCount + showCount) >= CONFIG.maxItems) {
-              break;
-            }
-            if (item.Type === 'Movie') {
-              if (movieCount < CONFIG.maxMovies) {
-                movieCount++;
-                keptItems.push(item);
-              }
-            } else if (item.Type === 'Series' || item.Type === 'Season' || item.Type === 'Episode') {
-              if (showCount < CONFIG.maxTvShows) {
-                showCount++;
-                keptItems.push(item);
-              }
-            } else {
-              keptItems.push(item);
-            }
-          }
-          items = keptItems;
-
-          // reshuffle if there are different max number for movies and TV
-          if ((CONFIG.maxMovies != CONFIG.maxTvShows) && (CONFIG.sortBy === 'Random' || CONFIG.sortBy === 'Original')) {
-            items.sort(() => Math.random() - 0.5);
           }
 
           // Fallback if no items in date range
@@ -2019,6 +2182,11 @@
           }
         }
 
+        // Apply Require Logo filter if enabled
+        if (requireLogo) {
+          items = items.filter(item => (item.ImageTags && item.ImageTags.Logo) || item.ParentLogoImageTag);
+        }
+
         // Apply Content Limits (MaxMovies, MaxTvShows)
         let movieCount = 0;
         let showCount = 0;
@@ -2044,8 +2212,12 @@
         }
         items = keptItems;
 
-        console.log("🎬 Media Bar:", `Successfully fetched ${items.length} random items from server (Movies: ${movieCount}, Shows: ${showCount})`);
+        // reshuffle if there are different max number for movies and TV
+        if ((CONFIG.maxMovies != CONFIG.maxTvShows) && (CONFIG.sortBy === 'Random' || CONFIG.sortBy === 'Original')) {
+          items.sort(() => Math.random() - 0.5);
+        }
 
+        console.log("🎬 Media Bar:", `Successfully fetched ${items.length} random library items from server (Movies: ${movieCount}, Shows: ${showCount})`);
         return items.map((item) => item.Id);
       } catch (error) {
         console.error("🎬 Media Bar:", "Error fetching item IDs:", error);
@@ -5817,100 +5989,139 @@
         STATE.slideshow.isLoading = true;
         let itemIds = [];
 
-        // 1. Try Custom Media/Collection IDs from Config & seasonal content
         const activePlaylist = MediaBarEnhancedSettingsManager.getSetting('activePlaylist', 'Default');
-        if (CONFIG.enableCustomMediaIds || CONFIG.enableSeasonalContent || (activePlaylist && activePlaylist.startsWith('Playlist:'))) {
-          console.log("🎬 Media Bar:", "Using Custom Media IDs from configuration");
-          const parsed = this.parseCustomIds();
-          const hasGenresOrTags = parsed.genres.length > 0 || parsed.tags.length > 0;
-          const hasIds = parsed.ids.length > 0;
+        const isClientRecsExplicit = localStorage.getItem('mediaBarEnhanced-useRecommendations') === 'true';
 
-          let resolvedItems = [];
-
-          // Resolve explicit IDs (GUIDs, collection names, etc.)
-          if (hasIds) {
-            resolvedItems = await this.resolveCollectionsAndItems(parsed.ids);
-          }
-
-          // Fetch items matching genre/tag filters from the API
-          if (hasGenresOrTags) {
-            const genreTagItems = await ApiUtils.fetchItemsByGenresAndTags(parsed.genres, parsed.tags);
-
-            if (genreTagItems.length > 0) {
-              // Merge with explicit IDs, deduplicating by Id
-              const existingIds = new Set(resolvedItems.map(i => i.Id));
-              for (const item of genreTagItems) {
-                if (!existingIds.has(item.Id)) {
-                  resolvedItems.push(item);
-                  existingIds.add(item.Id);
-                }
-              }
-              console.log("🎬 Media Bar:", `Merged ${genreTagItems.length} genre/tag items with ${hasIds ? parsed.ids.length : 0} explicit IDs → ${resolvedItems.length} total unique items`);
-            }
-          }
-
-          // Apply max items limit to custom IDs if enabled
-          if (CONFIG.applyLimitsToCustomIds) {
-            let movieCount = 0;
-            let showCount = 0;
-            let keptItems = [];
-
-            for (const item of resolvedItems) {
-              if (keptItems.length >= CONFIG.maxItems) break;
-
-              if (item.Type === 'Movie') {
-                if (movieCount < CONFIG.maxMovies) {
-                  movieCount++;
-                  keptItems.push(item);
-                }
-              } else if (item.Type === 'Series' || item.Type === 'Season' || item.Type === 'Episode') {
-                // Count Seasons/Episodes as TV Shows
-                if (showCount < CONFIG.maxTvShows) {
-                  showCount++;
-                  keptItems.push(item);
-                }
-              } else {
-                // Other types: count towards total only
-                keptItems.push(item);
+        // Priority 1: Forced Playlist from Client Menu
+        if (activePlaylist && activePlaylist.startsWith('Playlist:')) {
+          const playlistName = activePlaylist.replace('Playlist:', '');
+          try {
+            const playlists = JSON.parse(CONFIG.customPlaylists || "[]");
+            const found = playlists.find(p => p.Name === playlistName);
+            if (found) {
+              console.log("🎬 Media Bar:", `Using client-forced playlist: ${playlistName}`);
+              const parsed = this.parseIdsString(found.MediaIds);
+              if (parsed.ids.length > 0) {
+                const resolved = await this.resolveCollectionsAndItems(parsed.ids);
+                itemIds = resolved.map(i => i.Id);
               }
             }
-            itemIds = keptItems.map(i => i.Id);
-            console.log("🎬 Media Bar:", `Applied limits to custom IDs: ${itemIds.length} items (Movies: ${movieCount}, Shows: ${showCount})`);
-          } else {
-            // Even if applyLimitsToCustomIds is false, filter out items whose max count is 0
-            resolvedItems = resolvedItems.filter(item => {
-              if (item.Type === 'Movie' && CONFIG.maxMovies === 0) return false;
-              if ((item.Type === 'Series' || item.Type === 'Season' || item.Type === 'Episode') && CONFIG.maxTvShows === 0) return false;
-              return true;
-            });
-            itemIds = resolvedItems.map(i => i.Id);
+          } catch (e) {
+            console.error("🎬 Media Bar:", "Error parsing client playlist:", e);
           }
         }
 
-        // 2. Fallback to server query (Random)
-        if (itemIds.length === 0) {
-          console.log("🎬 Media Bar:", "No custom list found, fetching random items from server...");
-          itemIds = await ApiUtils.fetchItemIdsFromServer();
-
-          if (CONFIG.sortBy === 'Random') {
-            itemIds = SlideUtils.shuffleArray(itemIds);
+        // Priority 2: Client Explicit Personalized Recommendations Override
+        if (itemIds.length === 0 && activePlaylist !== 'Library' && isClientRecsExplicit) {
+          console.log("🎬 Media Bar:", "Client explicitly enabled personalized recommendations, querying recommendations...");
+          itemIds = await ApiUtils.fetchRecommendationsFromServer();
+          if (itemIds.length === 0) {
+            console.log("🎬 Media Bar:", "No client recommendations found for user, continuing content priority chain...");
           }
-        } else {
-          // Custom IDs
-          if (CONFIG.sortBy === 'Random') {
-            itemIds = SlideUtils.shuffleArray(itemIds);
-          } else if (CONFIG.sortBy !== 'Original') {
-            // Client-side sort required...
-            console.log("🎬 Media Bar:", `Sorting ${itemIds.length} custom items by ${CONFIG.sortBy} ${CONFIG.sortOrder}`);
-            const itemsWithDetails = [];
-            for (const id of itemIds) {
-              const item = await ApiUtils.fetchItemDetails(id);
-              if (item) itemsWithDetails.push(item);
+        }
+
+        // Priority 3: Seasonal Content & Priority 4: Custom Media IDs from Configuration
+        if (itemIds.length === 0 && activePlaylist !== 'Library') {
+          if (CONFIG.enableCustomMediaIds || CONFIG.enableSeasonalContent) {
+            const parsed = this.parseCustomIds();
+            const hasGenresOrTags = parsed.genres.length > 0 || parsed.tags.length > 0;
+            const hasIds = parsed.ids.length > 0;
+
+            if (hasIds || hasGenresOrTags) {
+              console.log("🎬 Media Bar:", "Using Custom Media IDs / Seasonal content from configuration");
+              let resolvedItems = [];
+
+              // Resolve explicit IDs (GUIDs, collection names, etc.)
+              if (hasIds) {
+                resolvedItems = await this.resolveCollectionsAndItems(parsed.ids);
+              }
+
+              // Fetch items matching genre/tag filters from the API
+              if (hasGenresOrTags) {
+                const genreTagItems = await ApiUtils.fetchItemsByGenresAndTags(parsed.genres, parsed.tags);
+
+                if (genreTagItems.length > 0) {
+                  // Merge with explicit IDs, deduplicating by Id
+                  const existingIds = new Set(resolvedItems.map(i => i.Id));
+                  for (const item of genreTagItems) {
+                    if (!existingIds.has(item.Id)) {
+                      resolvedItems.push(item);
+                      existingIds.add(item.Id);
+                    }
+                  }
+                  console.log("🎬 Media Bar:", `Merged ${genreTagItems.length} genre/tag items with ${hasIds ? parsed.ids.length : 0} explicit IDs → ${resolvedItems.length} total unique items`);
+                }
+              }
+
+              // Apply max items limit to custom IDs if enabled
+              if (CONFIG.applyLimitsToCustomIds) {
+                let movieCount = 0;
+                let showCount = 0;
+                let keptItems = [];
+
+                for (const item of resolvedItems) {
+                  if (keptItems.length >= CONFIG.maxItems) break;
+
+                  if (item.Type === 'Movie') {
+                    if (movieCount < CONFIG.maxMovies) {
+                      movieCount++;
+                      keptItems.push(item);
+                    }
+                  } else if (item.Type === 'Series' || item.Type === 'Season' || item.Type === 'Episode') {
+                    // Count Seasons/Episodes as TV Shows
+                    if (showCount < CONFIG.maxTvShows) {
+                      showCount++;
+                      keptItems.push(item);
+                    }
+                  } else {
+                    // Other types: count towards total only
+                    keptItems.push(item);
+                  }
+                }
+                itemIds = keptItems.map(i => i.Id);
+                console.log("🎬 Media Bar:", `Applied limits to custom IDs: ${itemIds.length} items (Movies: ${movieCount}, Shows: ${showCount})`);
+              } else {
+                // Even if applyLimitsToCustomIds is false, filter out items whose max count is 0
+                resolvedItems = resolvedItems.filter(item => {
+                  if (item.Type === 'Movie' && CONFIG.maxMovies === 0) return false;
+                  if ((item.Type === 'Series' || item.Type === 'Season' || item.Type === 'Episode') && CONFIG.maxTvShows === 0) return false;
+                  return true;
+                });
+                itemIds = resolvedItems.map(i => i.Id);
+              }
             }
-
-            const sortedItems = SlideUtils.sortItems(itemsWithDetails, CONFIG.sortBy, CONFIG.sortOrder);
-            itemIds = sortedItems.map(i => i.Id);
           }
+        }
+
+        // Priority 5: Server Default Personalized Recommendations
+        if (itemIds.length === 0 && activePlaylist !== 'Library' && CONFIG.useRecommendations) {
+          console.log("🎬 Media Bar:", "Server default recommendations enabled, querying recommendations...");
+          itemIds = await ApiUtils.fetchRecommendationsFromServer();
+          if (itemIds.length === 0) {
+            console.log("🎬 Media Bar:", "No server recommendations found for user, continuing to random library items...");
+          }
+        }
+
+        // Priority 6: Random Library Items (Fallback)
+        if (itemIds.length === 0) {
+          console.log("🎬 Media Bar:", "Fetching random library items from server...");
+          itemIds = await ApiUtils.fetchItemIdsFromServer();
+        } else if (CONFIG.sortBy !== 'Original' && CONFIG.sortBy !== 'Random') {
+          // Client-side sort for custom/seasonal/playlist items
+          console.log("🎬 Media Bar:", `Sorting ${itemIds.length} custom items by ${CONFIG.sortBy} ${CONFIG.sortOrder}`);
+          const itemsWithDetails = [];
+          for (const id of itemIds) {
+            const item = await ApiUtils.fetchItemDetails(id);
+            if (item) itemsWithDetails.push(item);
+          }
+
+          const sortedItems = SlideUtils.sortItems(itemsWithDetails, CONFIG.sortBy, CONFIG.sortOrder);
+          itemIds = sortedItems.map(i => i.Id);
+        }
+
+        // Shuffle once at the end if Random sorting is selected
+        if (CONFIG.sortBy === 'Random') {
+          itemIds = SlideUtils.shuffleArray(itemIds);
         }
 
         STATE.slideshow.itemIds = itemIds;
@@ -6559,6 +6770,8 @@
 
       const generalSettings = [
         { key: 'enabled', label: t.enabledLabel, description: t.enabledDesc, default: true },
+        { key: 'useRecommendations', label: t.useRecommendationsLabel || 'Personalized Recommendations', description: t.useRecommendationsDesc || 'Show recommendations based on your watch history.', default: false },
+        { key: 'requireLogo', label: t.requireLogoLabel || 'Require Title Logo', description: t.requireLogoDesc || 'Only include items that have a title logo.', default: CONFIG.requireLogo },
         { key: 'slideAnimations', label: t.slideAnimationsLabel, description: t.slideAnimationsDesc, default: CONFIG.slideAnimationEnabled },
         { key: 'showProgressBar', label: t.showProgressBarLabel || 'Show Progress Bar', description: t.showProgressBarDesc || 'Display timing progress line.', default: CONFIG.showProgressBar },
         { key: 'yoYoProgressBar', label: t.yoYoProgressBarLabel || 'Yo-Yo Progress Bar', description: t.yoYoProgressBarDesc || 'Empty progress bar from left to right on alternating slides instead of resetting.', default: CONFIG.yoYoProgressBar },

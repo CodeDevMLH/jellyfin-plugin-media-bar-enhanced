@@ -85,5 +85,7 @@ namespace Jellyfin.Plugin.MediaBarEnhanced.Configuration
         public bool OnlyLocalTrailers { get; set; } = false;
         public bool YoYoProgressBar { get; set; } = true;
         public bool SyncPageBackdrop { get; set; } = false;
+        public bool UseRecommendations { get; set; } = false;
+        public bool RequireLogo { get; set; } = false;
     }
 }
