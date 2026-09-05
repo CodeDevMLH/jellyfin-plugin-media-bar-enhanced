@@ -12,9 +12,9 @@
         "version": "3.7.0.0",
         "changelog": "- feat: Add per-user personalized recommendations based on Jellyfin Suggestions API\n- feat: Add optional filter to require title logos before displaying items\n- feat: Integrate cache-friendly image URL tags for persistent client caching\n- fix: Centralize content limits and reshuffle logic across all content endpoints",
         "targetAbi": "10.11.0.0",
-        "sourceUrl": "https://github.com/CodeDevMLH/jellyfin-plugin-media-bar-enhanced/releases/download/v3.6.0.0/Jellyfin.Plugin.MediaBarEnhanced.zip",
-        "checksum": "8ccd0b96d4b9e326d23885eed9a11b16",
-        "timestamp": "2026-08-24T23:58:56Z"
+        "sourceUrl": "https://github.com/CodeDevMLH/jellyfin-plugin-media-bar-enhanced/releases/download/v3.7.0.0/Jellyfin.Plugin.MediaBarEnhanced.zip",
+        "checksum": "67ccb99ff0e51b63197a172e487bc4a7",
+        "timestamp": "2026-09-05T01:02:13Z"
       },
       {
         "version": "3.6.0.0",
