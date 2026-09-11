@@ -579,6 +579,39 @@
     return isTv;
   };
 
+  /**
+   * Central helper function to detect if Jellyfin is running version 12
+   * and automatically synchronize the jellyfin-v12 CSS class.
+   * @returns {boolean} True if running Jellyfin v12.
+   */
+  const isV12 = () => {
+    const serverVer = (window.ApiClient?._serverInfo?.Version)
+      || (typeof window.ApiClient?.serverVersion === 'function' ? window.ApiClient.serverVersion() : '')
+      || '';
+    const serverMajorVer = parseInt(serverVer.split('.')[0], 10);
+    const appVer = STATE.jellyfinData?.appVersion || '';
+    const majorVer = parseInt(appVer.split('.')[0], 10);
+
+    const isV12Active = !!(
+      document.querySelector('.MuiAppBar-root, .MuiToolbar-root') ||
+      (serverVer.startsWith('12.') || serverMajorVer >= 12) ||
+      (appVer.startsWith('12.') || majorVer >= 12)
+    );
+
+    if (document.body) {
+      if (isV12Active) {
+        document.body.classList.add('jellyfin-v12');
+      } else {
+        document.body.classList.remove('jellyfin-v12');
+      }
+    }
+
+    return isV12Active;
+  };
+
+  // Immediate detection check
+  isV12();
+
   // Request throttling system
   const requestQueue = [];
   let isProcessingQueue = false;
@@ -662,7 +695,7 @@
    */
   const initJellyfinData = (callback) => {
     if (!window.ApiClient) {
-      console.warn("🎬 Media Bar:", "⏳ window.ApiClient is not available yet. Retrying...");
+      console.warn("🎬 Media Bar:", "window.ApiClient is not available yet. Retrying...");
       setTimeout(() => initJellyfinData(callback), CONFIG.retryInterval);
       return;
     }
@@ -696,11 +729,7 @@
       };
 
       try {
-        const appVer = STATE.jellyfinData.appVersion || '';
-        const majorVer = parseInt(appVer.split('.')[0], 10);
-        if (appVer.startsWith('12.') || majorVer >= 12) {
-          document.body.classList.add('jellyfin-v12');
-        }
+        isV12();
       } catch (e) { }
 
       if (callback && typeof callback === "function") {
@@ -719,7 +748,7 @@
     try {
       const locale = await LocalizationUtils.getCurrentLocale();
       await LocalizationUtils.loadTranslations(locale);
-      console.log("🎬 Media Bar:", "✅ Localization initialized");
+      console.log("🎬 Media Bar:", "Localization initialized for locale:", locale);
     } catch (error) {
       console.error("🎬 Media Bar:", "Error initializing localization:", error);
     }
@@ -864,7 +893,7 @@
    * Resets the slideshow state completely
    */
   const resetSlideshowState = () => {
-    console.log("🎬 Media Bar:", "🔄 Resetting slideshow state...");
+    console.log("🎬 Media Bar:", "Resetting slideshow state...");
 
     if (STATE.slideshow.slideInterval) {
       STATE.slideshow.slideInterval.stop();
@@ -925,14 +954,14 @@
 
       if (isLoggedIn !== wasLoggedIn) {
         if (isLoggedIn) {
-          console.log("🎬 Media Bar:", "👤 User logged in. Initializing slideshow...");
+          console.log("🎬 Media Bar:", "User logged in. Initializing slideshow...");
           if (!STATE.slideshow.hasInitialized) {
             waitForApiClientAndInitialize();
           } else {
-            console.log("🎬 Media Bar:", "🔄 Slideshow already initialized, skipping");
+            console.log("🎬 Media Bar:", "Slideshow already initialized, skipping");
           }
         } else {
-          console.log("🎬 Media Bar:", "👋 User logged out. Stopping slideshow...");
+          console.log("🎬 Media Bar:", "User logged out. Stopping slideshow...");
           resetSlideshowState();
         }
         wasLoggedIn = isLoggedIn;
@@ -950,7 +979,7 @@
 
     window.slideshowCheckInterval = setInterval(() => {
       if (!window.ApiClient) {
-        console.log("🎬 Media Bar:", "⏳ ApiClient not available yet. Waiting...");
+        console.log("🎬 Media Bar:", "ApiClient not available yet. Waiting...");
         return;
       }
 
@@ -962,13 +991,13 @@
 
         if (!STATE.slideshow.hasInitialized) {
           initJellyfinData(async () => {
-            console.log("🎬 Media Bar:", "✅ Jellyfin API client initialized successfully");
+            console.log("🎬 Media Bar:", "Jellyfin API client initialized successfully");
             await initLocalization();
             await fetchPluginConfig();
             slidesInit();
           });
         } else {
-          console.log("🎬 Media Bar:", "🔄 Slideshow already initialized, skipping");
+          console.log("🎬 Media Bar:", "Slideshow already initialized, skipping");
         }
       } else {
         console.log("🎬 Media Bar:",
@@ -1002,7 +1031,7 @@
           // Sync to LocalStorage for next load
           localStorage.setItem('mediaBarEnhanced-enableLoadingScreen', CONFIG.enableLoadingScreen);
 
-          console.log("🎬 Media Bar:", "✅ MediaBarEnhanced config loaded", CONFIG);
+          console.log("🎬 Media Bar:", "MediaBarEnhanced config loaded", CONFIG);
         }
       }
     } catch (e) {
@@ -1375,7 +1404,7 @@
     chunkUrlCache: {},
 
     /**
-     * Gets the current locale from user preference, server config, or HTML tag
+     * Gets the current locale from HTML tag, user preference, or server config
      * @returns {Promise<string>} Locale code (e.g., "de", "en-us")
      */
     async getCurrentLocale() {
@@ -1385,50 +1414,39 @@
 
       let locale = null;
 
-      try {
-        if (window.ApiClient && typeof window.ApiClient.deviceId === 'function') {
-          const deviceId = window.ApiClient.deviceId();
-          if (deviceId) {
-            const deviceKey = `${deviceId}-language`;
-            const val = localStorage.getItem(deviceKey);
+      // check <html lang="...">
+      const langAttr = document.documentElement.getAttribute("lang");
+      if (langAttr) {
+        locale = langAttr.toLowerCase();
+      }
+
+      // Check localStorage (deviceId, userId, or generic language)
+      if (!locale) {
+        try {
+          const userId = (window.ApiClient && typeof window.ApiClient.getCurrentUserId === 'function' ? window.ApiClient.getCurrentUserId() : null) || (STATE.jellyfinData ? STATE.jellyfinData.userId : null);
+          if (userId && userId !== "Not Found") {
+            const userKey = `${userId}-language`;
+            const val = localStorage.getItem(userKey);
             if (val) locale = val.toLowerCase();
           }
-        }
-        if (!locale) {
-          const val = localStorage.getItem("language");
-          if (val) locale = val.toLowerCase();
-        }
-      } catch (e) {
-        console.warn("🎬 Media Bar:", "Could not access localStorage for language:", e);
-      }
-
-      if (!locale) {
-        const langAttr = document.documentElement.getAttribute("lang");
-        if (langAttr) {
-          locale = langAttr.toLowerCase();
-        }
-      }
-
-      if (isUserLoggedIn() && STATE.jellyfinData && STATE.jellyfinData.accessToken && STATE.jellyfinData.accessToken !== "Not Found") {
-        try {
-          const userId = (typeof window.ApiClient.getCurrentUserId === 'function' ? window.ApiClient.getCurrentUserId() : null) || (STATE.jellyfinData ? STATE.jellyfinData.userId : null);
-          if (userId && userId !== "Not Found") {
-            const userUrl = `${STATE.jellyfinData.serverAddress}/Users/${userId}`;
-            const userResponse = await fetch(userUrl, {
-              headers: ApiUtils.getAuthHeaders(),
-            });
-            if (userResponse.ok) {
-              const userData = await userResponse.json();
-              if (userData.Configuration && userData.Configuration.AudioLanguagePreference) {
-                locale = userData.Configuration.AudioLanguagePreference.toLowerCase();
-              }
+          if (!locale && window.ApiClient && typeof window.ApiClient.deviceId === 'function') {
+            const deviceId = window.ApiClient.deviceId();
+            if (deviceId) {
+              const deviceKey = `${deviceId}-language`;
+              const val = localStorage.getItem(deviceKey);
+              if (val) locale = val.toLowerCase();
             }
           }
-        } catch (error) {
-          console.warn("🎬 Media Bar:", "Could not fetch user audio language preference:", error);
+          if (!locale) {
+            const val = localStorage.getItem("language");
+            if (val) locale = val.toLowerCase();
+          }
+        } catch (e) {
+          console.warn("🎬 Media Bar:", "Could not access localStorage for language:", e);
         }
       }
 
+      // Fallback to server metadata language preference
       if (!locale && isUserLoggedIn() && STATE.jellyfinData && STATE.jellyfinData.accessToken && STATE.jellyfinData.accessToken !== "Not Found") {
         try {
           const configUrl = `${STATE.jellyfinData.serverAddress}/System/Configuration`;
@@ -1449,6 +1467,7 @@
         }
       }
 
+      // Browser navigator language fallback
       if (!locale) {
         const navLang = navigator.language || navigator.userLanguage;
         locale = navLang ? navLang.toLowerCase() : "en-us";
@@ -1474,23 +1493,40 @@
     },
 
     /**
-     * Finds the translation chunk URL from performance entries
+     * Finds the translation chunk URL from performance entries or script tags
      * @param {string} locale - Locale code
      * @returns {string|null} URL to translation chunk or null
      */
     findTranslationChunkUrl(locale) {
-      const localePrefix = locale.split('-')[0];
+      if (!locale) return null;
+      const localeNormalized = locale.toLowerCase().replace('_', '-');
+      const localePrefix = localeNormalized.split('-')[0];
 
+      if (this.chunkUrlCache[localeNormalized]) {
+        return this.chunkUrlCache[localeNormalized];
+      }
       if (this.chunkUrlCache[localePrefix]) {
         return this.chunkUrlCache[localePrefix];
       }
+
+      const checkUrl = (url) => {
+        if (!url || typeof url !== 'string') return false;
+        const lower = url.toLowerCase();
+        return (
+          lower.includes(`${localeNormalized}-json`) ||
+          lower.includes(`${localePrefix}-json`) ||
+          lower.includes(`${localeNormalized}.json`) ||
+          lower.includes(`${localePrefix}.json`)
+        ) && lower.includes('.chunk.js');
+      };
 
       if (window.performance && window.performance.getEntriesByType) {
         try {
           const resources = window.performance.getEntriesByType('resource');
           for (const resource of resources) {
             const url = resource.name || resource.url;
-            if (url && url.includes(`${localePrefix}-json`) && url.includes('.chunk.js')) {
+            if (checkUrl(url)) {
+              this.chunkUrlCache[localeNormalized] = url;
               this.chunkUrlCache[localePrefix] = url;
               return url;
             }
@@ -1500,7 +1536,19 @@
         }
       }
 
-      this.chunkUrlCache[localePrefix] = null;
+      // Fallback: check active script tags in DOM
+      try {
+        const scripts = document.querySelectorAll('script[src]');
+        for (const script of scripts) {
+          const src = script.getAttribute('src') || script.src;
+          if (checkUrl(src)) {
+            this.chunkUrlCache[localeNormalized] = src;
+            this.chunkUrlCache[localePrefix] = src;
+            return src;
+          }
+        }
+      } catch (e) {}
+
       return null;
     },
 
@@ -1510,94 +1558,72 @@
      * @returns {Promise<void>}
      */
     async loadTranslations(locale) {
-      if (this.translations[locale]) return;
-      if (this.isLoading[locale]) {
-        await this.isLoading[locale];
+      if (!locale) return;
+      const localeNormalized = locale.toLowerCase().replace('_', '-');
+      const localePrefix = localeNormalized.split('-')[0];
+
+      if (this.translations[localeNormalized] && this.translations[localeNormalized].Play) return;
+      if (this.translations[localePrefix] && this.translations[localePrefix].Play) return;
+
+      if (this.isLoading[localeNormalized]) {
+        await this.isLoading[localeNormalized];
         return;
       }
 
       const loadPromise = (async () => {
         try {
-          const chunkUrl = this.findTranslationChunkUrl(locale);
-          if (!chunkUrl) {
-            return;
-          }
+          const chunkUrl = this.findTranslationChunkUrl(localeNormalized);
+          if (chunkUrl) {
+            const response = await fetch(chunkUrl);
+            if (response.ok) {
+              const chunkText = await response.text();
 
-          const response = await fetch(chunkUrl);
-          if (!response.ok) {
-            throw new Error(`Failed to fetch translations: ${response.statusText}`);
-          }
+              // 1. If chunk uses JSON.parse('...'), evaluate expression safely (works on Webpack 4 & 5)
+              const parseIdx = chunkText.indexOf('JSON.parse(');
+              if (parseIdx !== -1) {
+                let endIdx = chunkText.lastIndexOf("}')");
+                if (endIdx === -1) endIdx = chunkText.lastIndexOf('}")');
+                if (endIdx !== -1) {
+                  try {
+                    const expr = chunkText.slice(parseIdx, endIdx + 3);
+                    const parsed = (new Function('return ' + expr))();
+                    if (parsed && typeof parsed === 'object') {
+                      this.translations[localeNormalized] = parsed;
+                      this.translations[localePrefix] = parsed;
+                      return;
+                    }
+                  } catch (e) {
+                    console.warn("🎬 Media Bar:", "Error evaluating chunk expression:", e);
+                  }
+                }
+              }
 
-          /**
-           * @example
-           * Standard version
-           * ```js
-           * "use strict";
-           * (self.webpackChunk = self.webpackChunk || []).push([[62634], {
-           *   30985: function(e) {
-           *     e.exports = JSON.parse('{"Absolute":"..."}')
-           *   }
-           * }]);
-           * ```
-           *
-           * Minified version
-           * ```js
-           * "use strict";(self.webpackChunk=self.webpackChunk||[]).push([[24072],{60715:function(e){e.exports=JSON.parse('{"Absolute":"..."}')}}]);
-           * ```
-           */
-          const chunkText = await response.text();
-
-          const replaceEscaped = (text) =>
-            text.replace(/\\"/g, '"').replace(/\\n/g, '\n').replace(/\\\\/g, '\\').replace(/\\'/g, "'");
-
-          // 1. Try to remove start and end wrappers first
-          try {
-            // Matches from start of file to the beginning of JSON.parse('
-            const START = /^(.*)JSON\.parse\(['"]/gms;
-            // Matches from the end of the JSON string to the end of the file
-            const END = /['"]?\)?\s*}?(\r\n|\r|\n)?}?]?\)?;(\r\n|\r|\n)?$/gms;
-
-            const jsonString = replaceEscaped(chunkText.replace(START, '').replace(END, ''));
-            this.translations[locale] = JSON.parse(jsonString);
-            return;
-          } catch (e) {
-            console.error("🎬 Media Bar:", 'Failed to parse JSON from standard extraction.');
-            // Try alternative extraction below
-          }
-
-          // 2. Try to extract only the JSON string directly
-          let jsonMatch = chunkText.match(/JSON\.parse\(['"](.*?)['"]\)/);
-          if (jsonMatch) {
-            try {
-              const jsonString = replaceEscaped(jsonMatch[1]);
-              this.translations[locale] = JSON.parse(jsonString);
-              return;
-            } catch (e) {
-              console.error("🎬 Media Bar:", 'Failed to parse JSON from direct extraction.');
-              // Try direct extraction
-            }
-          }
-
-          // 3. Fallback: extract everything between the first { and the last }
-          const jsonStart = chunkText.indexOf('{');
-          const jsonEnd = chunkText.lastIndexOf('}') + 1;
-          if (jsonStart !== -1 && jsonEnd > jsonStart) {
-            const jsonString = chunkText.substring(jsonStart, jsonEnd);
-            try {
-              this.translations[locale] = JSON.parse(jsonString);
-              return;
-            } catch (e) {
-              console.error("🎬 Media Bar:", "Failed to parse JSON from chunk:", e);
+              // 2. If chunk uses direct JSON object (e.g. module.exports = { ... })
+              const jsonStart = chunkText.indexOf('{"');
+              const jsonEnd = chunkText.lastIndexOf('"}') + 2;
+              if (jsonStart !== -1 && jsonEnd > jsonStart) {
+                try {
+                  const jsonString = chunkText.substring(jsonStart, jsonEnd);
+                  const parsed = JSON.parse(jsonString);
+                  if (parsed && typeof parsed === 'object') {
+                    this.translations[localeNormalized] = parsed;
+                    this.translations[localePrefix] = parsed;
+                    return;
+                  }
+                } catch (e) {
+                  console.warn("🎬 Media Bar:", "Failed to parse JSON from chunk:", e);
+                }
+              }
             }
           }
         } catch (error) {
           console.error("🎬 Media Bar:", "Error loading translations:", error);
         } finally {
-          delete this.isLoading[locale];
+          delete this.isLoading[localeNormalized];
         }
       })();
 
-      this.isLoading[locale] = loadPromise;
+      this.isLoading[localeNormalized] = loadPromise;
       await loadPromise;
     },
 
@@ -1610,7 +1636,10 @@
      */
     getLocalizedString(key, fallback, ...args) {
       const locale = this.cachedLocale || 'en-us';
-      let translated = (this.translations[locale] && this.translations[locale][key]) || fallback;
+      const localePrefix = locale.split('-')[0];
+      let translated = (this.translations[locale] && this.translations[locale][key]) ||
+                       (this.translations[localePrefix] && this.translations[localePrefix][key]) ||
+                       fallback;
 
       if (args.length > 0) {
         for (let i = 0; i < args.length; i++) {
@@ -3053,15 +3082,19 @@
           }
         }
 
+        STATE.slideshow.isTransitioning = false;
+
         if (STATE.slideshow.hasInitialized && STATE.slideshow.itemIds.length > 0) {
           SlideshowManager.updateCurrentSlide(STATE.slideshow.currentSlideIndex);
+        } else if (STATE.slideshow.slideInterval && !STATE.slideshow.isPaused) {
+          SlideshowManager.resumeActivePlayback();
         }
         if (STATE.slideshow.slideInterval && !STATE.slideshow.isPaused) {
           STATE.slideshow.slideInterval.start();
-          SlideshowManager.resumeActivePlayback();
         }
       } else if (!isVisible) {
         if (this.wasVisible) {
+          STATE.slideshow.isTransitioning = false;
           // Track if user left home screen for a details page (TV mode only)
           if (isTvMode()) {
             const currentHash = window.location.hash || "";
@@ -3735,6 +3768,19 @@
 
           STATE.slideshow.videoPlayers[itemId] = videoBackdrop;
 
+          const showVideoPlayback = (video) => {
+            const slide = document.querySelector(`.slide[data-item-id="${itemId}"]`);
+            if (!slide || !slide.classList.contains('active')) return;
+            if (STATE.slideshow.playSignals && STATE.slideshow.playSignals[itemId] === false) return;
+
+            video.style.opacity = "1";
+            STATE.slideshow.isVideoPlaying = true;
+
+            if (getEffectiveWaitForTrailer() && STATE.slideshow.slideInterval) {
+              STATE.slideshow.slideInterval.stop();
+            }
+          };
+
           videoBackdrop.addEventListener('play', (event) => {
             const slide = document.querySelector(`.slide[data-item-id="${itemId}"]`);
             if (!slide || !slide.classList.contains('active')) {
@@ -3748,18 +3794,16 @@
               return;
             }
 
-            if (STATE.slideshow.playSignals[itemId] === false) {
+            if (STATE.slideshow.playSignals && STATE.slideshow.playSignals[itemId] === false) {
               event.target.pause();
               return;
             }
 
-            // Fade in
-            event.target.style.opacity = "1";
-            STATE.slideshow.isVideoPlaying = true;
+            showVideoPlayback(event.target);
+          });
 
-            if (getEffectiveWaitForTrailer() && STATE.slideshow.slideInterval) {
-              STATE.slideshow.slideInterval.stop();
-            }
+          videoBackdrop.addEventListener('playing', (event) => {
+            showVideoPlayback(event.target);
           });
 
           videoBackdrop.addEventListener('ended', (event) => {
@@ -3782,10 +3826,16 @@
           });
 
           videoBackdrop.addEventListener('timeupdate', (event) => {
-            if (!getEffectiveWaitForTrailer()) return;
             const video = event.target;
             const slide = video.closest('.slide');
             if (!slide || !slide.classList.contains('active')) return;
+
+            // Ensure video backdrop is visible if actively playing
+            if (!video.paused && video.currentTime > 0 && video.style.opacity !== "1") {
+              showVideoPlayback(video);
+            }
+
+            if (!getEffectiveWaitForTrailer()) return;
 
             if (video.duration && video.duration > 0) {
               const startOffset = video._startOffset || 0;
@@ -4536,7 +4586,6 @@
 
         if (!currentSlide) {
           currentSlide = await SlideCreator.createSlideForItemId(currentItemId);
-          this.upgradeSlideImageQuality(currentSlide);
 
           if (!currentSlide) {
             console.error("🎬 Media Bar:", `Failed to create slide for item ${currentItemId}`);
@@ -4544,6 +4593,8 @@
             setTimeout(() => this.nextSlide(), 500);
             return;
           }
+
+          this.upgradeSlideImageQuality(currentSlide);
         }
 
         previousVisibleSlide = container.querySelector(".slide.active");
@@ -5353,6 +5404,11 @@
           if (typeof ytPlayer.setVolume === 'function') ytPlayer.setVolume(getEffectiveTrailerVolume());
         }
         ytPlayer.playVideo();
+        if (ytPlayer._wrapperDiv) {
+          ytPlayer._wrapperDiv.style.transition = "opacity 1.2s ease-in-out";
+          ytPlayer._wrapperDiv.style.opacity = "1";
+        }
+        STATE.slideshow.isVideoPlaying = true;
         return;
       }
 
@@ -5366,7 +5422,10 @@
         }
         html5Video.muted = STATE.slideshow.isMuted;
         if (!STATE.slideshow.isMuted) html5Video.volume = getEffectiveTrailerVolume() / 100;
-        html5Video.play().catch(e => {
+        html5Video.play().then(() => {
+          html5Video.style.opacity = "1";
+          STATE.slideshow.isVideoPlaying = true;
+        }).catch(e => {
           if (e.name !== 'AbortError') console.warn("🎬 Media Bar:", "Error resuming HTML5 video:", e);
         });
       }
@@ -5727,7 +5786,20 @@
           return;
         }
 
-        const canNavigateSlides = isContainerFocused || isInsideContainer || isBodyFocused;
+        const isInteractiveElement = activeElement && activeElement !== document.body && (
+          activeElement.tagName === 'INPUT' ||
+          activeElement.tagName === 'TEXTAREA' ||
+          activeElement.tagName === 'SELECT' ||
+          activeElement.isContentEditable ||
+          activeElement.closest('.dialogContainer, .media-bar-settings-modal, .media-bar-trailer-popup, .actionSheet')
+        );
+
+        const isShelfFocused = isTv && activeElement && activeElement.closest('.homeSectionsContainer, .sections, .emby-scroller, .card');
+        const isNavbarFocused = isTv && this.TvNavigationEngine.isNavbarFocused(activeElement);
+
+        const canNavigateSlides = isContainerFocused || isInsideContainer || isBodyFocused || (
+          isHomeView && !isInteractiveElement && (!isTv || (!isShelfFocused && !isNavbarFocused))
+        );
 
         switch (e.key) {
           case "ArrowRight":
@@ -6343,12 +6415,9 @@
       const button = document.createElement('button');
       button.type = 'button';
 
-      const isV12 = !!(document.getElementById('root')
-        || document.querySelector('.appHeader')
-        || document.querySelector('[class*="appHeader"]')
-        || document.body.classList.contains('jellyfin-v12'));
+      const isV12Active = isV12();
 
-      if (isV12) {
+      if (isV12Active) {
         button.className = 'MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeLarge headerButton media-bar-settings-button';
       } else {
         button.className = 'headerSyncButton syncButton headerButton headerButtonRight paper-icon-button-light media-bar-settings-button';
@@ -6413,11 +6482,8 @@
         if (shouldInjectNavbar) {
           if (headerRight && !headerRight.querySelector('.media-bar-settings-button')) {
             const icon = this.createIcon();
-            const isV12 = !!(document.getElementById('root')
-              || document.querySelector('.appHeader')
-              || document.querySelector('[class*="appHeader"]')
-              || document.body.classList.contains('jellyfin-v12'));
-            if (isV12 && targetButton && targetButton.parentNode === headerRight) {
+            const isV12Active = isV12();
+            if (isV12Active && targetButton && targetButton.parentNode === headerRight) {
               headerRight.insertBefore(icon, targetButton);
             } else {
               headerRight.prepend(icon);
@@ -6601,12 +6667,16 @@
             return style.display === 'none' || style.visibility === 'hidden';
           };
 
-          const userMenuCandidates = Array.from(document.querySelectorAll('#app-user-menu, #app-user-menu .MuiMenu-list, #app-user-menu ul, .MuiMenu-paper .MuiMenu-list, .MuiMenu-paper ul, .MuiPopover-paper ul, .MuiModal-root ul, div[role="presentation"] ul, [role="menu"]'));
+          const userMenuCandidates = Array.from(document.querySelectorAll('#app-user-menu, #app-user-menu .MuiMenu-list, #app-user-menu ul, .MuiMenu-paper .MuiMenu-list, .MuiMenu-paper ul, .MuiPopover-paper ul, .MuiModal-root ul, div[role="presentation"] ul, [role="menu"]'))
+            .filter(menu => !menu.closest('.MuiDrawer-root, .MuiDrawer-paper, .mainDrawer, .navDrawer'));
+
           let muiUserMenu = userMenuCandidates.find(menu => {
             if (isElementHidden(menu)) return false;
+            if (menu.closest('.MuiDrawer-root, .MuiDrawer-paper, .mainDrawer, .navDrawer')) return false;
             if (menu.id === 'app-user-menu' || menu.closest('#app-user-menu')) return true;
             const items = Array.from(menu.children);
             return items.some(item => {
+              if (item.classList?.contains('media-bar-sidebar-settings-link') || item.classList?.contains('media-bar-usermenu-item') || item.classList?.contains('seasonal-sidebar-settings-link') || item.classList?.contains('seasonal-usermenu-item')) return false;
               const href = (item.getAttribute('href') || item.querySelector('a')?.getAttribute('href') || '').toLowerCase();
               const txt = (item.textContent || '').toLowerCase();
               const action = (item.getAttribute('data-action') || '').toLowerCase();
@@ -6642,6 +6712,7 @@
 
             // Position directly under Settings / mypreferences item
             const settingsItem = Array.from(muiUserMenu.children).find(el => {
+              if (el.classList?.contains('media-bar-sidebar-settings-link') || el.classList?.contains('media-bar-usermenu-item') || el.classList?.contains('seasonal-sidebar-settings-link') || el.classList?.contains('seasonal-usermenu-item')) return false;
               const txt = (el.textContent || '').toLowerCase();
               const href = (el.getAttribute('href') || el.querySelector('a')?.getAttribute('href') || '').toLowerCase();
               const action = (el.getAttribute('data-action') || '').toLowerCase();
@@ -7862,7 +7933,7 @@
    */
   const slidesInit = async () => {
     if (STATE.slideshow.hasInitialized) {
-      console.log("🎬 Media Bar:", "⚠️ Slideshow already initialized, skipping");
+      console.log("🎬 Media Bar:", "Slideshow already initialized, skipping");
       return;
     }
 
@@ -8081,7 +8152,7 @@
     const lazyLoadObserver = initLazyLoading();
 
     try {
-      console.log("🎬 Media Bar:", "🌟 Initializing Enhanced Jellyfin Slideshow");
+      console.log("🎬 Media Bar:", "Initializing Enhanced Jellyfin Slideshow");
 
       initArrowNavigation();
 
@@ -8097,7 +8168,7 @@
 
       VisibilityObserver.init();
 
-      console.log("🎬 Media Bar:", "✅ Enhanced Jellyfin Slideshow initialized successfully");
+      console.log("🎬 Media Bar:", "Enhanced Jellyfin Slideshow initialized successfully");
     } catch (error) {
       console.error("🎬 Media Bar:", "Error initializing slideshow:", error);
       STATE.slideshow.hasInitialized = false;
