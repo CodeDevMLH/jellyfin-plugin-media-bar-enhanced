@@ -2,7 +2,7 @@
 name: Bug report
 about: Create a report to help improve this plugin
 title: 'bug: short bug description'
-labels: bug
+labels: bug, enhancement
 assignees: ''
 
 ---
@@ -25,6 +25,7 @@ If applicable, add screenshots to help explain your problem.
 
 **Jellyfin Server (please complete the following information):**
  - OS: [e.g. Linux]
+- Jellyfin Version: [e.g. 12.0]
  - Containerized with docker? [Yes/No]
  - Media Bar Enhanced Plugin version: [e.g. 3.0.0.0]
 
