@@ -690,6 +690,15 @@
   };
 
   /**
+   * Detects if the current device is an iOS or iPadOS device (including iPads reporting desktop Mac UA)
+   * @returns {boolean} True if running on iOS or iPadOS
+   */
+  const isIOSDevice = () => {
+    return /iPhone|iPad|iPod/i.test(navigator.userAgent) ||
+      (/Macintosh/i.test(navigator.userAgent));
+  };
+
+  /**
    * Initializes Jellyfin data from ApiClient
    * @param {Function} callback - Function to call once data is initialized
    */
@@ -3474,9 +3483,7 @@
         let videoId = ApiUtils.extractYouTubeId(trailerUrl);
         let isYoutube = !!videoId;
 
-        const isLowPower = isLowPowerDevice();
-        const isIOSApp = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-        const limitVideos = isLowPower || isIOSApp;
+        const limitVideos = isLowPowerDevice() || isIOSDevice();
         const itemIndex = STATE.slideshow.itemIds ? STATE.slideshow.itemIds.indexOf(itemId) : -1;
         const isActiveSlide = itemIndex !== -1 && itemIndex === STATE.slideshow.currentSlideIndex;
         // Limit YouTube iframe bulk creation on low power devices OR iOS (which kills the WebProcess on OOM)
@@ -4585,9 +4592,7 @@
         }
 
         // pruning for iOS/LowPower
-        const isLowPower = isLowPowerDevice();
-        const isIOSApp = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-        const limitVideos = isLowPower || isIOSApp;
+        const limitVideos = isLowPowerDevice() || isIOSDevice();
 
         // Destroy old video to free up the hardware decoder before allocating new one.
         if (limitVideos) {
@@ -5072,7 +5077,7 @@
     async preloadAdjacentSlides(currentIndex) {
       const totalItems = STATE.slideshow.totalItems;
       let preloadCount = Math.min(Math.max(CONFIG.preloadCount || 1, 1), 5);
-      if (isLowPowerDevice()) preloadCount = 1; // Strict limit for TVs
+      if (isLowPowerDevice() || isIOSDevice()) preloadCount = 1; // Strict limit for TVs & Apple iOS/iPadOS devices
 
       const preloadedIds = new Set();
 
