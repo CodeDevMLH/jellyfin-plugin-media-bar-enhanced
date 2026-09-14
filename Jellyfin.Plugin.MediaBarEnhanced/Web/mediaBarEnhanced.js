@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Jellyfin Slideshow by M0RPH3US v4.0.1
  * Modified by CodeDevMLH
  *
@@ -30,7 +30,7 @@
   window.mediaBarEnhancedLoaded = true;
 
   // MARK: Version
-  const PLUGIN_VERSION = "3.7.0.0";
+  const PLUGIN_VERSION = "3.8.0.0";
 
   //Core Module Configuration
   const CONFIG = {
@@ -1547,7 +1547,7 @@
             return src;
           }
         }
-      } catch (e) {}
+      } catch (e) { }
 
       return null;
     },
@@ -1638,8 +1638,8 @@
       const locale = this.cachedLocale || 'en-us';
       const localePrefix = locale.split('-')[0];
       let translated = (this.translations[locale] && this.translations[locale][key]) ||
-                       (this.translations[localePrefix] && this.translations[localePrefix][key]) ||
-                       fallback;
+        (this.translations[localePrefix] && this.translations[localePrefix][key]) ||
+        fallback;
 
       if (args.length > 0) {
         for (let i = 0; i < args.length; i++) {
@@ -4259,6 +4259,8 @@
       return placeholder;
     },
 
+    slideCreationPromises: {},
+
     /**
      * Creates a slide for an item and adds it to the container
      * @param {string} itemId - Item ID
@@ -4266,62 +4268,102 @@
      * @returns {Promise<HTMLElement>} Created slide element
      */
     async createSlideForItemId(itemId, forceRecreate = false) {
-      try {
-        if (!forceRecreate && STATE.slideshow.createdSlides[itemId]) {
-          return document.querySelector(`.slide[data-item-id="${itemId}"]`);
+      if (!itemId) return null;
+
+      const container = SlideUtils.getOrCreateSlidesContainer();
+
+      if (!forceRecreate) {
+        if (STATE.slideshow.createdSlides[itemId]) {
+          const existing = container.querySelector(`.slide[data-item-id="${itemId}"]`);
+          if (existing) return existing;
         }
-
-        const container = SlideUtils.getOrCreateSlidesContainer();
-
-        const item = await ApiUtils.fetchItemDetails(itemId);
-        if (!item) {
-          console.warn("🎬 Media Bar:", `Failed to load details for item ${itemId}, skipping slide creation`);
-          return null;
+        const existingInDom = container.querySelector(`.slide[data-item-id="${itemId}"]`);
+        if (existingInDom) {
+          STATE.slideshow.createdSlides[itemId] = true;
+          return existingInDom;
         }
-
-        // Resolve the item's top-level Jellyfin library for per-library trailer rules
-        item.MediaBarLibraryId = await ApiUtils.resolveItemLibraryId(item);
-
-        // Trailer/theme-video data is only ever consumed for video backdrops or the trailer button popup
-        // skip all of these lookups when both are disabled.
-        const enableVideo = MediaBarEnhancedSettingsManager.getSetting('videoBackdrops', CONFIG.enableVideoBackdrop);
-        const showTrailerBtn = MediaBarEnhancedSettingsManager.getSetting('trailerButton', CONFIG.showTrailerButton);
-        const needsTrailerData = enableVideo || showTrailerBtn;
-        // Pre-fetch local trailer URL if needed
-        const onlyLocal = MediaBarEnhancedSettingsManager.getSetting('onlyLocalTrailers', CONFIG.onlyLocalTrailers);
-        const canHaveLocalTrailer = (item.LocalTrailerCount && item.LocalTrailerCount > 0) ||
-          item.Type === 'Series' || item.Type === 'Season' || item.Type === 'Episode';
-        if (needsTrailerData && (CONFIG.preferLocalTrailers || onlyLocal || canHaveLocalTrailer)) {
-          item.localTrailerUrl = await ApiUtils.fetchLocalTrailer(item);
+        if (this.slideCreationPromises[itemId]) {
+          return this.slideCreationPromises[itemId];
         }
-
-        // Pre-fetch theme video URL if needed
-        if (needsTrailerData && CONFIG.preferLocalBackdrops) {
-          item.themeVideoUrl = await ApiUtils.fetchThemeVideos(itemId);
-        }
-
-        // Pre-fetch SponsorBlock data early for remote YouTube trailers
-        if (needsTrailerData && CONFIG.useSponsorBlock && !onlyLocal && item.RemoteTrailers && item.RemoteTrailers.length > 0) {
-          const ytId = ApiUtils.extractYouTubeId(item.RemoteTrailers[0].Url);
-          if (ytId) {
-            ApiUtils.fetchSponsorBlockData(ytId); // Trigger background pre-fetch into cache
-          }
-        }
-
-        const slideElement = this.createSlideElement(
-          item,
-          item.Type === "Movie" ? "Movie" : "TV Show"
-        );
-
-        container.appendChild(slideElement);
-
-        STATE.slideshow.createdSlides[itemId] = true;
-
-        return slideElement;
-      } catch (error) {
-        console.error("🎬 Media Bar:", "Error creating slide for item:", error, itemId);
-        return null;
       }
+
+      const creationPromise = (async () => {
+        try {
+          const item = await ApiUtils.fetchItemDetails(itemId);
+          if (!item) {
+            console.warn("🎬 Media Bar:", `Failed to load details for item ${itemId}, skipping slide creation`);
+            return null;
+          }
+
+          // Resolve the item's top-level Jellyfin library for per-library trailer rules
+          item.MediaBarLibraryId = await ApiUtils.resolveItemLibraryId(item);
+
+          // Trailer/theme-video data is only ever consumed for video backdrops or the trailer button popup
+          // skip all of these lookups when both are disabled.
+          const enableVideo = MediaBarEnhancedSettingsManager.getSetting('videoBackdrops', CONFIG.enableVideoBackdrop);
+          const showTrailerBtn = MediaBarEnhancedSettingsManager.getSetting('trailerButton', CONFIG.showTrailerButton);
+          const needsTrailerData = enableVideo || showTrailerBtn;
+          // Pre-fetch local trailer URL if needed
+          const onlyLocal = MediaBarEnhancedSettingsManager.getSetting('onlyLocalTrailers', CONFIG.onlyLocalTrailers);
+          const canHaveLocalTrailer = (item.LocalTrailerCount && item.LocalTrailerCount > 0) ||
+            item.Type === 'Series' || item.Type === 'Season' || item.Type === 'Episode';
+          if (needsTrailerData && (CONFIG.preferLocalTrailers || onlyLocal || canHaveLocalTrailer)) {
+            item.localTrailerUrl = await ApiUtils.fetchLocalTrailer(item);
+          }
+
+          // Pre-fetch theme video URL if needed
+          if (needsTrailerData && CONFIG.preferLocalBackdrops) {
+            item.themeVideoUrl = await ApiUtils.fetchThemeVideos(itemId);
+          }
+
+          // Pre-fetch SponsorBlock data early for remote YouTube trailers
+          if (needsTrailerData && CONFIG.useSponsorBlock && !onlyLocal && item.RemoteTrailers && item.RemoteTrailers.length > 0) {
+            const ytId = ApiUtils.extractYouTubeId(item.RemoteTrailers[0].Url);
+            if (ytId) {
+              ApiUtils.fetchSponsorBlockData(ytId); // Trigger background pre-fetch into cache
+            }
+          }
+
+          // Check again if slide was created while waiting for async fetches
+          const existingSlide = container.querySelector(`.slide[data-item-id="${itemId}"]`);
+          if (existingSlide && !forceRecreate) {
+            STATE.slideshow.createdSlides[itemId] = true;
+            return existingSlide;
+          }
+
+          const slideElement = this.createSlideElement(
+            item,
+            item.Type === "Movie" ? "Movie" : "TV Show"
+          );
+
+          if (existingSlide) {
+            // Clean up old player if any
+            if (STATE.slideshow.videoPlayers && STATE.slideshow.videoPlayers[itemId]) {
+              const oldPlayer = STATE.slideshow.videoPlayers[itemId];
+              try {
+                if (typeof oldPlayer.destroy === 'function') oldPlayer.destroy();
+                else if (oldPlayer.tagName === 'VIDEO') { oldPlayer.pause(); oldPlayer.removeAttribute('src'); oldPlayer.load(); }
+              } catch (e) { }
+              delete STATE.slideshow.videoPlayers[itemId];
+            }
+            existingSlide.replaceWith(slideElement);
+          } else {
+            container.appendChild(slideElement);
+          }
+
+          STATE.slideshow.createdSlides[itemId] = true;
+
+          return slideElement;
+        } catch (error) {
+          console.error("🎬 Media Bar:", "Error creating slide for item:", error, itemId);
+          return null;
+        } finally {
+          delete this.slideCreationPromises[itemId];
+        }
+      })();
+
+      this.slideCreationPromises[itemId] = creationPromise;
+      return creationPromise;
     },
   };
 
@@ -4578,7 +4620,9 @@
           if (!hasVideo) {
             console.log("🎬 Media Bar:", "JIT recreating slide to embed video on constrained device");
             const newSlide = await SlideCreator.createSlideForItemId(currentItemId, true);
-            currentSlide.replaceWith(newSlide);
+            if (currentSlide && newSlide && currentSlide !== newSlide && currentSlide.parentNode) {
+              currentSlide.replaceWith(newSlide);
+            }
             currentSlide = newSlide;
             this.upgradeSlideImageQuality(currentSlide);
           }
@@ -5116,10 +5160,10 @@
 
           delete STATE.slideshow.loadedItems[itemId];
 
-          const slide = document.querySelector(
+          const slides = document.querySelectorAll(
             `.slide[data-item-id="${itemId}"]`
           );
-          if (slide) slide.remove();
+          slides.forEach(s => s.remove());
 
           delete STATE.slideshow.createdSlides[itemId];
           prunedAny = true;
@@ -6195,6 +6239,9 @@
         if (CONFIG.sortBy === 'Random') {
           itemIds = SlideUtils.shuffleArray(itemIds);
         }
+
+        // Ensure strict uniqueness across all itemIds
+        itemIds = [...new Set(itemIds.filter(Boolean))];
 
         STATE.slideshow.itemIds = itemIds;
         STATE.slideshow.totalItems = itemIds.length;
