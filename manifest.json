@@ -9,6 +9,14 @@
     "imageUrl": "https://raw.githubusercontent.com/CodeDevMLH/jellyfin-plugin-media-bar-enhanced/refs/heads/main/logo.png",
     "versions": [
       {
+        "version": "3.8.0.0",
+        "changelog": "- feat: Add centralized Jellyfin v12 detection with dynamic layout and header button adjustments\n- feat: Add dedicated non-full-width video layout with floating 16:9 trailer window\n- feat: Add iOS and iPadOS device detection with strict decoder and preload throttling\n- fix: Fix local and remote trailers failing to show or resume playback after navigation\n- fix: Fix Play button localization remaining in English on Jellyfin v12\n- fix: Optimize slide creation concurrency with promise caching and strict DOM pruning\n- fix: Restore keyboard and remote arrow navigation after returning to home screen",
+        "targetAbi": "10.11.0.0",
+        "sourceUrl": "",
+        "checksum": "",
+        "timestamp": ""
+      },
+      {
         "version": "3.7.0.0",
         "changelog": "- feat: Add per-user personalized recommendations based on Jellyfin Suggestions API\n- feat: Add optional filter to require title logos before displaying items\n- feat: Integrate cache-friendly image URL tags for persistent client caching\n- fix: Centralize content limits and reshuffle logic across all content endpoints",
         "targetAbi": "10.11.0.0",
