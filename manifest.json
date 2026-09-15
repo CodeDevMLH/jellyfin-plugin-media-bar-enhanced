@@ -12,9 +12,9 @@
         "version": "3.8.0.0",
         "changelog": "- feat: Add centralized Jellyfin v12 detection with dynamic layout and header button adjustments\n- feat: Add dedicated non-full-width video layout with floating 16:9 trailer window\n- feat: Add iOS and iPadOS device detection with strict decoder and preload throttling\n- fix: Fix local and remote trailers failing to show or resume playback after navigation\n- fix: Fix Play button localization remaining in English on Jellyfin v12\n- fix: Optimize slide creation concurrency with promise caching and strict DOM pruning\n- fix: Restore keyboard and remote arrow navigation after returning to home screen",
         "targetAbi": "10.11.0.0",
-        "sourceUrl": "",
-        "checksum": "",
-        "timestamp": ""
+        "sourceUrl": "https://github.com/CodeDevMLH/jellyfin-plugin-media-bar-enhanced/releases/download/v3.8.0.0/Jellyfin.Plugin.MediaBarEnhanced_v3.8.0.0.zip",
+        "checksum": "236ce2def4372448bc3b09c5431c1828",
+        "timestamp": "2026-09-15T00:54:13Z"
       },
       {
         "version": "3.7.0.0",
