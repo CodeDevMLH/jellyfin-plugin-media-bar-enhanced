@@ -3503,7 +3503,7 @@
           // Create an iframe upfront
           const ytPlayerIframe = SlideUtils.createElement("iframe", {
             id: `youtube-player-${itemId}`,
-            src: `https://www.youtube-nocookie.com/embed/${videoId}?enablejsapi=1&playsinline=1&origin=${encodeURIComponent(window.location.origin)}`,
+            src: `https://www.youtube-nocookie.com/embed/${videoId}?enablejsapi=1&playsinline=1&iv_load_policy=3&cc_load_policy=3&origin=${encodeURIComponent(window.location.origin)}`,
             style: "width: 100%; height: 100%; border: none; pointer-events: none;",
             allow: "autoplay; encrypted-media",
             referrerpolicy: "strict-origin-when-cross-origin",
@@ -3528,6 +3528,7 @@
               disablekb: 1,
               fs: 0,
               iv_load_policy: 3,
+              cc_load_policy: 3,
               rel: 0,
               loop: 0,
               playsinline: 1,
@@ -3755,13 +3756,14 @@
           isVideo = true;
 
           const videoSrc = (typeof trailerUrl === 'object' ? trailerUrl.url : trailerUrl);
+          const videoClass = CONFIG.fullWidthVideo ? "video-backdrop-full" : "video-backdrop-default";
           const videoAttributes = {
-            className: "backdrop video-backdrop",
+            className: `backdrop video-backdrop ${videoClass}`,
             preload: "none",
             disablePictureInPicture: true,
             controlsList: "nodownload noplaybackrate nopip",
             "data-src": videoSrc,
-            style: "object-fit: cover; object-position: center center; width: 100%; height: 100%; position: absolute; top: 0; left: 0; pointer-events: none; opacity: 0; transition: opacity 1.2s ease-in-out;"
+            style: "pointer-events: none; opacity: 0; transition: opacity 1.2s ease-in-out;"
           };
 
           videoAttributes.muted = "";
