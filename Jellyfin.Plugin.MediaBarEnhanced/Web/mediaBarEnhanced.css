@@ -26,9 +26,11 @@
 /* @import url(https://fonts.googleapis.com/icon?family=Material+Icons); */
 
 .backdrop.animate {
-  animation:
-    frostedGlass 1.2s cubic-bezier(0.4, 0, 0.2, 1),
-    kenBurnsZoomIn 10s ease-out forwards;
+  animation: kenBurnsZoomIn 10s linear forwards;
+  will-change: transform;
+  transform-origin: center center;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
 .slideshow-paused .backdrop.animate,
@@ -37,28 +39,27 @@
 }
 
 .logo.animate {
-  animation: frostedGlass 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: logoFadeIn 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-@keyframes frostedGlass {
+@keyframes logoFadeIn {
   from {
-    filter: blur(8px);
-    opacity: 0.7;
+    opacity: 0.6;
   }
 
   to {
-    filter: blur(0);
     opacity: 1;
   }
 }
 
+
 @keyframes kenBurnsZoomIn {
-  from {
-    transform: scale3d(1, 1, 1);
+  0% {
+    transform: scale(1);
   }
 
-  to {
-    transform: scale3d(1.1, 1.1, 1);
+  100% {
+    transform: scale(1.08);
   }
 }
 
@@ -146,19 +147,13 @@
 }
 
 .backdrop.low-quality {
-  filter: blur(0.5px);
-  transform: scale3d(1.01, 1.01, 1);
-  transition:
-    filter 0.3s ease-in-out,
-    transform 0.3s ease-in-out;
+  opacity: 0.85;
+  transition: opacity 0.3s ease-in-out;
 }
 
 .backdrop.high-quality {
-  filter: blur(0);
-  transform: scale3d(1, 1, 1);
-  transition:
-    filter 0.3s ease-in-out,
-    transform 0.3s ease-in-out;
+  opacity: 1;
+  transition: opacity 0.3s ease-in-out;
 }
 
 .logo.low-quality {
@@ -181,7 +176,7 @@
   position: absolute;
   top: 0;
   left: 0;
-  width: 100vw;
+  width: 100%;
   height: 90vh;
   overflow: hidden;
   margin: 0 auto;
@@ -276,22 +271,6 @@
   opacity: 0.9;
 }
 
-@media (max-width: 1599px) {
-  .pause-button {
-    top: 8rem;
-  }
-
-  .pause-button i {
-    font-size: 2rem;
-  }
-}
-
-@media (max-width: 768px) {
-  .pause-button i {
-    font-size: 2.5rem;
-  }
-}
-
 .mute-button {
   position: absolute;
   top: 5rem;
@@ -312,21 +291,36 @@
   opacity: 0.9;
 }
 
-@media (max-width: 1599px) {
-  .mute-button {
-    top: 8rem;
-  }
+/* Jellyfin v12 Desktop Overrides */
+body.jellyfin-v12 .pause-button {
+  top: 4rem;
+  right: calc(1.2rem + 2.8vw);
+  line-height: 1;
+}
 
-  .mute-button i {
-    font-size: 2rem;
-  }
+body.jellyfin-v12 .mute-button {
+  top: 4rem;
+  right: calc(4rem + 2.8vw);
+  line-height: 1;
+}
+
+body.jellyfin-v12 .pause-button i,
+body.jellyfin-v12 .mute-button i {
+  font-size: 1.5rem;
+  line-height: 1;
+  vertical-align: middle;
 }
 
 @media (max-width: 768px) {
-  .mute-button i {
+
+  .pause-button i,
+  body.jellyfin-v12 .pause-button i,
+  .mute-button i,
+  body.jellyfin-v12 .mute-button i {
     font-size: 2.5rem;
   }
 }
+
 
 .dots-container {
   position: absolute;
@@ -388,6 +382,8 @@
   right: 0%;
   width: 100%;
   height: 100%;
+  overflow: hidden;
+  border-radius: 5px;
   mask-image: linear-gradient(to top,
       rgba(255, 255, 255, 0) 2%,
       rgba(0, 0, 0, 0.5) 6%,
@@ -398,7 +394,8 @@
       #000000 8%);
 }
 
-.backdrop-container.full-width-video {
+.backdrop-container.full-width-video,
+.backdrop-container:has(.video-backdrop-full) {
   overflow: hidden;
   mask-image: linear-gradient(to top,
       #fff0 0%,
@@ -411,21 +408,16 @@
 }
 
 .backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
   right: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
   object-position: center 20%;
   border-radius: 5px;
-  z-index: 3;
-  mask-image: linear-gradient(to top,
-      rgba(255, 255, 255, 0) 2%,
-      rgba(0, 0, 0, 0.5) 6%,
-      #000000 8%);
-  -webkit-mask-image: linear-gradient(to top,
-      rgba(255, 255, 255, 0) 2%,
-      rgba(0, 0, 0, 0.5) 6%,
-      #000000 8%);
+  z-index: 2;
   transition: opacity 1.2s ease-in-out;
 }
 
@@ -437,7 +429,7 @@
   height: 100%;
   background-color: rgba(0, 0, 0, 0.2);
   border-radius: 5px;
-  z-index: 4;
+  z-index: 3;
   mask-image: linear-gradient(to top,
       rgba(255, 255, 255, 0) 2%,
       rgba(0, 0, 0, 0.5) 4%,
@@ -449,13 +441,6 @@
   transition: opacity 1.2s ease-in-out;
 }
 
-/* Hide static backdrop and its overlay when video backdrop is fully faded in/playing */
-.backdrop-container:has(.video-backdrop[style*="opacity: 1"]) .backdrop:not(.video-backdrop),
-.backdrop-container:has(.video-backdrop[style*="opacity:1"]) .backdrop:not(.video-backdrop),
-.backdrop-container:has(.video-backdrop[style*="opacity: 1"]) .backdrop-overlay,
-.backdrop-container:has(.video-backdrop[style*="opacity:1"]) .backdrop-overlay {
-  opacity: 0 !important;
-}
 
 .gradient-overlay {
   position: absolute;
@@ -862,15 +847,21 @@
   /* Jellyfin v12 Mobile Overrides */
   body.jellyfin-v12 .pause-button {
     top: 68px !important;
+    right: 17px !important;
   }
 
   body.jellyfin-v12 .mute-button {
     top: 68px !important;
+    right: 58px !important;
   }
 
   /* Default mobile view on v12 */
   body.jellyfin-v12:not(.media-bar-mobile-16-9):not(.media-bar-mobile-4-3) .homeSectionsContainer {
-    top: calc(50% + 16vh) !important;
+    top: 73vh !important;
+  }
+
+  body.jellyfin-v12.media-bar-has-counter:not(.media-bar-mobile-16-9):not(.media-bar-mobile-4-3) .homeSectionsContainer {
+    top: 74vh !important;
   }
 
   /* Compact 16:9 & 4:3 mobile views on v12 */
@@ -966,6 +957,15 @@
     right: 0%;
     width: 100%;
     height: 100%;
+    overflow: hidden;
+    mask-image: linear-gradient(to top,
+        rgba(255, 255, 255, 0) 2%,
+        rgba(0, 0, 0, 0.5) 7%,
+        #000000 12%);
+    -webkit-mask-image: linear-gradient(to top,
+        rgba(255, 255, 255, 0) 2%,
+        rgba(0, 0, 0, 0.5) 7%,
+        #000000 12%);
   }
 
   .backdrop {
@@ -977,14 +977,6 @@
     object-fit: cover;
     object-position: center 20%;
     z-index: 3;
-    mask-image: linear-gradient(to top,
-        rgba(255, 255, 255, 0) 2%,
-        rgba(0, 0, 0, 0.5) 6%,
-        #000000 8%);
-    -webkit-mask-image: linear-gradient(to top,
-        rgba(255, 255, 255, 0) 2%,
-        rgba(0, 0, 0, 0.5) 6%,
-        #000000 8%);
   }
 
   .gradient-overlay {
@@ -998,12 +990,12 @@
     pointer-events: none;
     mask-image: linear-gradient(to top,
         rgba(255, 255, 255, 0) 2%,
-        rgba(0, 0, 0, 0.5) 6%,
-        #000000 8%);
+        rgba(0, 0, 0, 0.5) 7%,
+        #000000 12%);
     -webkit-mask-image: linear-gradient(to top,
         rgba(255, 255, 255, 0) 2%,
-        rgba(0, 0, 0, 0.5) 6%,
-        #000000 8%);
+        rgba(0, 0, 0, 0.5) 7%,
+        #000000 12%);
   }
 
   .dots-container {
@@ -1134,8 +1126,7 @@
   }
 
   body.media-bar-mobile-16-9 .backdrop-container,
-  body.media-bar-mobile-16-9 .gradient-overlay,
-  body.media-bar-mobile-16-9 .backdrop {
+  body.media-bar-mobile-16-9 .gradient-overlay {
     height: 100%;
     mask-image: linear-gradient(to bottom, #000 60%, rgba(0, 0, 0, 0.4) 80%, transparent 100%) !important;
     -webkit-mask-image: linear-gradient(to bottom, #000 60%, rgba(0, 0, 0, 0.4) 80%, transparent 100%) !important;
@@ -1251,8 +1242,7 @@
   }
 
   body.media-bar-mobile-4-3 .backdrop-container,
-  body.media-bar-mobile-4-3 .gradient-overlay,
-  body.media-bar-mobile-4-3 .backdrop {
+  body.media-bar-mobile-4-3 .gradient-overlay {
     height: 100%;
     mask-image: linear-gradient(to bottom, #000 60%, rgba(0, 0, 0, 0.4) 80%, transparent 100%) !important;
     -webkit-mask-image: linear-gradient(to bottom, #000 60%, rgba(0, 0, 0, 0.4) 80%, transparent 100%) !important;
@@ -1365,6 +1355,84 @@
 
   body.media-bar-has-counter:not(.media-bar-mobile-16-9):not(.media-bar-mobile-4-3) .button-container {
     top: calc(50% + 25.5vh);
+  }
+
+  /* Original Layout: Fill 100% height of container on all smartphone models without letterboxing */
+  body:not(.media-bar-mobile-16-9):not(.media-bar-mobile-4-3) .video-backdrop-full {
+    height: 100% !important;
+    min-height: 100% !important;
+    width: 177.78vh !important;
+    min-width: 177.78% !important;
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+  }
+
+  body:not(.media-bar-mobile-16-9):not(.media-bar-mobile-4-3) video.video-backdrop,
+  body:not(.media-bar-mobile-16-9):not(.media-bar-mobile-4-3) .video-backdrop-default,
+  body:not(.media-bar-mobile-16-9):not(.media-bar-mobile-4-3) .video-backdrop:not(.video-backdrop-full) {
+    position: absolute !important;
+    top: 38% !important;
+    left: 50% !important;
+    right: auto !important;
+    transform: translate(-50%, -50%) !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 56.25vw !important;
+    min-height: 0 !important;
+    aspect-ratio: 16 / 9 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    overflow: hidden !important;
+    object-fit: contain !important;
+  }
+
+  body:not(.media-bar-mobile-16-9):not(.media-bar-mobile-4-3) .video-backdrop-default iframe,
+  body:not(.media-bar-mobile-16-9):not(.media-bar-mobile-4-3) .video-backdrop-default video {
+    width: 100% !important;
+    height: 100% !important;
+    border-radius: 0 !important;
+    object-fit: contain !important;
+  }
+
+  /* Jellyfin v12 Original Layout: Factor in the 48px navbar height (transparent when not scrolled) */
+  body.jellyfin-v12:not(.media-bar-mobile-16-9):not(.media-bar-mobile-4-3) .video-backdrop-full {
+    height: calc(100% + 48px) !important;
+    min-height: calc(100% + 48px) !important;
+    width: calc(177.78vh + 86px) !important;
+    min-width: calc(177.78% + 86px) !important;
+    position: absolute !important;
+    top: calc(50% + 24px) !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+  }
+
+  body.jellyfin-v12:not(.media-bar-mobile-16-9):not(.media-bar-mobile-4-3) video.video-backdrop,
+  body.jellyfin-v12:not(.media-bar-mobile-16-9):not(.media-bar-mobile-4-3) .video-backdrop-default,
+  body.jellyfin-v12:not(.media-bar-mobile-16-9):not(.media-bar-mobile-4-3) .video-backdrop:not(.video-backdrop-full) {
+    position: absolute !important;
+    top: calc(28% + 5px) !important;
+    left: 50% !important;
+    right: auto !important;
+    transform: translate(-50%, -50%) !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 56.25vw !important;
+    min-height: 0 !important;
+    aspect-ratio: 16 / 9 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    overflow: hidden !important;
+    object-fit: contain !important;
+  }
+
+  body.jellyfin-v12:not(.media-bar-mobile-16-9):not(.media-bar-mobile-4-3) .video-backdrop-default iframe,
+  body.jellyfin-v12:not(.media-bar-mobile-16-9):not(.media-bar-mobile-4-3) .video-backdrop-default video {
+    width: 100% !important;
+    height: 100% !important;
+    border-radius: 0 !important;
+    object-fit: contain !important;
   }
 
   /* Reset and unify video backdrop constraints in compact modes (applies to YouTube and HTML5 local videos) */
@@ -1501,14 +1569,67 @@
 
 /* Video Backdrop Styles */
 .video-backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 4;
   pointer-events: none;
   object-fit: cover;
   overflow: hidden;
 }
 
+/* Non-Full Width Video Layout */
 .video-backdrop-default {
+  position: absolute;
   width: 100%;
-  height: 100%;
+  height: 56.25vw;
+  aspect-ratio: 16 / 9;
+}
+
+/* Non-Full Width Video Layout: Compact trailer window in top right for Desktop & Landscape */
+@media (min-width: 768px) {
+  .video-backdrop-default {
+    position: absolute;
+    top: 11vh;
+    right: 3.5vw;
+    left: auto;
+    width: min(44vw, 680px, calc(44vh * 16 / 9));
+    aspect-ratio: 16 / 9;
+    height: auto;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.15);
+    z-index: 4;
+    mask-image: none !important;
+    -webkit-mask-image: none !important;
+  }
+
+  .video-backdrop-default iframe,
+  .video-backdrop-default video {
+    width: 100% !important;
+    height: 100% !important;
+    border: none !important;
+    border-radius: 12px;
+    object-fit: cover;
+    display: block;
+  }
+
+  @media (max-width: 1200px) {
+    .video-backdrop-default {
+      width: min(48vw, 520px, calc(44vh * 16 / 9));
+      top: 14vh;
+      right: 3vw;
+    }
+  }
+
+  @media (max-width: 900px) {
+    .video-backdrop-default {
+      width: min(50vw, 420px, calc(44vh * 16 / 9));
+      top: 15vh;
+    }
+  }
 }
 
 .video-backdrop-full {
@@ -2874,6 +2995,9 @@ select.media-bar-select option {
   transform: scale3d(0.72, 0.72, 1);
   opacity: 0;
   transition: transform var(--transition-duration, 500ms) cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity var(--transition-duration, 500ms) ease-in-out;
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
 .transition-effect-zoomin .slide.active {
@@ -2885,6 +3009,9 @@ select.media-bar-select option {
   transform: scale3d(1.28, 1.28, 1);
   opacity: 0;
   transition: transform var(--transition-duration, 500ms) cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity var(--transition-duration, 500ms) ease-in-out;
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
 .transition-effect-zoomout .slide.active {
