@@ -30,6 +30,9 @@ This plugin is a fork and enhancement of the original [Media Bar by MakD](https:
   - [Build The Plugin By Yourself](#build-the-plugin-by-yourself)
   - [Troubleshooting](#troubleshooting)
     - [Effects Not Showing](#effects-not-showing)
+    - [Adjusting Spacing \& Positioning with Custom CSS (e.g. Custom Themes / Mobile Overlap)](#adjusting-spacing--positioning-with-custom-css-eg-custom-themes--mobile-overlap)
+      - [Desktop Layout (Spacing between Media Bar and Library Rows)](#desktop-layout-spacing-between-media-bar-and-library-rows)
+      - [Mobile Layout (Portrait Overlaps / Custom Navbar Themes)](#mobile-layout-portrait-overlaps--custom-navbar-themes)
     - [Docker Permission Issues](#docker-permission-issues)
     - [YouTube "Sign in to confirm you're not a bot" message instead of trailers](#youtube-sign-in-to-confirm-youre-not-a-bot-message-instead-of-trailers)
   - [Uninstall](#uninstall)
@@ -317,6 +320,52 @@ If you want to build the plugin yourself:
 2. **Clear browser cache**:
    - Force refresh browser (Ctrl+F5)
    - Clear jellyfin web client cache (--> mostly you have to clear the whole browser cache)
+
+### Adjusting Spacing & Positioning with Custom CSS (e.g. Custom Themes / Mobile Overlap)
+If you use custom Jellyfin themes or find that the Media Bar overlaps or leaves too much space above your library rows, you can fine-tune the positions via **Custom CSS** in the Jellyfin Dashboard:
+
+1. In the Jellyfin web client, open admin **Dashboard** -> **Branding**.
+2. Scroll down to the **Custom CSS code** field.
+3. Paste the applicable snippet below and adjust the values to match your theme:
+
+#### Desktop Layout (Spacing between Media Bar and Library Rows)
+```css
+/* Move library rows up or down on Desktop */
+.homeSectionsContainer {
+    top: 65vh !important; /* Increase (e.g. 70vh) to push down, decrease (e.g. 58vh) to pull up */
+}
+```
+
+#### Mobile Layout (Portrait Overlaps / Custom Navbar Themes)
+Depending on which mobile view mode is selected in Media Bar Enhanced settings:
+```css
+@media only screen and (max-width: 767px) and (orientation: portrait) {
+    /* 1. Default Mobile View: Adjust library row vertical position */
+    body:not(.media-bar-mobile-16-9):not(.media-bar-mobile-4-3) .homeSectionsContainer {
+        top: 72vh !important;
+    }
+
+    /* 2. Compact 16:9 Mobile View: Adjust library row position */
+    body.media-bar-mobile-16-9 .homeSectionsContainer {
+        top: calc(56vw + 35px) !important;
+    }
+
+    /* Compact 16:9 Mobile View: Adjust Media Bar top if overlapping your navbar */
+    body.media-bar-mobile-16-9 #slides-container {
+        top: 50px !important; /* Increase if under navbar, decrease if too low */
+    }
+
+    /* 3. Classic 4:3 Mobile View: Adjust library row position */
+    body.media-bar-mobile-4-3 .homeSectionsContainer {
+        top: calc(75vw + 35px) !important;
+    }
+
+    /* Classic 4:3 Mobile View: Adjust Media Bar top */
+    body.media-bar-mobile-4-3 #slides-container {
+        top: 50px !important;
+    }
+}
+```
 
 ### Docker Permission Issues
 If you encounter the message `Access was denied when attempting to inject script into index.html. Automatic direct injection failed. Automatic direct insertion failed. The system will now attempt to use the File Transformation plugin.` in the log or similar permission errors in Docker:
