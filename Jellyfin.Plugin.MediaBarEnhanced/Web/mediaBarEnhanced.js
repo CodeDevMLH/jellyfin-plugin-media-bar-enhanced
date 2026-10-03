@@ -30,7 +30,7 @@
   window.mediaBarEnhancedLoaded = true;
 
   // MARK: Version
-  const PLUGIN_VERSION = "3.9.0.0";
+  const PLUGIN_VERSION = "3.9.1.0";
 
   //Core Module Configuration
   const CONFIG = {
@@ -3582,9 +3582,13 @@
       const activeTab = document.querySelector(".emby-tab-button-active");
       const isVisible = isHome && activeTab && activeTab.getAttribute("data-index") === "0";
 
-      container.style.display = isVisible ? "block" : "none";
-      container.style.visibility = isVisible ? "visible" : "hidden";
-      container.style.pointerEvents = isVisible ? "auto" : "none";
+      const targetDisplay = isVisible ? "block" : "none";
+      const targetVisibility = isVisible ? "visible" : "hidden";
+      const targetPointerEvents = isVisible ? "auto" : "none";
+
+      if (container.style.display !== targetDisplay) container.style.display = targetDisplay;
+      if (container.style.visibility !== targetVisibility) container.style.visibility = targetVisibility;
+      if (container.style.pointerEvents !== targetPointerEvents) container.style.pointerEvents = targetPointerEvents;
       container.classList.toggle("media-bar-hidden", !isVisible);
 
       if (container.parentNode !== document.body) {
