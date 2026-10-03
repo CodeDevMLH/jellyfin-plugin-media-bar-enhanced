@@ -17,6 +17,10 @@ namespace Jellyfin.Plugin.MediaBarEnhanced.Configuration
         public int MaxItems { get; set; } = 20;
         public int MaxParentalRating { get; set; } = 0;
         public int MaxDaysRecent { get; set; } = 0;
+        public int MaxDaysRecentRelease { get; set; } = 0;
+        public string ReleaseYears { get; set; } = "";
+        public string ExcludedGenres { get; set; } = "";
+        public string ExcludedTags { get; set; } = "";
         public int PreloadCount { get; set; } = 3;
         public int FadeTransitionDuration { get; set; } = 500;
         public int MaxPaginationDots { get; set; } = 15;
@@ -39,6 +43,8 @@ namespace Jellyfin.Plugin.MediaBarEnhanced.Configuration
         public int HoverAudioFadeMs { get; set; } = 400;
         public int DefaultTrailerVolume { get; set; } = 40;
         public bool FullWidthVideo { get; set; } = true;
+        public bool EnableSplitScreenTrailer { get; set; } = false;
+        public bool PauseOnHover { get; set; } = false;
         public bool EnableMobileVideo { get; set; } = false;
         public bool ShowTrailerButton { get; set; } = true;
         public bool EnableLoadingScreen { get; set; } = true;
