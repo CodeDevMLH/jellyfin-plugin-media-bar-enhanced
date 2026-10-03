@@ -30,7 +30,7 @@
   window.mediaBarEnhancedLoaded = true;
 
   // MARK: Version
-  const PLUGIN_VERSION = "3.8.0.0";
+  const PLUGIN_VERSION = "3.9.0.0";
 
   //Core Module Configuration
   const CONFIG = {
@@ -54,6 +54,8 @@
     showPaginationDots: true,
     maxParentalRating: null,
     maxDaysRecent: null,
+    maxDaysRecentRelease: null,
+    releaseYears: "",
     slideAnimationEnabled: true,
     enableVideoBackdrop: true,
     useSponsorBlock: true,
@@ -67,6 +69,8 @@
     startMuted: true,
     defaultTrailerVolume: 40,
     fullWidthVideo: true,
+    enableSplitScreenTrailer: false,
+    pauseOnHover: false,
     enableMobileVideo: false,
     showTrailerButton: true,
     enableKeyboardControls: true,
@@ -111,6 +115,8 @@
     customPlaylists: "[]",
     forceSlideCounter: false,
     excludedLibraries: "",
+    excludedGenres: "",
+    excludedTags: "",
     trailerEnabledLibraries: "",
     onlyLocalTrailers: false,
     yoYoProgressBar: true,
@@ -190,6 +196,10 @@
       useRecommendationsDesc: 'Show recommendations based on your watch history.',
       requireLogoLabel: 'Require Title Logo',
       requireLogoDesc: 'Only include items that have a title logo.',
+      splitScreenTrailerLabel: 'Split-Screen Trailer View',
+      splitScreenTrailerDesc: 'Display trailer video on the right half with a smooth gradient fade, while keeping movie artwork and details on the left.',
+      pauseOnHoverLabel: 'Pause Slideshow on Hover',
+      pauseOnHoverDesc: 'Pause slide transitions and timer while hovering over the Media Bar (Note: active trailers already pause transitions if "Wait for trailer to end" is enabled).',
       toastMuted: 'Muted',
       toastUnmuted: 'Audio On',
       toastPaused: 'Slideshow Paused',
@@ -268,6 +278,10 @@
       useRecommendationsDesc: 'Zeigt Vorschläge basierend auf deinem bisherigen Sehverlauf.',
       requireLogoLabel: 'Titel-Logo erforderlich',
       requireLogoDesc: 'Nur Medien anzeigen, für die ein Titel-Logo vorhanden ist.',
+      splitScreenTrailerLabel: 'Split-Screen Trailer-Ansicht',
+      splitScreenTrailerDesc: 'Trailer-Video auf der rechten Seite mit weichem Verlauf anzeigen, während Poster und Filminfos links bleiben.',
+      pauseOnHoverLabel: 'Pause bei Maus-Hover',
+      pauseOnHoverDesc: 'Slideshow-Wechsel und Timer pausieren, während sich der Mauszeiger über der Media Bar befindet (Hinweis: Bei aktivem "Auf Trailer-Ende warten" wartet die Slideshow ohnehin auf laufende Videos).',
       toastMuted: 'Stumm geschaltet',
       toastUnmuted: 'Ton aktiviert',
       toastPaused: 'Diashow pausiert',
@@ -346,6 +360,10 @@
       useRecommendationsDesc: 'Muestra recomendaciones basadas en tu historial de reproducción.',
       requireLogoLabel: 'Requerir logo de título',
       requireLogoDesc: 'Solo incluir elementos que tengan un logo de título.',
+      splitScreenTrailerLabel: 'Vista de tráiler en pantalla dividida',
+      splitScreenTrailerDesc: 'Muestra el tráiler en la mitad derecha con un fundido suave, manteniendo el póster y los detalles a la izquierda.',
+      pauseOnHoverLabel: 'Pausar al pasar el ratón',
+      pauseOnHoverDesc: 'Pausa las transiciones y el temporizador mientras el cursor está sobre la barra de medios (Nota: si "Esperar a que termine el tráiler" está activado, la presentación ya espera al vídeo en reproducción).',
       toastMuted: 'Silenciado',
       toastUnmuted: 'Sonido activado',
       toastPaused: 'Diapositivas en pausa',
@@ -424,6 +442,10 @@
       useRecommendationsDesc: 'Afficher des recommandations basées sur votre historique de visionnage.',
       requireLogoLabel: 'Exiger le logo du titre',
       requireLogoDesc: 'N\'inclure que les éléments disposant d\'un logo de titre.',
+      splitScreenTrailerLabel: 'Vue bande-annonce en écran scindé',
+      splitScreenTrailerDesc: 'Affiche la bande-annonce sur la moitié droite avec un fondu doux, en gardant l\'affiche et les infos à gauche.',
+      pauseOnHoverLabel: 'Pause au survol de la souris',
+      pauseOnHoverDesc: 'Suspend les transitions et le minuteur lorsque la souris survole la barre multimédia (Remarque : si "Attendre la fin de la bande-annonce" est activé, le diaporama attend déjà la fin de la vidéo).',
       toastMuted: 'Muet',
       toastUnmuted: 'Son activé',
       toastPaused: 'Diaporama en pause',
@@ -502,6 +524,10 @@
       useRecommendationsDesc: 'Mostra suggerimenti basati sulla tua cronologia di visione.',
       requireLogoLabel: 'Richiedi logo del titolo',
       requireLogoDesc: 'Includi solo elementi che hanno un logo di titolo.',
+      splitScreenTrailerLabel: 'Vista trailer a schermo diviso',
+      splitScreenTrailerDesc: 'Mostra il video del trailer sulla metà destra con sfumatura morbida, mantenendo la locandina e i dettagli a sinistra.',
+      pauseOnHoverLabel: 'Metti in pausa al passaggio del mouse',
+      pauseOnHoverDesc: 'Mette in pausa le transizioni e il timer mentre il cursore è sopra la barra multimediale (Nota: se "Attendi fine trailer" è attivo, la presentazione attende già la fine del video).',
       toastMuted: 'Disattivato',
       toastUnmuted: 'Audio attivato',
       toastPaused: 'Presentazione in pausa',
@@ -525,6 +551,7 @@
     },
     slideshow: {
       hasInitialized: false,
+      initialLoadComplete: false,
       isTransitioning: false,
       isPaused: false,
       currentSlideIndex: 0,
@@ -841,7 +868,13 @@
           const slidesContainer = document.querySelector("#slides-container");
 
           if (homeSections && slidesContainer) {
-            finishLoading();
+            const hasSlide = !!slidesContainer.querySelector(".slide");
+            const isDisabledOrHidden = slidesContainer.style.display === "none" || !CONFIG.enableMediaBar;
+            const isInitialLoadFinished = STATE.slideshow.initialLoadComplete === true;
+
+            if (hasSlide || isDisabledOrHidden || isInitialLoadFinished) {
+              finishLoading();
+            }
           }
         } else {
           if (
@@ -931,6 +964,7 @@
     }
 
     STATE.slideshow.hasInitialized = false;
+    STATE.slideshow.initialLoadComplete = false;
     STATE.slideshow.isTransitioning = false;
     STATE.slideshow.isPaused = false;
     STATE.slideshow.currentSlideIndex = 0;
@@ -1129,6 +1163,149 @@
     },
 
     /**
+     * Parses a year or year-range expression into years array and optional min/max premiere dates
+     * Supports:
+     * - "2024"                 --> [2024]
+     * - "2000-2010", "2000..2010" --> [2000, 2001, ..., 2010]
+     * - "2000s", "90s", "1990s"   --> decade range, e.g. 2000-2009
+     * - "2020+", ">=2020"      --> minPremiereDate: "2020-01-01T00:00:00.000Z" + years up to currentYear+1
+     * - "<=1999", "-1999"      --> maxPremiereDate: "1999-12-31T23:59:59.999Z"
+     * - "2020, 2021, 2022"     --> [2020, 2021, 2022]
+     * @param {string} expr
+     * @returns {{ years: number[], minPremiereDate: string|null, maxPremiereDate: string|null }}
+     */
+    parseYearExpression(expr) {
+      if (!expr || typeof expr !== 'string') return { years: [], minPremiereDate: null, maxPremiereDate: null };
+      const trimmed = expr.trim();
+      if (!trimmed) return { years: [], minPremiereDate: null, maxPremiereDate: null };
+
+      const years = new Set();
+      let minPremiereDate = null;
+      let maxPremiereDate = null;
+      const currentYear = new Date().getFullYear();
+
+      // Check for decade format: e.g. "1990s" or "2000s" or "90s"
+      const decadeMatch = trimmed.match(/^(?:19|20)?(\d{2})0s$/i);
+      if (decadeMatch) {
+        let baseYear = parseInt(decadeMatch[0].replace(/s$/i, ''), 10);
+        if (baseYear < 100) baseYear += 1900;
+        for (let y = baseYear; y <= baseYear + 9; y++) {
+          years.add(y);
+        }
+        return { years: Array.from(years), minPremiereDate, maxPremiereDate };
+      }
+
+      // Check for range: e.g. "2000-2010" or "2000..2010" or "2000 to 2010"
+      const rangeMatch = trimmed.match(/^(\d{4})\s*(?:[-–—..]|to)\s*(\d{4})$/i);
+      if (rangeMatch) {
+        const start = Math.min(parseInt(rangeMatch[1], 10), parseInt(rangeMatch[2], 10));
+        const end = Math.max(parseInt(rangeMatch[1], 10), parseInt(rangeMatch[2], 10));
+        for (let y = start; y <= end; y++) {
+          years.add(y);
+        }
+        return { years: Array.from(years), minPremiereDate, maxPremiereDate };
+      }
+
+      // Check for >= or +: e.g. "2020+" or ">=2020" or ">2019"
+      const greaterMatch = trimmed.match(/^(?:>=?\s*(\d{4})|(\d{4})\+)$/);
+      if (greaterMatch) {
+        const yr = parseInt(greaterMatch[1] || greaterMatch[2], 10);
+        minPremiereDate = `${yr}-01-01T00:00:00.000Z`;
+        const endYr = Math.max(yr, currentYear + 1);
+        for (let y = yr; y <= endYr; y++) {
+          years.add(y);
+        }
+        return { years: Array.from(years), minPremiereDate, maxPremiereDate };
+      }
+
+      // Check for <= or -: e.g. "<=1999" or "-1999" or "<2000"
+      const lesserMatch = trimmed.match(/^(?:<=\s*(\d{4})|-(\d{4}))$/);
+      if (lesserMatch) {
+        const yr = parseInt(lesserMatch[1] || lesserMatch[2], 10);
+        maxPremiereDate = `${yr}-12-31T23:59:59.999Z`;
+        return { years: [], minPremiereDate, maxPremiereDate };
+      }
+
+      // Check for comma or whitespace separated list of 4-digit years
+      const matches = trimmed.match(/\b\d{4}\b/g);
+      if (matches) {
+        matches.forEach(m => years.add(parseInt(m, 10)));
+      }
+
+      return { years: Array.from(years), minPremiereDate, maxPremiereDate };
+    },
+
+    /**
+     * Parses a rating expression into officialRatings array, minCommunityRating, and maxOfficialRating
+     * Supports:
+     * - "PG-13", "R", "TV-MA", "FSK-16" -> officialRatings: ["PG-13", ...]
+     * - ">=7.5", "7.5+", ">8", "8.5"   -> minCommunityRating: 7.5
+     * - "<=16", "<18", "max 12"        -> maxOfficialRating: 16
+     * - "12, 16, 18"                   -> officialRatings: ["12", "16", "18"]
+     * @param {string} expr
+     * @param {string} prefix
+     * @returns {{ officialRatings: string[], minCommunityRating: number|null, maxOfficialRating: number|null }}
+     */
+    parseRatingExpression(expr, prefix = 'rating') {
+      const res = { officialRatings: [], minCommunityRating: null, maxOfficialRating: null };
+      if (!expr || typeof expr !== 'string') return res;
+      const trimmed = expr.trim();
+      if (!trimmed) return res;
+
+      // If prefix was explicitly minrating, communityrating, or score:
+      if (/^(?:minrating|communityrating|score)$/i.test(prefix)) {
+        const num = parseFloat(trimmed.replace(/[^\d.]/g, ''));
+        if (!isNaN(num)) res.minCommunityRating = num;
+        return res;
+      }
+
+      // If prefix was explicitly age or parental:
+      if (/^(?:age|parental)$/i.test(prefix)) {
+        const num = parseInt(trimmed.replace(/\D/g, ''), 10);
+        if (!isNaN(num)) {
+          res.maxOfficialRating = num;
+        } else {
+          res.officialRatings.push(trimmed);
+        }
+        return res;
+      }
+
+      // General rating / ratings / officialrating
+      // Check for community rating score pattern: e.g. ">= 7.5", "8+", "> 7"
+      const minScoreMatch = trimmed.match(/^(?:>=\s*(\d+(?:\.\d+)?)|(\d+(?:\.\d+)?)\+|>\s*(\d+(?:\.\d+)?))$/);
+      if (minScoreMatch) {
+        const score = parseFloat(minScoreMatch[1] || minScoreMatch[2] || minScoreMatch[3]);
+        if (!isNaN(score)) res.minCommunityRating = score;
+        return res;
+      }
+
+      // Check for max age rating pattern: e.g. "<= 16", "< 18", "max 12"
+      const maxAgeMatch = trimmed.match(/^(?:<=\s*(\d+)|<\s*(\d+)|max\s*(\d+))$/i);
+      if (maxAgeMatch) {
+        const age = parseInt(maxAgeMatch[1] || maxAgeMatch[2] || maxAgeMatch[3], 10);
+        if (!isNaN(age)) res.maxOfficialRating = age;
+        return res;
+      }
+
+      // Check for decimal number e.g. "7.5" or "8.0" (clear community rating score)
+      if (/^\d+\.\d+$/.test(trimmed)) {
+        const score = parseFloat(trimmed);
+        if (!isNaN(score)) res.minCommunityRating = score;
+        return res;
+      }
+
+      // Multiple ratings separated by comma or pipe (e.g. "PG-13, R" or "12, 16")
+      trimmed.split(/[,|]/).forEach(r => {
+        const val = r.trim();
+        if (val) {
+          res.officialRatings.push(val);
+        }
+      });
+
+      return res;
+    },
+
+    /**
      * Truncates text to specified length and adds ellipsis
      * @param {HTMLElement} element - Element containing text to truncate
      * @param {number} maxLength - Maximum length before truncation
@@ -1201,15 +1378,19 @@
       if (!container) {
         container = this.createElement("div", {
           id: "slides-container",
-          className: "noautofocus",
+          className: "noautofocus media-bar-hidden",
           tabIndex: "-1",
           "data-scroll-mode-x": "custom",
-          "data-scroll-mode-y": "custom"
+          "data-scroll-mode-y": "custom",
+          style: "display: none; visibility: hidden; pointer-events: none;"
         });
         document.body.appendChild(container);
       } else {
         container.setAttribute("data-scroll-mode-x", "custom");
         container.setAttribute("data-scroll-mode-y", "custom");
+      }
+      if (typeof isSplitScreenTrailerEnabled === 'function') {
+        container.classList.toggle("split-screen-trailer", isSplitScreenTrailerEnabled());
       }
       return container;
     },
@@ -2062,6 +2243,25 @@
           dateFilter = `&minDateLastSaved=${pastDate.toISOString()}`;
         }
 
+        let releaseDateFilter = '';
+        if (CONFIG.maxDaysRecentRelease) {
+          const pastRelDate = new Date();
+          pastRelDate.setDate(pastRelDate.getDate() - CONFIG.maxDaysRecentRelease);
+          releaseDateFilter += `&minPremiereDate=${pastRelDate.toISOString()}`;
+        }
+        if (CONFIG.releaseYears) {
+          const parsedYears = SlideUtils.parseYearExpression(CONFIG.releaseYears);
+          if (parsedYears.years && parsedYears.years.length > 0) {
+            releaseDateFilter += `&years=${[...new Set(parsedYears.years)].join(',')}`;
+          }
+          if (parsedYears.minPremiereDate) {
+            releaseDateFilter += `&minPremiereDate=${encodeURIComponent(parsedYears.minPremiereDate)}`;
+          }
+          if (parsedYears.maxPremiereDate) {
+            releaseDateFilter += `&maxPremiereDate=${encodeURIComponent(parsedYears.maxPremiereDate)}`;
+          }
+        }
+
         // Exclude seasonal content from random lists
         let excludeFilter = '';
         if (CONFIG.excludeSeasonalContent && CONFIG.seasonalSections) {
@@ -2082,7 +2282,7 @@
                     }
                     return id.trim();
                   })
-                  .filter((id) => id);
+                  .filter((id) => id && !id.match(/^(genre|genres|tag|tags|studio|studios|year|years|released?|person|persons|actor|actors|director|directors|rating|ratings|officialrating|minrating|communityrating|score|age|parental):/i));
 
                 allExcludedIds.push(...idsInThisSection);
               }
@@ -2101,7 +2301,7 @@
         const fetchItems = async (currentDateFilter, parentId = '') => {
           const parentParam = parentId ? `&parentId=${parentId}` : '';
           const fetchLimit = Math.max((CONFIG.maxItems || 10) * 3, 30);
-          const url = `${STATE.jellyfinData.serverAddress}/Items?IncludeItemTypes=${itemTypes.join(",")}&Recursive=true&hasOverview=true&imageTypes=Logo,Backdrop&${sortParams}${playedFilter}${parentalFilter}${currentDateFilter}${excludeFilter}${parentParam}&enableUserData=true&Limit=${fetchLimit}&fields=Id,Type,DateCreated,ImageTags,ParentLogoImageTag,ParentBackdropItemId,SeriesId`;
+          const url = `${STATE.jellyfinData.serverAddress}/Items?IncludeItemTypes=${itemTypes.join(",")}&Recursive=true&hasOverview=true&imageTypes=Logo,Backdrop&${sortParams}${playedFilter}${parentalFilter}${currentDateFilter}${releaseDateFilter}${excludeFilter}${parentParam}&enableUserData=true&Limit=${fetchLimit}&fields=Id,Type,DateCreated,PremiereDate,ProductionYear,ImageTags,ParentLogoImageTag,ParentBackdropItemId,SeriesId,Genres,Tags`;
           const resp = await fetch(url, { headers: this.getAuthHeaders() });
           return resp;
         };
@@ -2166,9 +2366,41 @@
             });
           }
 
+          if (CONFIG.maxDaysRecentRelease && releaseDateFilter !== '') {
+            const pastRelDate = new Date();
+            pastRelDate.setDate(pastRelDate.getDate() - CONFIG.maxDaysRecentRelease);
+            items = items.filter(item => {
+              if (!item.PremiereDate) return false;
+              return new Date(item.PremiereDate) >= pastRelDate;
+            });
+          }
+
+          if (CONFIG.releaseYears && releaseDateFilter !== '') {
+            const parsed = SlideUtils.parseYearExpression(CONFIG.releaseYears);
+            if (parsed.years && parsed.years.length > 0) {
+              const ySet = new Set(parsed.years);
+              items = items.filter(item => {
+                if (item.ProductionYear && ySet.has(item.ProductionYear)) return true;
+                if (item.PremiereDate) {
+                  const yr = new Date(item.PremiereDate).getFullYear();
+                  if (ySet.has(yr)) return true;
+                }
+                return false;
+              });
+            }
+            if (parsed.minPremiereDate) {
+              const minD = new Date(parsed.minPremiereDate);
+              items = items.filter(item => item.PremiereDate && new Date(item.PremiereDate) >= minD);
+            }
+            if (parsed.maxPremiereDate) {
+              const maxD = new Date(parsed.maxPremiereDate);
+              items = items.filter(item => item.PremiereDate && new Date(item.PremiereDate) <= maxD);
+            }
+          }
+
           // Fallback if no items in date range
-          if (items.length === 0 && dateFilter !== '') {
-            console.warn("🎬 Media Bar:", "No items found in libraries with date filter. Falling back to no date limit.");
+          if (items.length === 0 && (dateFilter !== '' || releaseDateFilter !== '')) {
+            console.warn("🎬 Media Bar:", "No items found in libraries with date/release filter. Falling back to no date limit.");
             const fallbackPromises = includedIds.map(async (libId) => {
               try {
                 const resp = await fetchItems('', libId);
@@ -2210,8 +2442,40 @@
             });
           }
 
-          if (items.length === 0 && dateFilter !== '') {
-            console.warn("🎬 Media Bar:", "No items found with date filter. Falling back to no date limit.");
+          if (CONFIG.maxDaysRecentRelease && releaseDateFilter !== '') {
+            const pastRelDate = new Date();
+            pastRelDate.setDate(pastRelDate.getDate() - CONFIG.maxDaysRecentRelease);
+            items = items.filter(item => {
+              if (!item.PremiereDate) return false;
+              return new Date(item.PremiereDate) >= pastRelDate;
+            });
+          }
+
+          if (CONFIG.releaseYears && releaseDateFilter !== '') {
+            const parsed = SlideUtils.parseYearExpression(CONFIG.releaseYears);
+            if (parsed.years && parsed.years.length > 0) {
+              const ySet = new Set(parsed.years);
+              items = items.filter(item => {
+                if (item.ProductionYear && ySet.has(item.ProductionYear)) return true;
+                if (item.PremiereDate) {
+                  const yr = new Date(item.PremiereDate).getFullYear();
+                  if (ySet.has(yr)) return true;
+                }
+                return false;
+              });
+            }
+            if (parsed.minPremiereDate) {
+              const minD = new Date(parsed.minPremiereDate);
+              items = items.filter(item => item.PremiereDate && new Date(item.PremiereDate) >= minD);
+            }
+            if (parsed.maxPremiereDate) {
+              const maxD = new Date(parsed.maxPremiereDate);
+              items = items.filter(item => item.PremiereDate && new Date(item.PremiereDate) <= maxD);
+            }
+          }
+
+          if (items.length === 0 && (dateFilter !== '' || releaseDateFilter !== '')) {
+            console.warn("🎬 Media Bar:", "No items found with date/release filter. Falling back to no date limit.");
             response = await fetchItems('');
             if (response.ok) {
               const data = await response.json();
@@ -2223,6 +2487,23 @@
         // Apply Require Logo filter if enabled
         if (requireLogo) {
           items = items.filter(item => (item.ImageTags && item.ImageTags.Logo) || item.ParentLogoImageTag);
+        }
+
+        // Apply Global Excluded Genres & Tags (Blacklist)
+        const serverExcludedGenres = CONFIG.excludedGenres ? CONFIG.excludedGenres.split(',').map(g => g.trim().toLowerCase()).filter(Boolean) : [];
+        if (serverExcludedGenres.length > 0) {
+          items = items.filter(item => {
+            if (!item.Genres || !Array.isArray(item.Genres) || item.Genres.length === 0) return true;
+            return !item.Genres.some(g => serverExcludedGenres.includes(g.toLowerCase()));
+          });
+        }
+
+        const serverExcludedTags = CONFIG.excludedTags ? CONFIG.excludedTags.split(',').map(t => t.trim().toLowerCase()).filter(Boolean) : [];
+        if (serverExcludedTags.length > 0) {
+          items = items.filter(item => {
+            if (!item.Tags || !Array.isArray(item.Tags) || item.Tags.length === 0) return true;
+            return !item.Tags.some(t => serverExcludedTags.includes(t.toLowerCase()));
+          });
         }
 
         // Apply Content Limits (MaxMovies, MaxTvShows)
@@ -2264,22 +2545,46 @@
     },
 
     /**
-     * Fetches items filtered by genres and/or tags from the server.
-     * Multiple genres are OR'd (union). Multiple tags are OR'd (union).
-     * Genres + Tags combined are AND'd (items must match at least one genre AND at least one tag).
+     * Fetches items filtered by genre, tag, year, and/or release date ranges
      * @param {string[]} genres - Genre names to filter by
      * @param {string[]} tags - Tag names to filter by
+     * @param {number[]} years - Year numbers to filter by
+     * @param {string|null} minPremiereDate - Earliest premiere date ISO string
+     * Fetches items filtered by genre, tag, year, release date, studio, person, and/or rating
+     * @param {string[]} genres - Genre names to filter by
+     * @param {string[]} tags - Tag names to filter by
+     * @param {number[]} years - Year numbers to filter by
+     * @param {string|null} minPremiereDate - Earliest premiere date ISO string
+     * @param {string|null} maxPremiereDate - Latest premiere date ISO string
+     * @param {string[]} studios - Studio names to filter by
+     * @param {string[]} persons - Person names (actors, directors, etc.) to filter by
+     * @param {string[]} officialRatings - Official parental ratings (e.g. PG-13, R, 16) to filter by
+     * @param {number|null} minCommunityRating - Minimum community rating (IMDb score)
+     * @param {number|null} maxOfficialRating - Maximum parental rating limit
      * @returns {Promise<string[]>} Array of item IDs
      */
-    async fetchItemsByGenresAndTags(genres = [], tags = []) {
+    async fetchItemsByGenresAndTags(
+      genres = [],
+      tags = [],
+      years = [],
+      minPremiereDate = null,
+      maxPremiereDate = null,
+      studios = [],
+      persons = [],
+      officialRatings = [],
+      minCommunityRating = null,
+      maxOfficialRating = null,
+      excludedGenres = [],
+      excludedTags = []
+    ) {
       try {
         if (!STATE.jellyfinData.accessToken || STATE.jellyfinData.accessToken === "Not Found") {
-          console.warn("🎬 Media Bar:", "Access token not available for genre/tag fetch.");
+          console.warn("🎬 Media Bar:", "Access token not available for filter fetch.");
           return [];
         }
 
         if (!STATE.jellyfinData.serverAddress || STATE.jellyfinData.serverAddress === "Not Found") {
-          console.warn("🎬 Media Bar:", "Server address not available for genre/tag fetch.");
+          console.warn("🎬 Media Bar:", "Server address not available for filter fetch.");
           return [];
         }
 
@@ -2293,13 +2598,41 @@
         }
 
         let genreParam = '';
-        if (genres.length > 0) {
+        if (genres && genres.length > 0) {
           genreParam = `&genres=${genres.map(g => encodeURIComponent(g)).join('|')}`;
         }
 
         let tagParam = '';
-        if (tags.length > 0) {
+        if (tags && tags.length > 0) {
           tagParam = `&tags=${tags.map(t => encodeURIComponent(t)).join('|')}`;
+        }
+
+        let yearParam = '';
+        if (years && years.length > 0) {
+          yearParam = `&years=${[...new Set(years)].join(',')}`;
+        }
+
+        let premiereDateParam = '';
+        if (minPremiereDate) {
+          premiereDateParam += `&minPremiereDate=${encodeURIComponent(minPremiereDate)}`;
+        }
+        if (maxPremiereDate) {
+          premiereDateParam += `&maxPremiereDate=${encodeURIComponent(maxPremiereDate)}`;
+        }
+
+        let studioParam = '';
+        if (studios && studios.length > 0) {
+          studioParam = `&studios=${studios.map(s => encodeURIComponent(s)).join('|')}`;
+        }
+
+        let officialRatingParam = '';
+        if (officialRatings && officialRatings.length > 0) {
+          officialRatingParam = `&officialRatings=${officialRatings.map(r => encodeURIComponent(r)).join('|')}`;
+        }
+
+        let minCommunityRatingParam = '';
+        if (minCommunityRating !== null && minCommunityRating !== undefined) {
+          minCommunityRatingParam = `&minCommunityRating=${minCommunityRating}`;
         }
 
         // Apply same filters as fetchItemIdsFromServer
@@ -2313,8 +2646,11 @@
         const playedFilter = CONFIG.includeWatchedContent ? '' : '&isPlayed=False';
 
         let parentalFilter = '';
-        if (CONFIG.maxParentalRating) {
-          parentalFilter = `&MaxOfficialRating=${CONFIG.maxParentalRating}`;
+        const effectiveMaxParental = maxOfficialRating !== null
+          ? (CONFIG.maxParentalRating ? Math.min(CONFIG.maxParentalRating, maxOfficialRating) : maxOfficialRating)
+          : CONFIG.maxParentalRating;
+        if (effectiveMaxParental) {
+          parentalFilter = `&MaxOfficialRating=${effectiveMaxParental}`;
         }
 
         let dateFilter = '';
@@ -2324,7 +2660,7 @@
           dateFilter = `&minDateLastSaved=${pastDate.toISOString()}`;
         }
 
-        // Exclude seasonal content from genre/tag results
+        // Exclude seasonal content from results
         let excludeFilter = '';
         if (CONFIG.excludeSeasonalContent && CONFIG.seasonalSections) {
           try {
@@ -2343,7 +2679,7 @@
                     }
                     return id.trim();
                   })
-                  .filter((id) => id && !id.match(/^(genre|tag):/i));
+                  .filter((id) => id && !id.match(/^(genre|genres|tag|tags|studio|studios|year|years|released?|person|persons|actor|actors|director|directors|rating|ratings|officialrating|minrating|communityrating|score|age|parental):/i));
                 allExcludedIds.push(...idsInThisSection);
               }
             }
@@ -2355,13 +2691,67 @@
           }
         }
 
-        console.log("🎬 Media Bar:", `Fetching items by genre/tag filter (genres: [${genres.join(', ')}], tags: [${tags.join(', ')}])...`);
+        const filterSummary = [];
+        if (genres && genres.length > 0) filterSummary.push(`genres: [${genres.join(', ')}]`);
+        if (tags && tags.length > 0) filterSummary.push(`tags: [${tags.join(', ')}]`);
+        if (studios && studios.length > 0) filterSummary.push(`studios: [${studios.join(', ')}]`);
+        if (persons && persons.length > 0) filterSummary.push(`persons: [${persons.join(', ')}]`);
+        if (officialRatings && officialRatings.length > 0) filterSummary.push(`ratings: [${officialRatings.join(', ')}]`);
+        if (minCommunityRating !== null) filterSummary.push(`minScore: ${minCommunityRating}`);
+        if (maxOfficialRating !== null) filterSummary.push(`maxAge: ${maxOfficialRating}`);
+        if (years && years.length > 0) filterSummary.push(`years: [${years.join(', ')}]`);
+        if (minPremiereDate) filterSummary.push(`minPremiereDate: ${minPremiereDate}`);
+        if (maxPremiereDate) filterSummary.push(`maxPremiereDate: ${maxPremiereDate}`);
+        if (excludedGenres && excludedGenres.length > 0) filterSummary.push(`excludedGenres: [${excludedGenres.join(', ')}]`);
+        if (excludedTags && excludedTags.length > 0) filterSummary.push(`excludedTags: [${excludedTags.join(', ')}]`);
 
-        const fetchItemsByGenreTag = async (parentId = '') => {
+        console.log("🎬 Media Bar:", `Fetching items by filter (${filterSummary.join(', ')})...`);
+
+        const fetchItemsByFilter = async (parentId = '', personName = '') => {
           const parentParam = parentId ? `&parentId=${parentId}` : '';
-          const url = `${STATE.jellyfinData.serverAddress}/Items?IncludeItemTypes=${itemTypes.join(",")}&Recursive=true&hasOverview=true&imageTypes=Logo,Backdrop&${sortParams}${playedFilter}${parentalFilter}${dateFilter}${excludeFilter}${genreParam}${tagParam}${parentParam}&enableUserData=true&Limit=${CONFIG.maxItems}&fields=Id,DateCreated,Type`;
+          const personParam = personName ? `&person=${encodeURIComponent(personName)}` : '';
+          const url = `${STATE.jellyfinData.serverAddress}/Items?IncludeItemTypes=${itemTypes.join(",")}&Recursive=true&hasOverview=true&imageTypes=Logo,Backdrop&${sortParams}${playedFilter}${parentalFilter}${dateFilter}${excludeFilter}${genreParam}${tagParam}${yearParam}${premiereDateParam}${studioParam}${officialRatingParam}${minCommunityRatingParam}${personParam}${parentParam}&enableUserData=true&Limit=${CONFIG.maxItems}&fields=Id,DateCreated,PremiereDate,ProductionYear,Type,OfficialRating,CommunityRating,Studios,People,Genres,Tags`;
           const resp = await fetch(url, { headers: this.getAuthHeaders() });
           return resp;
+        };
+
+        const queryPersonList = (persons && persons.length > 0) ? persons : [''];
+        const fetchItemsForParent = async (parentId = '') => {
+          if (queryPersonList.length === 1) {
+            try {
+              const resp = await fetchItemsByFilter(parentId, queryPersonList[0]);
+              if (resp.ok) {
+                const data = await resp.json();
+                return data.Items || [];
+              }
+            } catch (e) {
+              console.error("🎬 Media Bar:", `Error fetching filtered items for parent ${parentId || 'root'}:`, e);
+            }
+            return [];
+          } else {
+            try {
+              const responses = await Promise.all(
+                queryPersonList.map(p => fetchItemsByFilter(parentId, p))
+              );
+              const combined = [];
+              const seenIds = new Set();
+              for (const resp of responses) {
+                if (resp && resp.ok) {
+                  const data = await resp.json();
+                  (data.Items || []).forEach(item => {
+                    if (!seenIds.has(item.Id)) {
+                      seenIds.add(item.Id);
+                      combined.push(item);
+                    }
+                  });
+                }
+              }
+              return combined;
+            } catch (e) {
+              console.error("🎬 Media Bar:", `Error fetching multi-person items for parent ${parentId || 'root'}:`, e);
+              return [];
+            }
+          }
         };
 
         const libraryMap = await this.fetchLibraryIds() || {};
@@ -2384,61 +2774,130 @@
         if (allLibraryIds.length > 0 && includedIds.length === 0) {
           return [];
         } else if (includedIds.length > 0 && includedIds.length < allLibraryIds.length) {
-          const fetchPromises = includedIds.map(async (libId) => {
-            try {
-              const resp = await fetchItemsByGenreTag(libId);
-              if (resp.ok) {
-                const data = await resp.json();
-                return data.Items || [];
-              }
-            } catch (e) {
-              console.error("🎬 Media Bar:", `Error fetching items by genre/tag for library ${libId}:`, e);
-            }
-            return [];
-          });
+          const fetchPromises = includedIds.map(libId => fetchItemsForParent(libId));
           const results = await Promise.all(fetchPromises);
+          const seenIds = new Set();
           results.forEach(resList => {
-            items.push(...resList);
+            resList.forEach(item => {
+              if (!seenIds.has(item.Id)) {
+                seenIds.add(item.Id);
+                items.push(item);
+              }
+            });
           });
-
-          // Sort combined results client-side
-          if (CONFIG.sortBy === 'Random' || CONFIG.sortBy === 'Original') {
-            items.sort(() => Math.random() - 0.5);
-          } else if (CONFIG.sortBy === 'DateCreated') {
-            items.sort((a, b) => new Date(b.DateCreated) - new Date(a.DateCreated));
-          } else {
-            items.sort((a, b) => (a.SortName || '').localeCompare(b.SortName || ''));
-          }
-
-          if (CONFIG.maxDaysRecent && dateFilter !== '') {
-            const pastDate = new Date();
-            pastDate.setDate(pastDate.getDate() - CONFIG.maxDaysRecent);
-            items = items.filter(item => {
-              if (!item.DateCreated) return true;
-              return new Date(item.DateCreated) >= pastDate;
-            });
-          }
         } else {
-          const response = await fetchItemsByGenreTag();
-          if (response.ok) {
-            const data = await response.json();
-            items = data.Items || [];
-          }
-          if (CONFIG.maxDaysRecent && dateFilter !== '') {
-            const pastDate = new Date();
-            pastDate.setDate(pastDate.getDate() - CONFIG.maxDaysRecent);
-            items = items.filter(item => {
-              if (!item.DateCreated) return true;
-              return new Date(item.DateCreated) >= pastDate;
+          items = await fetchItemsForParent('');
+        }
+
+        // Sort combined results
+        if (CONFIG.sortBy === 'Random' || CONFIG.sortBy === 'Original') {
+          items.sort(() => Math.random() - 0.5);
+        } else if (CONFIG.sortBy === 'DateCreated') {
+          items.sort((a, b) => new Date(b.DateCreated) - new Date(a.DateCreated));
+        } else {
+          items.sort((a, b) => (a.SortName || '').localeCompare(b.SortName || ''));
+        }
+
+        // Client-side verification / filtering for robustness
+        if (CONFIG.maxDaysRecent && dateFilter !== '') {
+          const pastDate = new Date();
+          pastDate.setDate(pastDate.getDate() - CONFIG.maxDaysRecent);
+          items = items.filter(item => {
+            if (!item.DateCreated) return true;
+            return new Date(item.DateCreated) >= pastDate;
+          });
+        }
+
+        if (years && years.length > 0) {
+          const ySet = new Set(years.map(y => parseInt(y, 10)));
+          items = items.filter(item => {
+            if (item.ProductionYear && ySet.has(item.ProductionYear)) return true;
+            if (item.PremiereDate) {
+              const yr = new Date(item.PremiereDate).getFullYear();
+              if (ySet.has(yr)) return true;
+            }
+            return false;
+          });
+        }
+
+        if (minPremiereDate) {
+          const minD = new Date(minPremiereDate);
+          items = items.filter(item => item.PremiereDate && new Date(item.PremiereDate) >= minD);
+        }
+
+        if (maxPremiereDate) {
+          const maxD = new Date(maxPremiereDate);
+          items = items.filter(item => item.PremiereDate && new Date(item.PremiereDate) <= maxD);
+        }
+
+        if (studios && studios.length > 0) {
+          const sSet = new Set(studios.map(s => s.toLowerCase()));
+          items = items.filter(item => {
+            if (!item.Studios || !Array.isArray(item.Studios) || item.Studios.length === 0) return true;
+            return item.Studios.some(s => sSet.has((s.Name || '').toLowerCase()));
+          });
+        }
+
+        if (officialRatings && officialRatings.length > 0) {
+          const rSet = new Set(officialRatings.map(r => r.toLowerCase()));
+          items = items.filter(item => {
+            if (!item.OfficialRating) return false;
+            const rLower = item.OfficialRating.toLowerCase();
+            return rSet.has(rLower) || officialRatings.some(r => {
+              const target = r.toLowerCase();
+              return rLower === target || rLower.endsWith('-' + target) || rLower.replace(/\D/g, '') === target.replace(/\D/g, '');
             });
+          });
+        }
+
+        if (effectiveMaxParental) {
+          items = items.filter(item => {
+            if (!item.OfficialRating) return true;
+            const ratingNum = parseInt(item.OfficialRating.replace(/\D/g, ''), 10);
+            return isNaN(ratingNum) || ratingNum <= effectiveMaxParental;
+          });
+        }
+
+        if (minCommunityRating !== null && minCommunityRating !== undefined) {
+          items = items.filter(item => {
+            if (typeof item.CommunityRating !== 'number') return false;
+            return item.CommunityRating >= minCommunityRating;
+          });
+        }
+
+        // Apply Excluded Genres (Blacklist)
+        const serverExcludedGenres = CONFIG.excludedGenres ? CONFIG.excludedGenres.split(',').map(g => g.trim().toLowerCase()).filter(Boolean) : [];
+        const effectiveExcludedGenres = [...new Set([...(excludedGenres || []).map(g => g.toLowerCase()), ...serverExcludedGenres])];
+        if (effectiveExcludedGenres.length > 0) {
+          const prevCount = items.length;
+          items = items.filter(item => {
+            if (!item.Genres || !Array.isArray(item.Genres) || item.Genres.length === 0) return true;
+            return !item.Genres.some(g => effectiveExcludedGenres.includes(g.toLowerCase()));
+          });
+          if (items.length < prevCount) {
+            console.log("🎬 Media Bar:", `Excluded ${prevCount - items.length} item(s) matching excluded genres: [${effectiveExcludedGenres.join(', ')}]`);
           }
         }
 
-        console.log("🎬 Media Bar:", `Found ${items.length} items matching genre/tag filters`);
+        // Apply Excluded Tags (Blacklist)
+        const serverExcludedTags = CONFIG.excludedTags ? CONFIG.excludedTags.split(',').map(t => t.trim().toLowerCase()).filter(Boolean) : [];
+        const effectiveExcludedTags = [...new Set([...(excludedTags || []).map(t => t.toLowerCase()), ...serverExcludedTags])];
+        if (effectiveExcludedTags.length > 0) {
+          const prevCount = items.length;
+          items = items.filter(item => {
+            if (!item.Tags || !Array.isArray(item.Tags) || item.Tags.length === 0) return true;
+            return !item.Tags.some(t => effectiveExcludedTags.includes(t.toLowerCase()));
+          });
+          if (items.length < prevCount) {
+            console.log("🎬 Media Bar:", `Excluded ${prevCount - items.length} item(s) matching excluded tags: [${effectiveExcludedTags.join(', ')}]`);
+          }
+        }
+
+        console.log("🎬 Media Bar:", `Found ${items.length} items matching filter rules`);
 
         return items.map(item => ({ Id: item.Id, Type: item.Type }));
       } catch (error) {
-        console.error("🎬 Media Bar:", "Error fetching items by genre/tag:", error);
+        console.error("🎬 Media Bar:", "Error fetching items by filter rules:", error);
         return [];
       }
     },
@@ -2666,11 +3125,12 @@
     },
 
     /**
-     * Fetches items belonging to a collection (BoxSet)
-     * @param {string} collectionId - ID of the collection
+     * Fetches items belonging to a collection (BoxSet), playlist, or folder
+     * @param {string} collectionId - ID of the collection/playlist/folder
+     * @param {string} [itemType='BoxSet'] - Type of item ('BoxSet', 'Playlist', 'Folder', etc.)
      * @returns {Promise<Array>} Array of item IDs
      */
-    async fetchCollectionItems(collectionId) {
+    async fetchCollectionItems(collectionId, itemType = 'BoxSet') {
       try {
         let itemTypes = [];
         if (CONFIG.maxMovies > 0) itemTypes.push("Movie");
@@ -2681,8 +3141,12 @@
           return [];
         }
 
+        // For BoxSets and Playlists, omit Recursive=true so Jellyfin preserves custom/original collection sort order
+        const isFolder = itemType === 'Folder' || itemType === 'CollectionFolder' || itemType === 'UserView';
+        const recursiveParam = isFolder ? "&Recursive=true" : "";
+
         const response = await fetch(
-          `${STATE.jellyfinData.serverAddress}/Items?ParentId=${collectionId}&Recursive=true&IncludeItemTypes=${itemTypes.join(",")}&fields=Id,Type&userId=${STATE.jellyfinData.userId}`,
+          `${STATE.jellyfinData.serverAddress}/Items?ParentId=${collectionId}${recursiveParam}&IncludeItemTypes=${itemTypes.join(",")}&fields=Id,Type,Genres,Tags&userId=${STATE.jellyfinData.userId}`,
           {
             headers: this.getAuthHeaders(),
           }
@@ -2695,8 +3159,8 @@
 
         const data = await response.json();
         const items = data.Items || [];
-        console.log("🎬 Media Bar:", `Resolved collection ${collectionId} to ${items.length} items`);
-        return items.map(i => ({ Id: i.Id, Type: i.Type }));
+        console.log("🎬 Media Bar:", `Resolved collection ${collectionId} to ${items.length} items (isFolder=${isFolder})`);
+        return items.map(i => ({ Id: i.Id, Type: i.Type, Genres: i.Genres || [], Tags: i.Tags || [] }));
       } catch (error) {
         console.error("🎬 Media Bar:", `Error fetching collection items for ${collectionId}:`, error);
         return [];
@@ -2977,6 +3441,9 @@
       this.callback = callback;
       this.interval = interval;
       this.timerId = null;
+      this.startedAt = null;
+      this.remaining = interval;
+      this.isPaused = false;
       this.start();
     }
 
@@ -2987,8 +3454,11 @@
     stop() {
       if (this.timerId) {
         clearInterval(this.timerId);
+        clearTimeout(this.timerId);
         this.timerId = null;
       }
+      this.isPaused = false;
+      this.remaining = this.interval;
       return this;
     }
 
@@ -2998,7 +3468,48 @@
      */
     start() {
       if (!this.timerId) {
-        this.timerId = setInterval(this.callback, this.interval);
+        this.startedAt = Date.now();
+        this.remaining = this.interval;
+        this.isPaused = false;
+        this.timerId = setInterval(() => {
+          this.startedAt = Date.now();
+          this.remaining = this.interval;
+          this.callback();
+        }, this.interval);
+      }
+      return this;
+    }
+
+    /**
+     * Pauses the timer preserving remaining duration
+     * @returns {SlideTimer} This instance for chaining
+     */
+    pause() {
+      if (this.timerId && !this.isPaused) {
+        clearInterval(this.timerId);
+        clearTimeout(this.timerId);
+        this.timerId = null;
+        this.isPaused = true;
+        const elapsed = Date.now() - (this.startedAt || Date.now());
+        this.remaining = Math.max(0, this.remaining - elapsed);
+      }
+      return this;
+    }
+
+    /**
+     * Resumes the paused timer with remaining duration
+     * @returns {SlideTimer} This instance for chaining
+     */
+    resume() {
+      if (this.isPaused && !this.timerId) {
+        this.isPaused = false;
+        this.startedAt = Date.now();
+        const timeoutDuration = this.remaining > 0 ? this.remaining : this.interval;
+        this.timerId = setTimeout(() => {
+          this.timerId = null;
+          this.callback();
+          this.start();
+        }, timeoutDuration);
       }
       return this;
     }
@@ -3030,6 +3541,7 @@
    */
   const VisibilityObserver = {
     wasVisible: false,
+    _historyWrapped: false,
     updateVisibility() {
       const videoPlayer = document.querySelector('.videoPlayerContainer');
       const trailerPlayer = document.querySelector('.youtubePlayerContainer');
@@ -3038,36 +3550,38 @@
         document.querySelector('#videoOsdPage:not(.hide)') ||
         document.body.classList.contains('is-videoplayer');
 
+      const container = document.getElementById("slides-container");
+
       // If a full screen video player is active, hide slideshow and stop playback
       if (isVideoPlayerActive) {
-        const container = document.getElementById("slides-container");
         if (container) {
           container.style.display = "none";
           container.style.visibility = "hidden";
           container.style.pointerEvents = "none";
+          container.classList.add("media-bar-hidden");
         }
         if (STATE.slideshow.slideInterval) {
           STATE.slideshow.slideInterval.stop();
         }
         SlideshowManager.stopAllPlayback();
         this.wasVisible = false; // Reset so returning to home correctly restarts the slideshow!
+        PageBackdrop.clear();
         return;
       }
 
-      const activeTab = document.querySelector(".emby-tab-button-active");
-      const container = document.getElementById("slides-container");
-
       if (!container) return;
 
-      const isVisible =
-        (window.location.hash === "#/home.html" ||
-          window.location.hash === "#/home") &&
-        activeTab &&
-        activeTab.getAttribute("data-index") === "0";
+      const currentHash = (window.location.hash || "").toLowerCase();
+      const isHome = (currentHash === "#/home.html" || currentHash === "#/home" || currentHash === "#!/home.html" || currentHash === "#!/home") &&
+        !document.body.classList.contains("dashboardDocument");
+
+      const activeTab = document.querySelector(".emby-tab-button-active");
+      const isVisible = isHome && activeTab && activeTab.getAttribute("data-index") === "0";
 
       container.style.display = isVisible ? "block" : "none";
       container.style.visibility = isVisible ? "visible" : "hidden";
       container.style.pointerEvents = isVisible ? "auto" : "none";
+      container.classList.toggle("media-bar-hidden", !isVisible);
 
       if (container.parentNode !== document.body) {
         document.body.appendChild(container);
@@ -3143,13 +3657,32 @@
      * Initializes visibility observer
      */
     init() {
-      const observer = new MutationObserver(() => this.updateVisibility());
-      observer.observe(document.body, { childList: true, subtree: true });
+      // Intercept SPA routing (pushState and replaceState) so router changes immediately trigger visibility update
+      if (!this._historyWrapped && window.history) {
+        ['pushState', 'replaceState'].forEach((fn) => {
+          const orig = window.history[fn];
+          if (orig) {
+            window.history[fn] = function (...args) {
+              const res = orig.apply(this, args);
+              try { VisibilityObserver.updateVisibility(); } catch (e) { }
+              return res;
+            };
+          }
+        });
+        this._historyWrapped = true;
+      }
 
-      document.body.addEventListener("click", () => this.updateVisibility());
-      window.addEventListener("hashchange", () => this.updateVisibility());
-      window.addEventListener("popstate", () => this.updateVisibility());
-      document.addEventListener("viewshow", () => this.updateVisibility());
+      const observer = new MutationObserver(() => this.updateVisibility());
+      observer.observe(document.body, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ["class"]
+      });
+
+      ['click', 'hashchange', 'popstate', 'viewshow', 'pageshow'].forEach((evt) => {
+        window.addEventListener(evt, () => this.updateVisibility());
+      });
 
       this.updateVisibility();
     },
@@ -3679,6 +4212,7 @@
                       event.target._wrapperDiv.style.transition = "opacity 1.2s ease-in-out";
                       event.target._wrapperDiv.style.opacity = "1";
                     }
+                    if (slide) slide.classList.add('with-video');
                     STATE.slideshow.isVideoPlaying = true;
                     if (getEffectiveWaitForTrailer() && STATE.slideshow.slideInterval) {
                       STATE.slideshow.slideInterval.stop();
@@ -3707,6 +4241,7 @@
                       SlideshowManager.startYouTubeProgressLoop(event.target);
                     }
                   } else if (event.data === YT.PlayerState.ENDED) {
+                    if (slide) slide.classList.remove('with-video');
                     if (isActive) {
                       STATE.slideshow.isVideoPlaying = false;
                       if (typeof SlideshowManager !== 'undefined') {
@@ -3723,6 +4258,9 @@
                       }
                     }
                   } else {
+                    if (slide && event.data !== YT.PlayerState.BUFFERING) {
+                      slide.classList.remove('with-video');
+                    }
                     if (isActive) {
                       STATE.slideshow.isVideoPlaying = false;
                       if (typeof SlideshowManager !== 'undefined') {
@@ -3783,6 +4321,7 @@
             if (STATE.slideshow.playSignals && STATE.slideshow.playSignals[itemId] === false) return;
 
             video.style.opacity = "1";
+            slide.classList.add('with-video');
             STATE.slideshow.isVideoPlaying = true;
 
             if (getEffectiveWaitForTrailer() && STATE.slideshow.slideInterval) {
@@ -3817,6 +4356,7 @@
 
           videoBackdrop.addEventListener('ended', (event) => {
             const slide = event.target.closest('.slide');
+            if (slide) slide.classList.remove('with-video');
             if (slide && slide.classList.contains('active')) {
               STATE.slideshow.isVideoPlaying = false;
               if (STATE.slideshow.slideInterval) {
@@ -3829,6 +4369,9 @@
 
           videoBackdrop.addEventListener('pause', (event) => {
             const slide = event.target.closest('.slide');
+            if (slide && event.target.currentTime === 0) {
+              slide.classList.remove('with-video');
+            }
             if (slide && slide.classList.contains('active')) {
               STATE.slideshow.isVideoPlaying = false;
             }
@@ -4571,6 +5114,9 @@
       let previousVisibleSlide;
       try {
         const container = SlideUtils.getOrCreateSlidesContainer();
+        if (typeof isSplitScreenTrailerEnabled === 'function') {
+          container.classList.toggle("split-screen-trailer", isSplitScreenTrailerEnabled());
+        }
         const totalItems = STATE.slideshow.totalItems;
 
         index = Math.max(0, Math.min(index, totalItems - 1));
@@ -4711,6 +5257,9 @@
           if (!video.closest(`.slide[data-item-id="${currentItemId}"]`)) {
             video.pause();
           }
+        });
+        container.querySelectorAll('.slide').forEach(s => {
+          if (s !== currentSlide) s.classList.remove('with-video');
         });
 
         // 3. Play and Reset current video
@@ -5897,78 +6446,247 @@
     },
 
     /**
-     * Parses custom media IDs, handling seasonal content if enabled.
-     * If Seasonal Content is enabled:
-     *  - Check if any defined season matches the current date.
-     *  - If match: Return IDs from that season.
-     *  - If NO match: Fall back to Default Custom IDs.
-     * If Custom Media IDs are enabled (and no seasonal match):
-     *  - Return Default Custom IDs.
-     * If no Custom Media IDs are enabled:
-     *  - Return empty result (triggering random fallback).
-     *
+     * Parses a string containing IDs, genre/tag/year/studio/person/rating filters, and custom video backdrops.
      * Supports special prefixes in the ID field:
-     *  - genre:Action  --> filter by genre
-     *  - tag:2000s     --> filter by tag
+     *  - genre:Action / genres:Action,Comedy      --> filter by genre
+     *  - tag:Halloween / tags:Christmas           --> filter by tag
+     *  - studio:Pixar / studios:Marvel Studios    --> filter by studio
+     *  - person:Tom Hanks / actor:Brad Pitt / director:Nolan --> filter by person/cast/crew
+     *  - year:2024 / years:2000-2010 / years:2000s / years:2020+ --> filter by year/range
+     *  - released:90d                             --> filter by release recency
+     *  - rating:PG-13 / rating:16                 --> filter by official/parental rating
+     *  - rating:>=7.5 / rating:8+ / minrating:7   --> filter by minimum community rating
+     *  - rating:<=12                              --> filter by maximum parental rating
      *
-     * @returns {{ ids: string[], genres: string[], tags: string[] }} Parsed result
+     * @returns {{ ids: string[], genres: string[], tags: string[], studios: string[], persons: string[], years: number[], officialRatings: string[], minPremiereDate: string|null, maxPremiereDate: string|null, minCommunityRating: number|null, maxOfficialRating: number|null }}
      */
     parseIdsString(idsString) {
-      if (!idsString) return { ids: [], genres: [], tags: [] };
+      if (!idsString) return {
+        ids: [],
+        genres: [],
+        tags: [],
+        studios: [],
+        persons: [],
+        years: [],
+        officialRatings: [],
+        minPremiereDate: null,
+        maxPremiereDate: null,
+        minCommunityRating: null,
+        maxOfficialRating: null
+      };
 
       const ids = [];
       const genres = [];
+      const excludedGenres = [];
       const tags = [];
+      const excludedTags = [];
+      const studios = [];
+      const persons = [];
+      const years = [];
+      const officialRatings = [];
+      let minPremiereDate = null;
+      let maxPremiereDate = null;
+      let minCommunityRating = null;
+      let maxOfficialRating = null;
+
+      const processSingleId = (raw) => {
+        if (!raw) return;
+        const urlMatch = raw.match(/\[(.*?)\]/);
+        let id = raw;
+        if (urlMatch) {
+          const url = urlMatch[1];
+          id = raw.replace(/\[.*?\]/, '').trim();
+          const guidMatch = id.match(/([0-9a-f]{32})/i);
+          if (guidMatch) {
+            id = guidMatch[1];
+          } else {
+            id = id.split('|')[0].trim();
+          }
+          STATE.slideshow.customTrailerUrls[id] = url;
+        }
+        if (id.trim()) {
+          ids.push(id.trim());
+        }
+      };
 
       idsString
-        .split(/[\n,]/)
+        .split(/\r?\n/)
         .map((line) => line.trim())
         .filter((line) => line)
         .forEach((line) => {
-          // Check for genre prefix
-          const genreMatch = line.match(/^genre:\s*(.+)$/i);
+          // Check for negative genre prefix: -genre:, !genre:, exclude_genre:, exclude-genre:
+          const excludedGenrePrefixMatch = line.match(/^(?:[-!]genres?|exclude[-_]genres?):\s*(.+)$/i);
+          if (excludedGenrePrefixMatch) {
+            excludedGenrePrefixMatch[1].split(/[,|]/).forEach(g => {
+              const val = g.trim().replace(/^[-!]/, '').trim();
+              if (val) excludedGenres.push(val);
+            });
+            return;
+          }
+
+          // Check for genre prefix (may contain positive genres or inline negative like -Horror or !Thriller)
+          const genreMatch = line.match(/^genres?:\s*(.+)$/i);
           if (genreMatch) {
-            genres.push(genreMatch[1].trim());
+            genreMatch[1].split(/[,|]/).forEach(g => {
+              const val = g.trim();
+              if (!val) return;
+              if (val.startsWith('-') || val.startsWith('!')) {
+                const clean = val.replace(/^[-!]/, '').trim();
+                if (clean) excludedGenres.push(clean);
+              } else {
+                genres.push(val);
+              }
+            });
             return;
           }
 
-          // Check for tag prefix
-          const tagMatch = line.match(/^tag:\s*(.+)$/i);
+          // Check for negative tag prefix: -tag:, !tag:, exclude_tag:, exclude-tag:
+          const excludedTagPrefixMatch = line.match(/^(?:[-!]tags?|exclude[-_]tags?):\s*(.+)$/i);
+          if (excludedTagPrefixMatch) {
+            excludedTagPrefixMatch[1].split(/[,|]/).forEach(t => {
+              const val = t.trim().replace(/^[-!]/, '').trim();
+              if (val) excludedTags.push(val);
+            });
+            return;
+          }
+
+          // Check for tag prefix (may contain positive tags or inline negative like -gore or !nsfw)
+          const tagMatch = line.match(/^tags?:\s*(.+)$/i);
           if (tagMatch) {
-            tags.push(tagMatch[1].trim());
+            tagMatch[1].split(/[,|]/).forEach(t => {
+              const val = t.trim();
+              if (!val) return;
+              if (val.startsWith('-') || val.startsWith('!')) {
+                const clean = val.replace(/^[-!]/, '').trim();
+                if (clean) excludedTags.push(clean);
+              } else {
+                tags.push(val);
+              }
+            });
             return;
           }
 
-          // Regular ID/name processing
-          const urlMatch = line.match(/\[(.*?)\]/);
-          let id = line;
-          if (urlMatch) {
-            const url = urlMatch[1];
-            // Remove the [url] part from the ID string for parsing
-            id = line.replace(/\[.*?\]/, '').trim();
-            // Attempt to extract GUID if present
-            const guidMatch = id.match(/([0-9a-f]{32})/i);
-            if (guidMatch) {
-              id = guidMatch[1];
-            } else {
-              // Fallback: split by pipe if used
-              id = id.split('|')[0].trim();
+          // Check for studio prefix
+          const studioMatch = line.match(/^studios?:\s*(.+)$/i);
+          if (studioMatch) {
+            studioMatch[1].split(/[,|]/).forEach(s => {
+              const val = s.trim();
+              if (val) studios.push(val);
+            });
+            return;
+          }
+
+          // Check for person prefix (actor, director, person)
+          const personMatch = line.match(/^(?:persons?|actors?|directors?):\s*(.+)$/i);
+          if (personMatch) {
+            personMatch[1].split(/[,|]/).forEach(p => {
+              const val = p.trim();
+              if (val) persons.push(val);
+            });
+            return;
+          }
+
+          // Check for year / years prefix (e.g. year:2024, years:2000-2010, years:2000s, years:2020+)
+          const yearMatch = line.match(/^years?:\s*(.+)$/i);
+          if (yearMatch) {
+            const parsed = SlideUtils.parseYearExpression(yearMatch[1].trim());
+            if (parsed.years && parsed.years.length > 0) {
+              years.push(...parsed.years);
             }
-            STATE.slideshow.customTrailerUrls[id] = url;
+            if (parsed.minPremiereDate) {
+              if (!minPremiereDate || new Date(parsed.minPremiereDate) < new Date(minPremiereDate)) {
+                minPremiereDate = parsed.minPremiereDate;
+              }
+            }
+            if (parsed.maxPremiereDate) {
+              if (!maxPremiereDate || new Date(parsed.maxPremiereDate) > new Date(maxPremiereDate)) {
+                maxPremiereDate = parsed.maxPremiereDate;
+              }
+            }
+            return;
           }
-          if (id.trim()) {
-            ids.push(id.trim());
+
+          // Check for release / released prefix (e.g. release:90d or released:30)
+          const releaseMatch = line.match(/^released?:\s*(\d+)\s*d?$/i);
+          if (releaseMatch) {
+            const days = parseInt(releaseMatch[1], 10);
+            const pastDate = new Date();
+            pastDate.setDate(pastDate.getDate() - days);
+            const iso = pastDate.toISOString();
+            if (!minPremiereDate || new Date(iso) > new Date(minPremiereDate)) {
+              minPremiereDate = iso;
+            }
+            return;
           }
+
+          // Check for rating / ratings / officialrating / minrating / score / age prefix
+          const ratingMatch = line.match(/^(?:ratings?|officialratings?|minratings?|communityratings?|score|age|parental):\s*(.+)$/i);
+          if (ratingMatch) {
+            const prefix = line.split(':')[0].toLowerCase().trim();
+            const parsed = SlideUtils.parseRatingExpression(ratingMatch[1].trim(), prefix);
+            if (parsed.officialRatings && parsed.officialRatings.length > 0) {
+              officialRatings.push(...parsed.officialRatings);
+            }
+            if (parsed.minCommunityRating !== null) {
+              if (minCommunityRating === null || parsed.minCommunityRating > minCommunityRating) {
+                minCommunityRating = parsed.minCommunityRating;
+              }
+            }
+            if (parsed.maxOfficialRating !== null) {
+              if (maxOfficialRating === null || parsed.maxOfficialRating < maxOfficialRating) {
+                maxOfficialRating = parsed.maxOfficialRating;
+              }
+            }
+            return;
+          }
+
+          // Non-filter line: can be multiple comma-separated IDs or a single ID with trailer
+          if (!line.includes('[') && line.includes(',')) {
+            line.split(',').forEach(sub => processSingleId(sub.trim()));
+            return;
+          }
+
+          processSingleId(line);
         });
 
-      return { ids, genres, tags };
+      return {
+        ids,
+        genres: [...new Set(genres)],
+        excludedGenres: [...new Set(excludedGenres)],
+        tags: [...new Set(tags)],
+        excludedTags: [...new Set(excludedTags)],
+        studios: [...new Set(studios)],
+        persons: [...new Set(persons)],
+        years: [...new Set(years)],
+        officialRatings: [...new Set(officialRatings)],
+        minPremiereDate,
+        maxPremiereDate,
+        minCommunityRating,
+        maxOfficialRating
+      };
     },
 
     parseCustomIds() {
       const activePlaylist = MediaBarEnhancedSettingsManager.getSetting('activePlaylist', 'Default');
 
+      const emptyFilters = () => ({
+        ids: [],
+        genres: [],
+        excludedGenres: [],
+        tags: [],
+        excludedTags: [],
+        studios: [],
+        persons: [],
+        years: [],
+        officialRatings: [],
+        minPremiereDate: null,
+        maxPremiereDate: null,
+        minCommunityRating: null,
+        maxOfficialRating: null
+      });
+
       if (activePlaylist === 'Library') {
-        return { ids: [], genres: [], tags: [] };
+        return emptyFilters();
       } else if (activePlaylist && activePlaylist.startsWith('Playlist:')) {
         const playlistName = activePlaylist.replace('Playlist:', '');
         try {
@@ -6040,7 +6758,7 @@
       // If NOT using seasonal content (disabled or no match),
       // Custom IDs are disabled, return empty to skip to random
       if (!usingSeasonal && !CONFIG.enableCustomMediaIds) {
-        return { ids: [], genres: [], tags: [] };
+        return emptyFilters();
       }
 
       // Parse the resulting string (either seasonal or default)
@@ -6049,8 +6767,35 @@
       if (result.genres.length > 0) {
         console.log("🎬 Media Bar:", `Parsed ${result.genres.length} genre filter(s): ${result.genres.join(', ')}`);
       }
+      if (result.excludedGenres && result.excludedGenres.length > 0) {
+        console.log("🎬 Media Bar:", `Parsed ${result.excludedGenres.length} excluded genre filter(s): ${result.excludedGenres.join(', ')}`);
+      }
       if (result.tags.length > 0) {
         console.log("🎬 Media Bar:", `Parsed ${result.tags.length} tag filter(s): ${result.tags.join(', ')}`);
+      }
+      if (result.excludedTags && result.excludedTags.length > 0) {
+        console.log("🎬 Media Bar:", `Parsed ${result.excludedTags.length} excluded tag filter(s): ${result.excludedTags.join(', ')}`);
+      }
+      if (result.studios && result.studios.length > 0) {
+        console.log("🎬 Media Bar:", `Parsed ${result.studios.length} studio filter(s): ${result.studios.join(', ')}`);
+      }
+      if (result.persons && result.persons.length > 0) {
+        console.log("🎬 Media Bar:", `Parsed ${result.persons.length} person filter(s): ${result.persons.join(', ')}`);
+      }
+      if (result.officialRatings && result.officialRatings.length > 0) {
+        console.log("🎬 Media Bar:", `Parsed ${result.officialRatings.length} official rating filter(s): ${result.officialRatings.join(', ')}`);
+      }
+      if (result.minCommunityRating !== null) {
+        console.log("🎬 Media Bar:", `Parsed min community rating filter: ${result.minCommunityRating}`);
+      }
+      if (result.maxOfficialRating !== null) {
+        console.log("🎬 Media Bar:", `Parsed max official rating filter: ${result.maxOfficialRating}`);
+      }
+      if (result.years.length > 0) {
+        console.log("🎬 Media Bar:", `Parsed ${result.years.length} year filter(s): ${result.years.join(', ')}`);
+      }
+      if (result.minPremiereDate || result.maxPremiereDate) {
+        console.log("🎬 Media Bar:", `Parsed release date filter(s): min=${result.minPremiereDate || 'none'}, max=${result.maxPremiereDate || 'none'}`);
       }
 
       return result;
@@ -6092,10 +6837,10 @@
           const item = await ApiUtils.fetchItemDetails(id);
           if (item && (item.Type === 'BoxSet' || item.Type === 'Playlist' || item.Type === 'CollectionFolder' || item.Type === 'Folder' || item.Type === 'UserView')) {
             console.log("🎬 Media Bar:", `Found Collection/Playlist/Folder: ${id} (${item.Type}), fetching children...`);
-            const children = await ApiUtils.fetchCollectionItems(id);
+            const children = await ApiUtils.fetchCollectionItems(id, item.Type);
             finalIds.push(...children);
           } else if (item) {
-            finalIds.push({ Id: item.Id, Type: item.Type });
+            finalIds.push({ Id: item.Id, Type: item.Type, Genres: item.Genres || [], Tags: item.Tags || [] });
           }
         } catch (e) {
           console.warn("🎬 Media Bar:", `Error resolving item ${rawId}:`, e);
@@ -6124,9 +6869,67 @@
             if (found) {
               console.log("🎬 Media Bar:", `Using client-forced playlist: ${playlistName}`);
               const parsed = this.parseIdsString(found.MediaIds);
+              const hasFilterRules = (parsed.genres && parsed.genres.length > 0) ||
+                (parsed.excludedGenres && parsed.excludedGenres.length > 0) ||
+                (parsed.tags && parsed.tags.length > 0) ||
+                (parsed.excludedTags && parsed.excludedTags.length > 0) ||
+                (parsed.studios && parsed.studios.length > 0) ||
+                (parsed.persons && parsed.persons.length > 0) ||
+                (parsed.officialRatings && parsed.officialRatings.length > 0) ||
+                parsed.minCommunityRating !== null ||
+                parsed.maxOfficialRating !== null ||
+                (parsed.years && parsed.years.length > 0) ||
+                !!parsed.minPremiereDate ||
+                !!parsed.maxPremiereDate;
+
+              let resolvedItems = [];
               if (parsed.ids.length > 0) {
-                const resolved = await this.resolveCollectionsAndItems(parsed.ids);
-                itemIds = resolved.map(i => i.Id);
+                resolvedItems = await this.resolveCollectionsAndItems(parsed.ids);
+              }
+              if (hasFilterRules) {
+                const filterItems = await ApiUtils.fetchItemsByGenresAndTags(
+                  parsed.genres,
+                  parsed.tags,
+                  parsed.years,
+                  parsed.minPremiereDate,
+                  parsed.maxPremiereDate,
+                  parsed.studios,
+                  parsed.persons,
+                  parsed.officialRatings,
+                  parsed.minCommunityRating,
+                  parsed.maxOfficialRating,
+                  parsed.excludedGenres,
+                  parsed.excludedTags
+                );
+                const existingIds = new Set(resolvedItems.map(i => i.Id));
+                for (const item of filterItems) {
+                  if (!existingIds.has(item.Id)) {
+                    resolvedItems.push(item);
+                    existingIds.add(item.Id);
+                  }
+                }
+              }
+
+              // Apply negative filters to all resolved items (including explicit IDs/BoxSets)
+              const serverExcludedGenres = CONFIG.excludedGenres ? CONFIG.excludedGenres.split(',').map(g => g.trim().toLowerCase()).filter(Boolean) : [];
+              const allExcludedGenres = [...new Set([...(parsed.excludedGenres || []).map(g => g.toLowerCase()), ...serverExcludedGenres])];
+              if (allExcludedGenres.length > 0) {
+                resolvedItems = resolvedItems.filter(item => {
+                  if (!item.Genres || !Array.isArray(item.Genres) || item.Genres.length === 0) return true;
+                  return !item.Genres.some(g => allExcludedGenres.includes(g.toLowerCase()));
+                });
+              }
+              const serverExcludedTags = CONFIG.excludedTags ? CONFIG.excludedTags.split(',').map(t => t.trim().toLowerCase()).filter(Boolean) : [];
+              const allExcludedTags = [...new Set([...(parsed.excludedTags || []).map(t => t.toLowerCase()), ...serverExcludedTags])];
+              if (allExcludedTags.length > 0) {
+                resolvedItems = resolvedItems.filter(item => {
+                  if (!item.Tags || !Array.isArray(item.Tags) || item.Tags.length === 0) return true;
+                  return !item.Tags.some(t => allExcludedTags.includes(t.toLowerCase()));
+                });
+              }
+
+              if (resolvedItems.length > 0) {
+                itemIds = resolvedItems.map(i => i.Id);
               }
             }
           } catch (e) {
@@ -6147,10 +6950,21 @@
         if (itemIds.length === 0 && activePlaylist !== 'Library') {
           if (CONFIG.enableCustomMediaIds || CONFIG.enableSeasonalContent) {
             const parsed = this.parseCustomIds();
-            const hasGenresOrTags = parsed.genres.length > 0 || parsed.tags.length > 0;
+            const hasFilterRules = (parsed.genres && parsed.genres.length > 0) ||
+              (parsed.excludedGenres && parsed.excludedGenres.length > 0) ||
+              (parsed.tags && parsed.tags.length > 0) ||
+              (parsed.excludedTags && parsed.excludedTags.length > 0) ||
+              (parsed.studios && parsed.studios.length > 0) ||
+              (parsed.persons && parsed.persons.length > 0) ||
+              (parsed.officialRatings && parsed.officialRatings.length > 0) ||
+              parsed.minCommunityRating !== null ||
+              parsed.maxOfficialRating !== null ||
+              (parsed.years && parsed.years.length > 0) ||
+              !!parsed.minPremiereDate ||
+              !!parsed.maxPremiereDate;
             const hasIds = parsed.ids.length > 0;
 
-            if (hasIds || hasGenresOrTags) {
+            if (hasIds || hasFilterRules) {
               console.log("🎬 Media Bar:", "Using Custom Media IDs / Seasonal content from configuration");
               let resolvedItems = [];
 
@@ -6159,21 +6973,52 @@
                 resolvedItems = await this.resolveCollectionsAndItems(parsed.ids);
               }
 
-              // Fetch items matching genre/tag filters from the API
-              if (hasGenresOrTags) {
-                const genreTagItems = await ApiUtils.fetchItemsByGenresAndTags(parsed.genres, parsed.tags);
+              // Fetch items matching genre/tag/year/release filters from the API
+              if (hasFilterRules) {
+                const filterItems = await ApiUtils.fetchItemsByGenresAndTags(
+                  parsed.genres,
+                  parsed.tags,
+                  parsed.years,
+                  parsed.minPremiereDate,
+                  parsed.maxPremiereDate,
+                  parsed.studios,
+                  parsed.persons,
+                  parsed.officialRatings,
+                  parsed.minCommunityRating,
+                  parsed.maxOfficialRating,
+                  parsed.excludedGenres,
+                  parsed.excludedTags
+                );
 
-                if (genreTagItems.length > 0) {
+                if (filterItems.length > 0) {
                   // Merge with explicit IDs, deduplicating by Id
                   const existingIds = new Set(resolvedItems.map(i => i.Id));
-                  for (const item of genreTagItems) {
+                  for (const item of filterItems) {
                     if (!existingIds.has(item.Id)) {
                       resolvedItems.push(item);
                       existingIds.add(item.Id);
                     }
                   }
-                  console.log("🎬 Media Bar:", `Merged ${genreTagItems.length} genre/tag items with ${hasIds ? parsed.ids.length : 0} explicit IDs → ${resolvedItems.length} total unique items`);
+                  console.log("🎬 Media Bar:", `Merged ${filterItems.length} filtered items with ${hasIds ? parsed.ids.length : 0} explicit IDs → ${resolvedItems.length} total unique items`);
                 }
+              }
+
+              // Apply negative filters to all resolved items (including explicit IDs/BoxSets)
+              const serverExcludedGenres = CONFIG.excludedGenres ? CONFIG.excludedGenres.split(',').map(g => g.trim().toLowerCase()).filter(Boolean) : [];
+              const allExcludedGenres = [...new Set([...(parsed.excludedGenres || []).map(g => g.toLowerCase()), ...serverExcludedGenres])];
+              if (allExcludedGenres.length > 0) {
+                resolvedItems = resolvedItems.filter(item => {
+                  if (!item.Genres || !Array.isArray(item.Genres) || item.Genres.length === 0) return true;
+                  return !item.Genres.some(g => allExcludedGenres.includes(g.toLowerCase()));
+                });
+              }
+              const serverExcludedTags = CONFIG.excludedTags ? CONFIG.excludedTags.split(',').map(t => t.trim().toLowerCase()).filter(Boolean) : [];
+              const allExcludedTags = [...new Set([...(parsed.excludedTags || []).map(t => t.toLowerCase()), ...serverExcludedTags])];
+              if (allExcludedTags.length > 0) {
+                resolvedItems = resolvedItems.filter(item => {
+                  if (!item.Tags || !Array.isArray(item.Tags) || item.Tags.length === 0) return true;
+                  return !item.Tags.some(t => allExcludedTags.includes(t.toLowerCase()));
+                });
               }
 
               // Apply max items limit to custom IDs if enabled
@@ -6300,6 +7145,7 @@
         console.error("🎬 Media Bar:", "Error loading slideshow data:", error);
       } finally {
         STATE.slideshow.isLoading = false;
+        STATE.slideshow.initialLoadComplete = true;
       }
     },
   };
@@ -6423,6 +7269,69 @@
 
     container.addEventListener("mouseenter", onMediaBarHoverAudioEnter);
     container.addEventListener("mouseleave", onMediaBarHoverAudioLeave);
+
+    const onHoverPauseEnter = () => {
+      if (typeof isPauseOnHoverEnabled === 'function' && isPauseOnHoverEnabled() && STATE.slideshow.slideInterval) {
+        STATE.slideshow.slideInterval.pause();
+        const pb = document.querySelector('.media-bar-progress-bar');
+        if (pb) pb.classList.add('paused');
+      }
+    };
+
+    const onHoverPauseLeave = () => {
+      if (typeof isPauseOnHoverEnabled === 'function' && isPauseOnHoverEnabled() && STATE.slideshow.slideInterval) {
+        STATE.slideshow.slideInterval.resume();
+        const pb = document.querySelector('.media-bar-progress-bar');
+        if (pb) pb.classList.remove('paused');
+      }
+    };
+
+    let videoHoverPaused = false;
+
+    container.addEventListener("mouseover", (e) => {
+      const videoBackdrop = e.target.closest(".video-backdrop");
+      if (videoBackdrop) {
+        const slide = videoBackdrop.closest(".slide");
+        if (slide) {
+          slide.classList.add("video-hovered");
+        }
+        if (STATE.slideshow.slideInterval && !isPauseOnHoverEnabled() && !videoHoverPaused) {
+          STATE.slideshow.slideInterval.pause();
+          videoHoverPaused = true;
+          const pb = document.querySelector(".media-bar-progress-bar");
+          if (pb) pb.classList.add("paused");
+        }
+      }
+    });
+
+    container.addEventListener("mouseout", (e) => {
+      const videoBackdrop = e.target.closest(".video-backdrop");
+      const relatedVideo = e.relatedTarget && e.relatedTarget.closest(".video-backdrop");
+      if (videoBackdrop && !relatedVideo) {
+        const slide = videoBackdrop.closest(".slide");
+        if (slide) {
+          slide.classList.remove("video-hovered");
+        }
+        if (videoHoverPaused && STATE.slideshow.slideInterval) {
+          STATE.slideshow.slideInterval.resume();
+          videoHoverPaused = false;
+          const pb = document.querySelector(".media-bar-progress-bar");
+          if (pb) pb.classList.remove("paused");
+        }
+      }
+    });
+
+    container.addEventListener("mouseleave", () => {
+      if (videoHoverPaused && STATE.slideshow.slideInterval) {
+        STATE.slideshow.slideInterval.resume();
+        videoHoverPaused = false;
+        const pb = document.querySelector(".media-bar-progress-bar");
+        if (pb) pb.classList.remove("paused");
+      }
+    });
+
+    container.addEventListener("mouseenter", onHoverPauseEnter);
+    container.addEventListener("mouseleave", onHoverPauseLeave);
 
     let arrowTimeout;
     container.addEventListener(
@@ -6904,6 +7813,8 @@
       ];
       const trailerSettings = [
         { key: 'videoBackdrops', label: t.videoBackdropsLabel, description: t.videoBackdropsDesc, default: CONFIG.enableVideoBackdrop },
+        { key: 'splitScreenTrailer', label: t.splitScreenTrailerLabel || 'Split-Screen Trailer View', description: t.splitScreenTrailerDesc || 'Play trailers in split-screen layout on the right with poster/info on the left.', default: CONFIG.enableSplitScreenTrailer },
+        { key: 'pauseOnHover', label: t.pauseOnHoverLabel || 'Pause Slideshow On Hover', description: t.pauseOnHoverDesc || 'Pause slide rotation while the mouse cursor is over the media bar.', default: CONFIG.pauseOnHover },
         { key: 'onlyLocalTrailers', label: t.onlyLocalTrailersLabel || 'Only Play Local Trailers', description: t.onlyLocalTrailersDesc || 'Do not play remote (YouTube) trailers.', default: CONFIG.onlyLocalTrailers },
         { key: 'trailerButton', label: t.trailerButtonLabel, description: t.trailerButtonDesc, default: CONFIG.showTrailerButton },
         { key: 'mobileVideo', label: t.mobileVideoLabel, description: t.mobileVideoDesc, default: CONFIG.enableMobileVideo },
@@ -7343,6 +8254,10 @@
         if (checkbox) {
           checkbox.addEventListener('change', (e) => {
             this.setSetting(setting.key, e.target.checked);
+            if (setting.key === 'splitScreenTrailer') {
+              const cont = document.getElementById('slides-container');
+              if (cont) cont.classList.toggle('split-screen-trailer', e.target.checked);
+            }
           });
         }
       });
@@ -7891,6 +8806,22 @@
   }
 
   /**
+   * Returns whether split-screen trailer layout is enabled.
+   * @returns {boolean} Whether split-screen trailer view is active
+   */
+  function isSplitScreenTrailerEnabled() {
+    return MediaBarEnhancedSettingsManager.getSetting('splitScreenTrailer', CONFIG.enableSplitScreenTrailer);
+  }
+
+  /**
+   * Returns whether pausing the slideshow on mouse hover is enabled.
+   * @returns {boolean} Whether pause on hover is active
+   */
+  function isPauseOnHoverEnabled() {
+    return MediaBarEnhancedSettingsManager.getSetting('pauseOnHover', CONFIG.pauseOnHover);
+  }
+
+  /**
    * Initialize page visibility handling to pause when tab is inactive
    */
   const initPageVisibilityHandler = () => {
@@ -8208,6 +9139,8 @@
     try {
       console.log("🎬 Media Bar:", "Initializing Enhanced Jellyfin Slideshow");
 
+      VisibilityObserver.init();
+
       initArrowNavigation();
 
       renderCustomOverlay();
@@ -8220,12 +9153,11 @@
 
       initPageVisibilityHandler();
 
-      VisibilityObserver.init();
-
       console.log("🎬 Media Bar:", "Enhanced Jellyfin Slideshow initialized successfully");
     } catch (error) {
       console.error("🎬 Media Bar:", "Error initializing slideshow:", error);
       STATE.slideshow.hasInitialized = false;
+      STATE.slideshow.initialLoadComplete = true;
     }
   };
 

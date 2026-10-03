@@ -186,7 +186,11 @@
 }
 
 #slides-container[style*="display: none"],
-#slides-container[style*="visibility: hidden"] {
+#slides-container[style*="visibility: hidden"],
+#slides-container.media-bar-hidden,
+body.dashboardDocument #slides-container {
+  display: none !important;
+  visibility: hidden !important;
   pointer-events: none !important;
 }
 
@@ -309,6 +313,12 @@ body.jellyfin-v12 .mute-button i {
   font-size: 1.5rem;
   line-height: 1;
   vertical-align: middle;
+}
+
+@media (min-width: 768px) {
+  body.jellyfin-v12 .homeSectionsContainer {
+    top: 68vh;
+  }
 }
 
 @media (max-width: 768px) {
@@ -1358,7 +1368,8 @@ body.jellyfin-v12 .mute-button i {
   }
 
   /* Original Layout: Fill 100% height of container on all smartphone models without letterboxing */
-  body:not(.media-bar-mobile-16-9):not(.media-bar-mobile-4-3) .video-backdrop-full {
+  body:not(.media-bar-mobile-16-9):not(.media-bar-mobile-4-3) .video-backdrop-full,
+  body:not(.media-bar-mobile-16-9):not(.media-bar-mobile-4-3) video.video-backdrop.video-backdrop-full {
     height: 100% !important;
     min-height: 100% !important;
     width: 177.78vh !important;
@@ -1367,9 +1378,10 @@ body.jellyfin-v12 .mute-button i {
     top: 50% !important;
     left: 50% !important;
     transform: translate(-50%, -50%) !important;
+    object-fit: cover !important;
   }
 
-  body:not(.media-bar-mobile-16-9):not(.media-bar-mobile-4-3) video.video-backdrop,
+  body:not(.media-bar-mobile-16-9):not(.media-bar-mobile-4-3) video.video-backdrop:not(.video-backdrop-full),
   body:not(.media-bar-mobile-16-9):not(.media-bar-mobile-4-3) .video-backdrop-default,
   body:not(.media-bar-mobile-16-9):not(.media-bar-mobile-4-3) .video-backdrop:not(.video-backdrop-full) {
     position: absolute !important;
@@ -1397,7 +1409,8 @@ body.jellyfin-v12 .mute-button i {
   }
 
   /* Jellyfin v12 Original Layout: Factor in the 48px navbar height (transparent when not scrolled) */
-  body.jellyfin-v12:not(.media-bar-mobile-16-9):not(.media-bar-mobile-4-3) .video-backdrop-full {
+  body.jellyfin-v12:not(.media-bar-mobile-16-9):not(.media-bar-mobile-4-3) .video-backdrop-full,
+  body.jellyfin-v12:not(.media-bar-mobile-16-9):not(.media-bar-mobile-4-3) video.video-backdrop.video-backdrop-full {
     height: calc(100% + 48px) !important;
     min-height: calc(100% + 48px) !important;
     width: calc(177.78vh + 86px) !important;
@@ -1406,9 +1419,10 @@ body.jellyfin-v12 .mute-button i {
     top: calc(50% + 24px) !important;
     left: 50% !important;
     transform: translate(-50%, -50%) !important;
+    object-fit: cover !important;
   }
 
-  body.jellyfin-v12:not(.media-bar-mobile-16-9):not(.media-bar-mobile-4-3) video.video-backdrop,
+  body.jellyfin-v12:not(.media-bar-mobile-16-9):not(.media-bar-mobile-4-3) video.video-backdrop:not(.video-backdrop-full),
   body.jellyfin-v12:not(.media-bar-mobile-16-9):not(.media-bar-mobile-4-3) .video-backdrop-default,
   body.jellyfin-v12:not(.media-bar-mobile-16-9):not(.media-bar-mobile-4-3) .video-backdrop:not(.video-backdrop-full) {
     position: absolute !important;
@@ -3060,4 +3074,108 @@ body:has(.videoPlayerContainer-onTop) .media-bar-settings-button {
 /* Page Backdrop Sync Layer */
 .slideshow-page-backdrop {
   opacity: 1;
+}
+
+/* Split-Screen Trailer View (Paradox27 Style Layout) */
+@media (min-width: 768px) {
+  #slides-container.split-screen-trailer .backdrop-container {
+    z-index: 3 !important;
+  }
+
+  #slides-container.split-screen-trailer .gradient-overlay,
+  #slides-container.split-screen-trailer .backdrop-overlay {
+    pointer-events: none !important;
+  }
+
+  #slides-container.split-screen-trailer .video-backdrop {
+    position: absolute !important;
+    top: 45% !important;
+    left: auto !important;
+    right: 0 !important;
+    width: 65% !important;
+    min-width: 55% !important;
+    height: 100% !important;
+    aspect-ratio: auto !important;
+    transform: translateY(-50%) !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    overflow: hidden !important;
+    mask-image: linear-gradient(to right, transparent 0%, transparent 12%, black 48%, black 100%),
+      linear-gradient(to top, transparent 0%, transparent 8%, black 25%) !important;
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, transparent 12%, black 48%, black 100%),
+      linear-gradient(to top, transparent 0%, transparent 8%, black 25%) !important;
+    -webkit-mask-composite: source-in !important;
+    mask-composite: intersect !important;
+    z-index: 4 !important;
+    pointer-events: auto !important;
+    transition: z-index 0.3s ease, mask-image 0.3s ease, -webkit-mask-image 0.3s ease, filter 0.3s ease !important;
+  }
+
+  /* When hovering over the trailer video: bring to foreground & reduce mask blend */
+  #slides-container.split-screen-trailer .video-backdrop:hover,
+  #slides-container.split-screen-trailer .slide.video-hovered .video-backdrop {
+    z-index: 10 !important;
+    mask-image: linear-gradient(to right, transparent 0%, transparent 2%, black 10%, black 100%),
+      linear-gradient(to top, transparent 0%, transparent 2%, black 10%) !important;
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, transparent 2%, black 10%, black 100%),
+      linear-gradient(to top, transparent 0%, transparent 2%, black 10%) !important;
+    filter: drop-shadow(-12px 0 30px rgba(0, 0, 0, 0.9));
+  }
+
+  /* Dim background image while hovering over the video so the video takes full focus */
+  #slides-container.split-screen-trailer .slide:has(.video-backdrop:hover) .backdrop:not(.video-backdrop),
+  #slides-container.split-screen-trailer .slide.video-hovered .backdrop:not(.video-backdrop) {
+    opacity: 0.55 !important;
+    filter: brightness(0.75);
+    transition: opacity 0.3s ease, filter 0.3s ease;
+  }
+
+  #slides-container.split-screen-trailer .video-backdrop iframe,
+  #slides-container.split-screen-trailer .video-backdrop video {
+    width: 100% !important;
+    height: 100% !important;
+    border-radius: 0 !important;
+    object-fit: cover !important;
+    display: block !important;
+  }
+
+  /* Keep static backdrop full width so pausing/buffering never exposes a black void */
+  #slides-container.split-screen-trailer .slide .backdrop:not(.video-backdrop) {
+    width: 100% !important;
+    left: 0 !important;
+    right: 0 !important;
+    object-fit: cover !important;
+    transition: opacity 0.4s ease, filter 0.4s ease !important;
+  }
+
+  /* Compact left-aligned information elements in split-screen mode */
+  #slides-container.split-screen-trailer .logo-container {
+    max-width: 44% !important;
+  }
+
+  #slides-container.split-screen-trailer .info-container,
+  #slides-container.split-screen-trailer .genre {
+    max-width: 44% !important;
+  }
+
+  #slides-container.split-screen-trailer .plot-container {
+    max-width: 44% !important;
+    width: min(44%, 42rem) !important;
+  }
+
+  #slides-container.split-screen-trailer .plot {
+    display: -webkit-box !important;
+    line-clamp: 3 !important;
+    -webkit-line-clamp: 3 !important;
+    -webkit-box-orient: vertical !important;
+    overflow: hidden !important;
+    max-width: 100% !important;
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
+  }
+}
+
+/* Pause on Hover: visual pause state for the timing progress bar */
+.media-bar-progress-bar.paused .media-bar-progress-fill {
+  animation-play-state: paused !important;
 }
