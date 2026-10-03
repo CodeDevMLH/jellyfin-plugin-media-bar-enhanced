@@ -60,11 +60,6 @@ namespace Jellyfin.Plugin.MediaBarEnhanced
                 var content = File.ReadAllText(indexPath);
                 var injectedJS = false;
                 var injectedCSS = false;
-                var modified = false;
-
-                // Cleanup legacy tags first to avoid duplicates or conflicts
-                content = RemoveLegacyTags(content, ref modified);
-
 
                 if (!content.Contains(ScriptTag))
                 {
@@ -86,7 +81,7 @@ namespace Jellyfin.Plugin.MediaBarEnhanced
                      }
                 }
 
-                if (injectedJS || injectedCSS || modified)
+                if (injectedJS || injectedCSS)
                 {
                     File.WriteAllText(indexPath, content);
 
@@ -98,13 +93,9 @@ namespace Jellyfin.Plugin.MediaBarEnhanced
                     {
                         _logger.LogInformation("MediaBarEnhanced JS script injected into index.html. But CSS was already present or could not be injected.");
                     }
-                    else if (injectedCSS)
-                    {
-                        _logger.LogInformation("MediaBarEnhanced CSS injected into index.html. But JS script was already present or could not be injected.");
-                    }
                     else
                     {
-                       _logger.LogInformation("MediaBarEnhanced script and CSS already present. Legacy tags removed if found.");
+                        _logger.LogInformation("MediaBarEnhanced CSS injected into index.html. But JS script was already present or could not be injected.");
                     }
                 }
                 else
@@ -159,9 +150,6 @@ namespace Jellyfin.Plugin.MediaBarEnhanced
                     content = content.Replace(CssTag + Environment.NewLine, "").Replace(CssTag, "");
                     modified = true;
                 }
-
-                // Remove legacy tags
-                content = RemoveLegacyTags(content, ref modified);
 
                 if (modified)
                 {
@@ -256,34 +244,6 @@ namespace Jellyfin.Plugin.MediaBarEnhanced
             {
                 _logger.LogWarning(ex, "Error attempting to unregister file transformation. It might not have been registered.");
             }
-        }
-        /// <summary>
-        /// Removes legacy script and css tags from the content.
-        /// </summary>
-        /// <param name="content">The file content.</param>
-        /// <param name="modified">Ref bool to track if changes were made.</param>
-        /// <returns>The modified content.</returns>
-        private string RemoveLegacyTags(string content, ref bool modified)
-        {
-            // Legacy tags (used in versions prior to 1.6.3.0 where paths started with / instead of ../)
-            const string LegacyScriptTag = "<script src=\"/MediaBarEnhanced/Resources/mediaBarEnhanced.js\" defer></script>";
-            const string LegacyCssTag = "<link rel=\"stylesheet\" href=\"/MediaBarEnhanced/Resources/mediaBarEnhanced.css\" />";
-
-            if (content.Contains(LegacyScriptTag))
-            {
-                content = content.Replace(LegacyScriptTag + Environment.NewLine, "").Replace(LegacyScriptTag, "");
-                modified = true;
-                _logger.LogInformation("Legacy MediaBarEnhanced script tag removed.");
-            }
-
-            if (content.Contains(LegacyCssTag))
-            {
-                content = content.Replace(LegacyCssTag + Environment.NewLine, "").Replace(LegacyCssTag, "");
-                modified = true;
-                _logger.LogInformation("Legacy MediaBarEnhanced CSS tag removed.");
-            }
-
-            return content;
         }
     }
 }
