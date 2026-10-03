@@ -3555,10 +3555,14 @@
       // If a full screen video player is active, hide slideshow and stop playback
       if (isVideoPlayerActive) {
         if (container) {
-          container.style.display = "none";
-          container.style.visibility = "hidden";
-          container.style.pointerEvents = "none";
-          container.classList.add("media-bar-hidden");
+          // Only touch the DOM when something actually changes. The observer below watches
+          // class attribute mutations on the whole body subtree, and classList.add() queues a
+          // mutation record even when the class is already present, so unconditional writes here
+          // re-trigger this callback forever and freeze the page as soon as the player opens.
+          if (container.style.display !== "none") container.style.display = "none";
+          if (container.style.visibility !== "hidden") container.style.visibility = "hidden";
+          if (container.style.pointerEvents !== "none") container.style.pointerEvents = "none";
+          container.classList.toggle("media-bar-hidden", true);
         }
         if (STATE.slideshow.slideInterval) {
           STATE.slideshow.slideInterval.stop();
@@ -3672,7 +3676,14 @@
         this._historyWrapped = true;
       }
 
-      const observer = new MutationObserver(() => this.updateVisibility());
+      const observer = new MutationObserver((mutations) => {
+        // Mutations inside the slides container are plugin content (slides, backdrops,
+        // our own show/hide writes) and never change what updateVisibility() looks at,
+        // so skip them. Reacting to our own hide() writes here is what caused the freeze.
+        const container = document.getElementById("slides-container");
+        if (container && mutations.every((m) => m.target === container || container.contains(m.target))) return;
+        this.updateVisibility();
+      });
       observer.observe(document.body, {
         childList: true,
         subtree: true,
