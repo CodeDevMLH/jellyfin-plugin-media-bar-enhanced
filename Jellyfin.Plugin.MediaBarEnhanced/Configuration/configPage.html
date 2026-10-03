@@ -444,7 +444,30 @@
                                                 name="FullWidthVideo" />
                                             <span>Full Width Video</span>
                                         </label>
-                                        <div class="fieldDescription">Stretch trailer video across the entire background. When disabled, displays the trailer as a compact 16:9 player in the top-right corner on desktop, keeping the static backdrop visible.</div>
+                                        <div class="fieldDescription">Stretch trailer video across the entire
+                                            background. When disabled, displays the trailer as a compact 16:9 player in
+                                            the top-right corner on desktop, keeping the static backdrop visible.</div>
+                                    </div>
+                                    <div class="checkboxContainer checkboxContainer-withDescription">
+                                        <label>
+                                            <input is="emby-checkbox" type="checkbox" id="EnableSplitScreenTrailer"
+                                                name="EnableSplitScreenTrailer" />
+                                            <span>Split-Screen Trailer View (Paradox27 Style)</span>
+                                        </label>
+                                        <div class="fieldDescription">Display trailer video on the right half with a
+                                            smooth gradient fade, while keeping the movie artwork and details card on
+                                            the left.</div>
+                                    </div>
+                                    <div class="checkboxContainer checkboxContainer-withDescription">
+                                        <label>
+                                            <input is="emby-checkbox" type="checkbox" id="PauseOnHover"
+                                                name="PauseOnHover" />
+                                            <span>Pause Slideshow on Hover</span>
+                                        </label>
+                                        <div class="fieldDescription">Pause slideshow transitions and timer while
+                                            hovering over the Media Bar to let you watch trailers or read descriptions.
+                                            (Note: If 'Wait for Trailer to End' is enabled, the slideshow already waits
+                                            for active trailers to finish).</div>
                                     </div>
                                     <div class="checkboxContainer checkboxContainer-withDescription">
                                         <label>
@@ -567,8 +590,12 @@
                                 <div class="info-banner" style="margin-top: 0;">
                                     <i class="material-icons" style="color: #00a4dc; font-size: 24px;">info</i>
                                     <div>
-                                        <strong>Content Priority:</strong> Forced Playlist &gt; Client Recs &gt; Seasonal &gt; Custom IDs &gt; Server Recs &gt; Random Library.
-                                        <a href="https://github.com/CodeDevMLH/jellyfin-plugin-media-bar-enhanced#content-display-priority-hierarchy" target="_blank" rel="noopener noreferrer" style="color: #00a4dc; text-decoration: underline; margin-left: 4px;">Learn more</a>
+                                        <strong>Content Priority:</strong> Forced Playlist &gt; Client Recs &gt;
+                                        Seasonal &gt; Custom IDs &gt; Server Recs &gt; Random Library.
+                                        <a href="https://github.com/CodeDevMLH/jellyfin-plugin-media-bar-enhanced#content-display-priority-hierarchy"
+                                            target="_blank" rel="noopener noreferrer"
+                                            style="color: #00a4dc; text-decoration: underline; margin-left: 4px;">Learn
+                                            more</a>
                                     </div>
                                 </div>
                                 <div class="highlight-setting-card">
@@ -619,17 +646,38 @@
                                         <b style="color:#00a4dc">Tip:</b> You can simply paste full Jellyfin item URLs
                                         here and the IDs will be automatically extracted!
                                         <br><br>
-                                        <b style="color:#00a4dc">Genre &amp; Tag Filters:</b> You can filter items by
-                                        genre or tag using prefixes:
+                                        <b style="color:#00a4dc">Dynamic Filters:</b> You can filter items directly from
+                                        your library using prefixes:
                                         <ul style="margin: 0.3em 0; padding-left: 20px;">
-                                            <li><code>genre:Action</code> &mdash; Show items with the "Action" genre.
+                                            <li><code>genre:Action</code> &mdash; Filter by genre (e.g. Action, Comedy).
                                             </li>
-                                            <li><code>tag:2000s</code> &mdash; Show items with the "2000s" tag.</li>
+                                            <li><code>-genre:Horror</code> or <code>!genre:Horror</code> &mdash; Exclude
+                                                a genre (Blacklist, e.g. <code>genre:Comedy</code> with
+                                                <code>-genre:Horror, Thriller</code> for family-friendly bars).</li>
+                                            <li><code>tag:Halloween</code> &mdash; Filter by tag (e.g. Halloween,
+                                                Favorite).</li>
+                                            <li><code>-tag:gore</code> or <code>!tag:gore</code> &mdash; Exclude items
+                                                with specific tags.</li>
+                                            <li><code>studio:Pixar</code> &mdash; Filter by studio (e.g. Pixar, Marvel
+                                                Studios, A24).</li>
+                                            <li><code>person:Tom Hanks</code> &mdash; Filter by actor, director, or crew
+                                                (also <code>actor:</code>, <code>director:</code>).</li>
+                                            <li><code>year:2024</code> &mdash; Filter by release year.</li>
+                                            <li><code>years:2000-2010</code> or <code>years:2000s</code> &mdash; Filter
+                                                by year range or decade.</li>
+                                            <li><code>years:2020+</code> &mdash; Filter by minimum year.</li>
+                                            <li><code>released:90d</code> &mdash; Filter items premiered within the last
+                                                90 days.</li>
+                                            <li><code>rating:PG-13</code> or <code>rating:16</code> &mdash; Filter by
+                                                official/parental rating.</li>
+                                            <li><code>rating:>=7.5</code> or <code>rating:8+</code> &mdash; Filter by
+                                                minimum community rating (IMDb score).</li>
+                                            <li><code>rating:<=12</code> &mdash; Filter by maximum parental rating.</li>
                                         </ul>
-                                        You can list multiple tags/genres separated by a comma or newline. Multiple
-                                        genres/tags are combined with OR (union) within their type. If you use both
-                                        genres and tags, they are combined with AND. You can freely mix genre/tag
-                                        filters with regular IDs, collection names, and playlist names.
+                                        You can list multiple filters separated by a comma or newline. Multiple values
+                                        of the same type are combined with OR (union). Different filter types (e.g.
+                                        genre AND year AND studio) are combined with AND. You can freely mix filter
+                                        prefixes with regular IDs, collection names, and playlist names.
                                         <br><br>
                                         <b style="color:#00a4dc">Manual Trailer/Video Override:</b> Specify a YouTube
                                         URL or a Jellyfin Item ID (e.g. Theme/Backdrop Video) in brackets:
@@ -1031,9 +1079,44 @@
                                     </div>
                                     <div class="inputContainer">
                                         <label class="inputLabel inputLabelUnfocused" for="MaxDaysRecent">Max Days
-                                            Recent</label>
+                                            Recent (Added Date)</label>
                                         <input is="emby-input" type="number" id="MaxDaysRecent" name="MaxDaysRecent" />
-                                        <div class="fieldDescription">Only show items added in the last X days.</div>
+                                        <div class="fieldDescription">Only show items added to Jellyfin in the last X
+                                            days (0 to disable).</div>
+                                    </div>
+                                </div>
+                                <div class="grid-2" style="margin-top: 1em;">
+                                    <div class="inputContainer">
+                                        <label class="inputLabel inputLabelUnfocused" for="MaxDaysRecentRelease">Max
+                                            Days
+                                            Since Release</label>
+                                        <input is="emby-input" type="number" id="MaxDaysRecentRelease"
+                                            name="MaxDaysRecentRelease" />
+                                        <div class="fieldDescription">Only show items premiered/released in the last X
+                                            days (0 to disable).</div>
+                                    </div>
+                                    <div class="inputContainer">
+                                        <label class="inputLabel inputLabelUnfocused" for="ReleaseYears">Release Years /
+                                            Range</label>
+                                        <input is="emby-input" type="text" id="ReleaseYears" name="ReleaseYears" />
+                                        <div class="fieldDescription">Filter by release years (e.g. "2024", "2000-2010",
+                                            "2000s", or "2020+").</div>
+                                    </div>
+                                </div>
+                                <div class="grid-2" style="margin-top: 1em;">
+                                    <div class="inputContainer">
+                                        <label class="inputLabel inputLabelUnfocused" for="ExcludedGenres">Excluded
+                                            Genres (Blacklist)</label>
+                                        <input is="emby-input" type="text" id="ExcludedGenres" name="ExcludedGenres" />
+                                        <div class="fieldDescription">Comma-separated list of genres to exclude (e.g.
+                                            "Horror, Thriller"). Prevents items with these genres from appearing.</div>
+                                    </div>
+                                    <div class="inputContainer">
+                                        <label class="inputLabel inputLabelUnfocused" for="ExcludedTags">Excluded Tags
+                                            (Blacklist)</label>
+                                        <input is="emby-input" type="text" id="ExcludedTags" name="ExcludedTags" />
+                                        <div class="fieldDescription">Comma-separated list of tags to exclude across the
+                                            media bar.</div>
                                     </div>
                                 </div>
                                 <div class="checkboxContainer checkboxContainer-withDescription"
@@ -1053,14 +1136,19 @@
                                             name="UseRecommendations" />
                                         <span>Enable Personalized Recommendations</span>
                                     </label>
-                                    <div class="fieldDescription">Show personalized suggestions tailored to the current user's watch history instead of random items.
+                                    <div class="fieldDescription">Show personalized suggestions tailored to the current
+                                        user's watch history instead of random items.
                                     </div>
                                 </div>
                                 <div class="info-banner" style="margin-top: 1.5em; margin-bottom: 0;">
                                     <i class="material-icons" style="color: #00a4dc; font-size: 24px;">info</i>
                                     <div>
-                                        <strong>Content Priority:</strong> Forced Playlist &gt; Client Recs &gt; Seasonal &gt; Custom IDs &gt; Server Recs &gt; Random Library.
-                                        <a href="https://github.com/CodeDevMLH/jellyfin-plugin-media-bar-enhanced#content-display-priority-hierarchy" target="_blank" rel="noopener noreferrer" style="color: #00a4dc; text-decoration: underline; margin-left: 4px;">Learn more</a>
+                                        <strong>Content Priority:</strong> Forced Playlist &gt; Client Recs &gt;
+                                        Seasonal &gt; Custom IDs &gt; Server Recs &gt; Random Library.
+                                        <a href="https://github.com/CodeDevMLH/jellyfin-plugin-media-bar-enhanced#content-display-priority-hierarchy"
+                                            target="_blank" rel="noopener noreferrer"
+                                            style="color: #00a4dc; text-decoration: underline; margin-left: 4px;">Learn
+                                            more</a>
                                     </div>
                                 </div>
                             </div>
@@ -1158,11 +1246,11 @@
                                 <div class="checkboxContainer checkboxContainer-withDescription"
                                     style="margin-top: 1.5em;">
                                     <label>
-                                        <input is="emby-checkbox" type="checkbox" id="RequireLogo"
-                                            name="RequireLogo" />
+                                        <input is="emby-checkbox" type="checkbox" id="RequireLogo" name="RequireLogo" />
                                         <span>Require Title Logo</span>
                                     </label>
-                                    <div class="fieldDescription">Only include items with a dedicated transparent title logo. Items without a logo will be skipped (ignoring text fallback).
+                                    <div class="fieldDescription">Only include items with a dedicated transparent title
+                                        logo. Items without a logo will be skipped (ignoring text fallback).
                                     </div>
                                 </div>
                             </div>
@@ -1359,7 +1447,7 @@
                             'LoadingCheckInterval', 'MaxPlotLength', 'MaxMovies', 'MaxTvShows',
                             'MaxItems', 'PreloadCount', 'FadeTransitionDuration', 'MaxPaginationDots',
                             'SlideAnimationEnabled', 'EnableVideoBackdrop', 'UseSponsorBlock', 'SponsorBlockCategories',
-                            'WaitForTrailerToEnd', 'StartMuted', 'HoverAudioFade', 'FullWidthVideo', 'EnableMobileVideo',
+                            'WaitForTrailerToEnd', 'StartMuted', 'HoverAudioFade', 'FullWidthVideo', 'EnableSplitScreenTrailer', 'PauseOnHover', 'EnableMobileVideo',
                             'ShowTrailerButton', 'AlwaysShowArrows', 'EnableKeyboardControls',
                             'EnableCustomMediaIds', 'CustomMediaIds', 'EnableLoadingScreen',
                             'EnableSeasonalContent', 'EnableClientSideSettings', 'SortBy', 'SortOrder',
@@ -1367,7 +1455,7 @@
                             'PreferLocalBackdrops', 'RandomizeThemeVideos', 'RandomizeLocalTrailers', 'RandomTrailerStartOffset',
                             'RandomTrailerStartMinPercent', 'RandomTrailerStartMaxPercent',
                             'IncludeWatchedContent', 'ShowPaginationDots', 'ForceSlideCounter', 'MaxParentalRating',
-                            'MaxDaysRecent', 'ExcludeSeasonalContent', 'HideArrowsOnMobile',
+                            'MaxDaysRecent', 'MaxDaysRecentRelease', 'ReleaseYears', 'ExcludedGenres', 'ExcludedTags', 'ExcludeSeasonalContent', 'HideArrowsOnMobile',
                             'EnableCustomOverlay', 'CustomOverlayText', 'CustomOverlayImageUrl',
                             'CustomOverlayStyle', 'CustomOverlayImageStyle', 'CustomOverlayPriority',
                             'CustomOverlayPositionX', 'CustomOverlayPositionY', 'CustomOverlayScale',
@@ -1774,7 +1862,7 @@
                         'LoadingCheckInterval', 'MaxPlotLength', 'MaxMovies', 'MaxTvShows',
                         'MaxItems', 'PreloadCount', 'FadeTransitionDuration', 'MaxPaginationDots',
                         'SlideAnimationEnabled', 'EnableVideoBackdrop', 'UseSponsorBlock', 'SponsorBlockCategories',
-                        'WaitForTrailerToEnd', 'StartMuted', 'HoverAudioFade', 'FullWidthVideo', 'EnableMobileVideo',
+                        'WaitForTrailerToEnd', 'StartMuted', 'HoverAudioFade', 'FullWidthVideo', 'EnableSplitScreenTrailer', 'PauseOnHover', 'EnableMobileVideo',
                         'ShowTrailerButton', 'AlwaysShowArrows', 'EnableKeyboardControls',
                         'EnableCustomMediaIds', 'CustomMediaIds', 'EnableLoadingScreen',
                         'EnableSeasonalContent', 'EnableClientSideSettings', 'SortBy', 'SortOrder',
@@ -1782,7 +1870,7 @@
                         'PreferLocalBackdrops', 'RandomizeThemeVideos', 'RandomizeLocalTrailers', 'RandomTrailerStartOffset',
                         'RandomTrailerStartMinPercent', 'RandomTrailerStartMaxPercent',
                         'IncludeWatchedContent', 'ShowPaginationDots', 'ForceSlideCounter', 'MaxParentalRating',
-                        'MaxDaysRecent', 'ExcludeSeasonalContent', 'HideArrowsOnMobile',
+                        'MaxDaysRecent', 'MaxDaysRecentRelease', 'ReleaseYears', 'ExcludedGenres', 'ExcludedTags', 'ExcludeSeasonalContent', 'HideArrowsOnMobile',
                         'EnableCustomOverlay', 'CustomOverlayText', 'CustomOverlayImageUrl',
                         'CustomOverlayStyle', 'CustomOverlayImageStyle', 'CustomOverlayPriority',
                         'CustomOverlayPositionX', 'CustomOverlayPositionY', 'CustomOverlayScale',
@@ -1803,6 +1891,7 @@
                         'MaxItems': 20,
                         'MaxParentalRating': 0,
                         'MaxDaysRecent': 0,
+                        'MaxDaysRecentRelease': 0,
                         'PreloadCount': 3,
                         'FadeTransitionDuration': 500,
                         'MaxPaginationDots': 15,
