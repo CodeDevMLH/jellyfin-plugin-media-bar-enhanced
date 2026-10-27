@@ -272,6 +272,7 @@ Alternatively, check the URL: `.../web/#/details?id=YOUR_ITEM_ID_IS_HERE&...`
 *   **Slide Animations**: Enable/disable the "Zoom In" effect.
 *   **Transition Effect**: Choose between `Fade`, `Slide`, or `None` for slide transitions.
 *   **Show Progress Bar**: Display an animated progress bar indicating time remaining on the active slide (`Top`, `Bottom`, or `Disabled`).
+    *   **Progress Bar Location**: `Under Pagination Dots / Counter`, `Top (under the header)`, or `Inside Active Dot / Counter`, where the active pagination dot stretches into a pill (or the slide counter fills up) that turns gray as the slide timer or trailer progresses.
 *   **Client-Side Settings**: Allow users to customize their own experience by enabling client-side overrides for certain settings.
 *   **Randomize Backdrop Video/Local Trailer**: If multiple videos are available, randomly select one instead of always using the first, if backdrop videos or local trailers are enabled.
 *   **Use SponsorBlock**: Skips non-content segments in YouTube trailers (if the data exists).

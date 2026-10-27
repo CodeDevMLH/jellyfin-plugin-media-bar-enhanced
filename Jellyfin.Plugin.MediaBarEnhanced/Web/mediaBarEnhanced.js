@@ -162,6 +162,7 @@
       progressBarLocationDesc: 'Choose where the timing progress bar is displayed.',
       progressBarLocationDots: 'Under Dots / Counter',
       progressBarLocationNavbar: 'Top (Under Header)',
+      progressBarLocationIndicator: 'Inside Active Dot / Counter',
       forceSlideCounterLabel: 'Always Use Slide Counter',
       forceSlideCounterDesc: 'Force numeric slide counter instead of pagination dots.',
       activePlaylistLabel: 'Active Playlist',
@@ -222,6 +223,7 @@
       progressBarLocationDesc: 'Wähle aus, wo der Timer-Fortschrittsbalken angezeigt wird.',
       progressBarLocationDots: 'Unter den Punkten / Counter',
       progressBarLocationNavbar: 'Oben (Unter Kopfzeile)',
+      progressBarLocationIndicator: 'Im aktiven Punkt / Counter',
       forceSlideCounterLabel: 'Zähler anstelle von Punkten erzwingen',
       forceSlideCounterDesc: 'Erzwingt den numerischen Diashow-Zähler anstelle der Navigationspunkte.',
       activePlaylistLabel: 'Aktive Playlist',
@@ -326,6 +328,7 @@
       progressBarLocationDesc: 'Elige dónde se muestra la barra de progreso de tiempo.',
       progressBarLocationDots: 'Debajo de los puntos / contador',
       progressBarLocationNavbar: 'Parte superior (debajo de la cabecera)',
+      progressBarLocationIndicator: 'Dentro del punto activo / contador',
       forceSlideCounterLabel: 'Forzar contador numérico',
       forceSlideCounterDesc: 'Fuerza el contador numérico de diapositivas en lugar de los puntos de paginación.',
       activePlaylistLabel: 'Lista de reproducción activa',
@@ -408,6 +411,7 @@
       progressBarLocationDesc: 'Choisissez où la barre de progression temporelle est affichée.',
       progressBarLocationDots: 'Sous les points / compteur',
       progressBarLocationNavbar: 'En haut (sous l\'en-tête)',
+      progressBarLocationIndicator: 'Dans le point actif / compteur',
       forceSlideCounterLabel: 'Toujours utiliser le compteur',
       forceSlideCounterDesc: 'Force le compteur de diapositives numérique au lieu des points de pagination.',
       activePlaylistLabel: 'Liste de lecture active',
@@ -490,6 +494,7 @@
       progressBarLocationDesc: 'Scegli dove mostrare la barra di avanzamento del tempo.',
       progressBarLocationDots: 'Sotto i punti / contatore',
       progressBarLocationNavbar: 'In alto (sotto l\'intestazione)',
+      progressBarLocationIndicator: 'Nel punto attivo / contatore',
       forceSlideCounterLabel: 'Forza contatore diapositive',
       forceSlideCounterDesc: 'Forza il contatore numerico delle diapositive al posto dei punti di paginazione.',
       activePlaylistLabel: 'Playlist attiva',
@@ -5159,7 +5164,10 @@
       if (window.matchMedia("(max-width: 767px) and (orientation: portrait)").matches) {
         const availableWidth = window.innerWidth * 0.9;
         const dotWidth = 18; // approximate width per dot
-        const fittingDots = Math.floor(availableWidth / dotWidth) - 1;
+        // reserve extra room when the active dot is stretched to hold the progress bar
+        const showProgress = MediaBarEnhancedSettingsManager.getSetting('showProgressBar', CONFIG.showProgressBar);
+        const progressInIndicator = showProgress && MediaBarEnhancedSettingsManager.getSetting('progressBarLocation', CONFIG.progressBarLocation) === 'Indicator';
+        const fittingDots = Math.floor(availableWidth / dotWidth) - (progressInIndicator ? 3 : 1);
         effectiveMaxDots = Math.min(effectiveMaxDots, fittingDots);
       }
 
@@ -5174,6 +5182,10 @@
         const counter = document.createElement("span");
         counter.className = "slide-counter";
         counter.id = "slide-counter";
+        // Separate text node wrapper so a progress bar can live inside the counter
+        const counterText = document.createElement("span");
+        counterText.className = "slide-counter-text";
+        counter.appendChild(counterText);
         dotsContainer.appendChild(counter);
       } else {
         document.body.classList.remove("media-bar-has-counter");
@@ -5203,7 +5215,8 @@
       // Handle Large List Counter
       const counter = document.getElementById("slide-counter");
       if (counter) {
-        counter.textContent = `${currentIndex + 1} / ${totalItems}`;
+        const counterText = counter.querySelector(".slide-counter-text") || counter;
+        counterText.textContent = `${currentIndex + 1} / ${totalItems}`;
         return;
       }
 
@@ -5663,6 +5676,9 @@
 
       const locationSetting = MediaBarEnhancedSettingsManager.getSetting('progressBarLocation', CONFIG.progressBarLocation) || 'Dots';
       const dotsContainer = document.querySelector('.dots-container');
+      if (dotsContainer) {
+        dotsContainer.classList.toggle('progress-in-indicator', locationSetting === 'Indicator');
+      }
 
       let parentContainer;
       let positionClass;
@@ -5670,6 +5686,20 @@
       if (locationSetting === 'Navbar') {
         parentContainer = document.getElementById('slides-container');
         positionClass = 'progress-bar-navbar';
+      } else if (locationSetting === 'Indicator') {
+        // Render the progress inside the slide counter, or inside the (stretched) active dot
+        const counter = document.getElementById('slide-counter');
+        const activeDot = dotsContainer ? dotsContainer.querySelector('.dot.active') : null;
+        if (counter) {
+          parentContainer = counter;
+          positionClass = 'progress-bar-counter';
+        } else if (activeDot) {
+          parentContainer = activeDot;
+          positionClass = 'progress-bar-active-dot';
+        } else {
+          parentContainer = document.getElementById('slides-container');
+          positionClass = 'progress-bar-bottom';
+        }
       } else { // 'Dots'
         if (dotsContainer) {
           parentContainer = dotsContainer;
@@ -8180,6 +8210,7 @@
         <select id="mb-setting-progressBarLocation" class="media-bar-select" tabindex="0">
             <option value="Dots" ${this.getSetting('progressBarLocation', CONFIG.progressBarLocation) === 'Dots' ? 'selected' : ''}>${t.progressBarLocationDots || 'Under Dots/Counter'}</option>
             <option value="Navbar" ${this.getSetting('progressBarLocation', CONFIG.progressBarLocation) === 'Navbar' ? 'selected' : ''}>${t.progressBarLocationNavbar || 'Top (Under Header)'}</option>
+            <option value="Indicator" ${this.getSetting('progressBarLocation', CONFIG.progressBarLocation) === 'Indicator' ? 'selected' : ''}>${t.progressBarLocationIndicator || 'Inside Active Dot / Counter'}</option>
         </select>
     </div>
 
