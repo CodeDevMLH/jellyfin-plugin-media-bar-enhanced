@@ -3186,3 +3186,26 @@ body:has(.videoPlayerContainer-onTop) .media-bar-settings-button {
 .media-bar-progress-bar.paused .media-bar-progress-fill {
   animation-play-state: paused !important;
 }
+
+/* Remove Bottom Gradient: drop the bottom-edge fade so custom themes/skins can style the area below the media bar */
+body.media-bar-no-bottom-gradient .backdrop-container,
+body.media-bar-no-bottom-gradient .backdrop-overlay,
+body.media-bar-no-bottom-gradient .gradient-overlay {
+  mask-image: none !important;
+  -webkit-mask-image: none !important;
+}
+
+@media (min-width: 768px) {
+
+  /* Keep the split-screen trailer's left-side fade, only remove its bottom fade */
+  body.media-bar-no-bottom-gradient #slides-container.split-screen-trailer .video-backdrop {
+    mask-image: linear-gradient(to right, transparent 0%, transparent 12%, black 48%, black 100%) !important;
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, transparent 12%, black 48%, black 100%) !important;
+  }
+
+  body.media-bar-no-bottom-gradient #slides-container.split-screen-trailer .video-backdrop:hover,
+  body.media-bar-no-bottom-gradient #slides-container.split-screen-trailer .slide.video-hovered .video-backdrop {
+    mask-image: linear-gradient(to right, transparent 0%, transparent 2%, black 10%, black 100%) !important;
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, transparent 2%, black 10%, black 100%) !important;
+  }
+}

@@ -201,6 +201,7 @@ Configure the plugin via **Dashboard** > **Plugins** > **Media Bar Enhanced**.
 *   **Split-Screen Trailer View**: Plays backdrop trailers in a split-screen layout on the right with a smooth fade into the center, keeping fanart and metadata card visible on the left (paradox27 style).
 *   **Pause Slideshow On Hover**: Pauses slide rotation timer and progress bar while hovering over the Media Bar with the mouse.
 *   **Sync Page Backdrop**: Mirrors the active slide background image into Jellyfin's page background.
+*   **Remove Bottom Gradient**: Removes the fade-out at the bottom edge of the media bar, so custom themes and skins (e.g. ElegantFin) can style the area below it cleanly.
 *   **Wait For Trailer To End**: Prevents slide transition until the video finishes.
 *   **Enable Trailer on Mobile**: Specific setting to allow video playback on mobile devices (disabled by default to save data/battery).
 *   **Show Trailer Button**: Adds a button to open the trailer in a popup modal if video backdrops are disabled (e.g. on mobile if trailers are disabled there).

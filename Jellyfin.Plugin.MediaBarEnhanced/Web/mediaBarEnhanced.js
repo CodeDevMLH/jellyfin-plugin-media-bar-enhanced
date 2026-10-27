@@ -121,6 +121,7 @@
     onlyLocalTrailers: false,
     yoYoProgressBar: true,
     syncPageBackdrop: false,
+    removeBottomGradient: false,
     useRecommendations: false,
     requireLogo: false,
   };
@@ -192,6 +193,8 @@
       yoYoProgressBarDesc: 'Empty progress bar from left to right on alternating slides instead of resetting.',
       syncPageBackdropLabel: 'Sync Page Backdrop',
       syncPageBackdropDesc: 'Mirrors the featured slide background image into Jellyfin\'s page background.',
+      removeBottomGradientLabel: 'Remove Bottom Gradient',
+      removeBottomGradientDesc: 'Remove the fade-out at the bottom edge of the media bar (useful with custom themes and skins).',
       useRecommendationsLabel: 'Personalized Recommendations',
       useRecommendationsDesc: 'Show recommendations based on your watch history.',
       requireLogoLabel: 'Require Title Logo',
@@ -274,6 +277,8 @@
       yoYoProgressBarDesc: 'Ladebalken bei abwechselnden Folien von links nach rechts leeren anstatt zurückzuspringen.',
       syncPageBackdropLabel: 'Seiten-Hintergrund synchronisieren',
       syncPageBackdropDesc: 'Spiegelt das Hintergrundbild der aktuellen Folie in den Seiten-Hintergrund von Jellyfin.',
+      removeBottomGradientLabel: 'Unteren Farbverlauf entfernen',
+      removeBottomGradientDesc: 'Entfernt die Ausblendung am unteren Rand der Media Bar (nützlich für eigene Themes und Skins).',
       useRecommendationsLabel: 'Personalisierte Empfehlungen',
       useRecommendationsDesc: 'Zeigt Vorschläge basierend auf deinem bisherigen Sehverlauf.',
       requireLogoLabel: 'Titel-Logo erforderlich',
@@ -356,6 +361,8 @@
       yoYoProgressBarDesc: 'Vaciar la barra de progreso de izquierda a derecha en diapositivas alternas en lugar de reiniciar.',
       syncPageBackdropLabel: 'Sincronizar fondo de página',
       syncPageBackdropDesc: 'Refleja la imagen de fondo de la diapositiva en el fondo de página de Jellyfin.',
+      removeBottomGradientLabel: 'Quitar degradado inferior',
+      removeBottomGradientDesc: 'Elimina el desvanecimiento del borde inferior de la barra multimedia (útil con temas y skins personalizados).',
       useRecommendationsLabel: 'Recomendaciones personalizadas',
       useRecommendationsDesc: 'Muestra recomendaciones basadas en tu historial de reproducción.',
       requireLogoLabel: 'Requerir logo de título',
@@ -438,6 +445,8 @@
       yoYoProgressBarDesc: 'Vider la barre de progression de gauche à droite sur les diapositives alternées au lieu de réinitialiser.',
       syncPageBackdropLabel: 'Synchroniser l\'arrière-plan de la page',
       syncPageBackdropDesc: 'Répète l\'image d\'arrière-plan de la diapositive active dans l\'arrière-plan de la page Jellyfin.',
+      removeBottomGradientLabel: 'Supprimer le dégradé inférieur',
+      removeBottomGradientDesc: 'Supprime le fondu en bas de la barre multimédia (utile avec des thèmes et skins personnalisés).',
       useRecommendationsLabel: 'Recommandations personnalisées',
       useRecommendationsDesc: 'Afficher des recommandations basées sur votre historique de visionnage.',
       requireLogoLabel: 'Exiger le logo du titre',
@@ -520,6 +529,8 @@
       yoYoProgressBarDesc: 'Svuota la barra di avanzamento da sinistra a destra nelle diapositive alternate invece di ripristinare.',
       syncPageBackdropLabel: 'Sincronizza sfondo pagina',
       syncPageBackdropDesc: 'Riflette l\'immagine di sfondo della diapositiva corrente nello sfondo della pagina di Jellyfin.',
+      removeBottomGradientLabel: 'Rimuovi sfumatura inferiore',
+      removeBottomGradientDesc: 'Rimuove la dissolvenza sul bordo inferiore della media bar (utile con temi e skin personalizzati).',
       useRecommendationsLabel: 'Raccomandazioni personalizzate',
       useRecommendationsDesc: 'Mostra suggerimenti basati sulla tua cronologia di visione.',
       requireLogoLabel: 'Richiedi logo del titolo',
@@ -7986,6 +7997,7 @@
       ];
       const layoutSettings = [
         { key: 'syncPageBackdrop', label: t.syncPageBackdropLabel || 'Sync Page Backdrop', description: t.syncPageBackdropDesc || 'Mirrors the featured slide background image into Jellyfin\'s page background.', default: CONFIG.syncPageBackdrop },
+        { key: 'removeBottomGradient', label: t.removeBottomGradientLabel || 'Remove Bottom Gradient', description: t.removeBottomGradientDesc || 'Remove the fade-out at the bottom edge of the media bar (useful with custom themes and skins).', default: CONFIG.removeBottomGradient },
       ];
 
       let html = `
@@ -8190,6 +8202,17 @@
         </div>
         <label class="media-bar-switch" tabindex="0">
             <input id="mb-setting-syncPageBackdrop" type="checkbox" ${this.getSetting('syncPageBackdrop', CONFIG.syncPageBackdrop) ? 'checked' : ''} />
+            <span class="media-bar-slider"></span>
+        </label>
+    </div>
+
+    <div class="media-bar-toggle-container" style="margin-top: 0.5em;">
+        <div class="media-bar-toggle-info">
+            <span class="media-bar-toggle-label">${t.removeBottomGradientLabel || 'Remove Bottom Gradient'}</span>
+            <span class="media-bar-toggle-desc">${t.removeBottomGradientDesc || 'Remove the fade-out at the bottom edge of the media bar (useful with custom themes and skins).'}</span>
+        </div>
+        <label class="media-bar-switch" tabindex="0">
+            <input id="mb-setting-removeBottomGradient" type="checkbox" ${this.getSetting('removeBottomGradient', CONFIG.removeBottomGradient) ? 'checked' : ''} />
             <span class="media-bar-slider"></span>
         </label>
     </div>
@@ -9092,6 +9115,9 @@
     } else if (mobileMode === '4:3') {
       document.body.classList.add('media-bar-mobile-4-3');
     }
+
+    const removeBottomGradient = MediaBarEnhancedSettingsManager.getSetting('removeBottomGradient', CONFIG.removeBottomGradient);
+    document.body.classList.toggle('media-bar-no-bottom-gradient', !!removeBottomGradient);
 
     const renderCustomOverlay = () => {
       let activeOverlayText = CONFIG.customOverlayText;

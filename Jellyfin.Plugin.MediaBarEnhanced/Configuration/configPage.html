@@ -542,6 +542,15 @@
                                         <div class="fieldDescription">Mirrors the featured slide background image into
                                             Jellyfin's page background.</div>
                                     </div>
+                                    <div class="checkboxContainer checkboxContainer-withDescription">
+                                        <label>
+                                            <input is="emby-checkbox" type="checkbox" id="RemoveBottomGradient"
+                                                name="RemoveBottomGradient" />
+                                            <span>Remove Bottom Gradient</span>
+                                        </label>
+                                        <div class="fieldDescription">Removes the fade-out at the bottom edge of the
+                                            media bar. Useful with custom themes and skins (e.g. ElegantFin).</div>
+                                    </div>
                                 </div>
 
                                 <div class="selectContainer" id="ProgressBarLocationContainer"
@@ -1483,7 +1492,8 @@
                             'BackdropVideoDelay', 'TrailerStartOffset', 'TrailerEndOffset', 'ConstrainPlotWidth', 'MobileCompactMode',
                             'DefaultTrailerVolume', 'HoverAudioFadeMs', 'ClientMenuLocation', 'ClientMenuLocationMobile',
                             'CustomPlaylists', 'TransitionEffect', 'ShowProgressBar', 'ProgressBarLocation', 'ExcludedLibraries',
-                            'TrailerEnabledLibraries', 'YoYoProgressBar', 'SyncPageBackdrop', 'UseRecommendations', 'RequireLogo'
+                            'TrailerEnabledLibraries', 'YoYoProgressBar', 'SyncPageBackdrop', 'UseRecommendations', 'RequireLogo',
+                            'RemoveBottomGradient'
                         ];
 
                         // Manual mapping for MediaBarIsEnabled -> IsEnabled, to avoid conflicts with other plugins
@@ -1898,7 +1908,8 @@
                         'BackdropVideoDelay', 'TrailerStartOffset', 'TrailerEndOffset', 'ConstrainPlotWidth', 'MobileCompactMode',
                         'DefaultTrailerVolume', 'HoverAudioFadeMs', 'ClientMenuLocation', 'ClientMenuLocationMobile',
                         'CustomPlaylists', 'TransitionEffect', 'ShowProgressBar', 'ProgressBarLocation', 'ExcludedLibraries',
-                        'TrailerEnabledLibraries', 'YoYoProgressBar', 'SyncPageBackdrop', 'UseRecommendations', 'RequireLogo'
+                        'TrailerEnabledLibraries', 'YoYoProgressBar', 'SyncPageBackdrop', 'UseRecommendations', 'RequireLogo',
+                        'RemoveBottomGradient'
                     ];
 
                     var numberDefaults = {
