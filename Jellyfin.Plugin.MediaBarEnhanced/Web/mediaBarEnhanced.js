@@ -30,7 +30,7 @@
   window.mediaBarEnhancedLoaded = true;
 
   // MARK: Version
-  const PLUGIN_VERSION = "3.11.1.0";
+  const PLUGIN_VERSION = "3.12.0.0";
 
   //Core Module Configuration
   const CONFIG = {
@@ -121,6 +121,8 @@
     onlyLocalTrailers: false,
     yoYoProgressBar: true,
     syncPageBackdrop: false,
+    randomizeBackdrops: false,
+    pauseOnExternalPlayback: false,
     useRecommendations: false,
     requireLogo: false,
     enableBottomGradient: true,
@@ -201,6 +203,8 @@
       yoYoProgressBarDesc: 'Empty progress bar from left to right on alternating slides instead of resetting.',
       syncPageBackdropLabel: 'Sync Page Backdrop',
       syncPageBackdropDesc: 'Mirrors the featured slide background image into Jellyfin\'s page background.',
+      randomizeBackdropsLabel: 'Randomize Background Image',
+      randomizeBackdropsDesc: 'Selects a random backdrop image instead of always the first one when multiple are available.',
       enableBottomGradientLabel: 'Enable Bottom Gradient',
       enableBottomGradientDesc: 'Smoothly fade the bottom edge of the media bar into Jellyfin\'s content (turn off for custom themes/skins).',
       useRecommendationsLabel: 'Personalized Recommendations',
@@ -211,6 +215,8 @@
       splitScreenTrailerDesc: 'Display trailer video on the right half with a smooth gradient fade, while keeping movie artwork and details on the left.',
       pauseOnHoverLabel: 'Pause Slideshow on Hover',
       pauseOnHoverDesc: 'Pause slide transitions and timer while hovering over the Media Bar (Note: active trailers already pause transitions if "Wait for trailer to end" is enabled).',
+      pauseOnExternalPlaybackLabel: 'Pause on External Playback',
+      pauseOnExternalPlaybackDesc: 'Pause slideshow and trailers when casting or playing media externally (e.g. MPV Shim, Chromecast).',
       toastMuted: 'Muted',
       toastUnmuted: 'Audio On',
       toastPaused: 'Slideshow Paused',
@@ -296,6 +302,8 @@
       yoYoProgressBarDesc: 'Ladebalken bei abwechselnden Folien von links nach rechts leeren anstatt zurückzuspringen.',
       syncPageBackdropLabel: 'Seiten-Hintergrund synchronisieren',
       syncPageBackdropDesc: 'Spiegelt das Hintergrundbild der aktuellen Folie in den Seiten-Hintergrund von Jellyfin.',
+      randomizeBackdropsLabel: 'Zufälliges Hintergrundbild',
+      randomizeBackdropsDesc: 'Wählt ein zufälliges Hintergrundbild aus, falls mehrere vorhanden sind, anstatt immer das erste anzuzeigen.',
       enableBottomGradientLabel: 'Unteren Farbverlauf aktivieren',
       enableBottomGradientDesc: 'Blendet den unteren Rand der Media Bar weich in den Seiteninhalt aus (für eigene Themes/Skins deaktivierbar).',
       useRecommendationsLabel: 'Personalisierte Empfehlungen',
@@ -306,6 +314,8 @@
       splitScreenTrailerDesc: 'Trailer-Video auf der rechten Seite mit weichem Verlauf anzeigen, während Poster und Filminfos links bleiben.',
       pauseOnHoverLabel: 'Pause bei Maus-Hover',
       pauseOnHoverDesc: 'Slideshow-Wechsel und Timer pausieren, während sich der Mauszeiger über der Media Bar befindet (Hinweis: Bei aktivem "Auf Trailer-Ende warten" wartet die Slideshow ohnehin auf laufende Videos).',
+      pauseOnExternalPlaybackLabel: 'Bei externer Wiedergabe pausieren',
+      pauseOnExternalPlaybackDesc: 'Slideshow und Trailer pausieren, wenn Medien extern wiedergegeben werden (z. B. MPV Shim, Cast).',
       toastMuted: 'Stumm geschaltet',
       toastUnmuted: 'Ton aktiviert',
       toastPaused: 'Diashow pausiert',
@@ -391,6 +401,8 @@
       yoYoProgressBarDesc: 'Vaciar la barra de progreso de izquierda a derecha en diapositivas alternas en lugar de reiniciar.',
       syncPageBackdropLabel: 'Sincronizar fondo de página',
       syncPageBackdropDesc: 'Refleja la imagen de fondo de la diapositiva en el fondo de página de Jellyfin.',
+      randomizeBackdropsLabel: 'Imagen de fondo aleatoria',
+      randomizeBackdropsDesc: 'Selecciona una imagen de fondo aleatoria en lugar de siempre la primera cuando hay varias disponibles.',
       enableBottomGradientLabel: 'Activar degradado inferior',
       enableBottomGradientDesc: 'Desvanece suavemente el borde inferior de la barra multimedia (desactivar para temas o skins personalizados).',
       useRecommendationsLabel: 'Recomendaciones personalizadas',
@@ -401,6 +413,8 @@
       splitScreenTrailerDesc: 'Muestra el tráiler en la mitad derecha con un fundido suave, manteniendo el póster y los detalles a la izquierda.',
       pauseOnHoverLabel: 'Pausar al pasar el ratón',
       pauseOnHoverDesc: 'Pausa las transiciones y el temporizador mientras el cursor está sobre la barra de medios (Nota: si "Esperar a que termine el tráiler" está activado, la presentación ya espera al vídeo en reproducción).',
+      pauseOnExternalPlaybackLabel: 'Pausar en reproducción externa',
+      pauseOnExternalPlaybackDesc: 'Pausa la presentación y los tráilers al transmitir contenido a un reproductor externo (p. ej. MPV Shim, Chromecast).',
       toastMuted: 'Silenciado',
       toastUnmuted: 'Sonido activado',
       toastPaused: 'Diapositivas en pausa',
@@ -486,6 +500,8 @@
       yoYoProgressBarDesc: 'Vider la barre de progression de gauche à droite sur les diapositives alternées au lieu de réinitialiser.',
       syncPageBackdropLabel: 'Synchroniser l\'arrière-plan de la page',
       syncPageBackdropDesc: 'Répète l\'image d\'arrière-plan de la diapositive active dans l\'arrière-plan de la page Jellyfin.',
+      randomizeBackdropsLabel: 'Arrière-plan aléatoire',
+      randomizeBackdropsDesc: 'Sélectionne un arrière-plan aléatoire au lieu de toujours le premier lorsque plusieurs sont disponibles.',
       enableBottomGradientLabel: 'Activer le dégradé inférieur',
       enableBottomGradientDesc: 'Estompe doucement le bord inférieur de la barre multimédia (désactiver pour les thèmes personnalisés).',
       useRecommendationsLabel: 'Recommandations personnalisées',
@@ -496,6 +512,8 @@
       splitScreenTrailerDesc: 'Affiche la bande-annonce sur la moitié droite avec un fondu doux, en gardant l\'affiche et les infos à gauche.',
       pauseOnHoverLabel: 'Pause au survol de la souris',
       pauseOnHoverDesc: 'Suspend les transitions et le minuteur lorsque la souris survole la barre multimédia (Remarque : si "Attendre la fin de la bande-annonce" est activé, le diaporama attend déjà la fin de la vidéo).',
+      pauseOnExternalPlaybackLabel: 'Pause lors de lecture externe',
+      pauseOnExternalPlaybackDesc: 'Suspend le diaporama et les bandes-annonces lors d\'une diffusion vers un lecteur externe (ex. MPV Shim, Chromecast).',
       toastMuted: 'Muet',
       toastUnmuted: 'Son activé',
       toastPaused: 'Diaporama en pause',
@@ -581,6 +599,8 @@
       yoYoProgressBarDesc: 'Svuota la barra di avanzamento da sinistra a destra nelle diapositive alternate invece di ripristinare.',
       syncPageBackdropLabel: 'Sincronizza sfondo pagina',
       syncPageBackdropDesc: 'Riflette l\'immagine di sfondo della diapositiva corrente nello sfondo della pagina di Jellyfin.',
+      randomizeBackdropsLabel: 'Sfondo casuale',
+      randomizeBackdropsDesc: 'Seleziona un\'immagine di sfondo casuale anziché sempre la prima quando ce ne sono diverse disponibili.',
       enableBottomGradientLabel: 'Attiva sfumatura inferiore',
       enableBottomGradientDesc: 'Sfuma delicatamente il bordo inferiore della barra multimediale (disattivare per skin personalizzate).',
       useRecommendationsLabel: 'Raccomandazioni personalizzate',
@@ -591,6 +611,8 @@
       splitScreenTrailerDesc: 'Mostra il video del trailer sulla metà destra con sfumatura morbida, mantenendo la locandina e i dettagli a sinistra.',
       pauseOnHoverLabel: 'Metti in pausa al passaggio del mouse',
       pauseOnHoverDesc: 'Mette in pausa le transizioni e il timer mentre il cursore è sopra la barra multimediale (Nota: se "Attendi fine trailer" è attivo, la presentazione attende già la fine del video).',
+      pauseOnExternalPlaybackLabel: 'Pausa durante riproduzione esterna',
+      pauseOnExternalPlaybackDesc: 'Mette in pausa la presentazione e i trailer durante la trasmissione su un lettore esterno (es. MPV Shim, Chromecast).',
       toastMuted: 'Disattivato',
       toastUnmuted: 'Audio attivato',
       toastPaused: 'Presentazione in pausa',
@@ -2010,7 +2032,7 @@
 
         const response = await fetch(
           // `${STATE.jellyfinData.serverAddress}/Items/${itemId}`,
-          `${STATE.jellyfinData.serverAddress}/Items/${itemId}?Fields=Overview,RemoteTrailers,Genres,CommunityRating,CriticRating,OfficialRating,PremiereDate,ProductionYear,MediaSources,RunTimeTicks,LocalTrailerCount,ChildCount,RecursiveItemCount`,
+          `${STATE.jellyfinData.serverAddress}/Items/${itemId}?Fields=Overview,RemoteTrailers,Genres,CommunityRating,CriticRating,OfficialRating,PremiereDate,ProductionYear,MediaSources,RunTimeTicks,LocalTrailerCount,ChildCount,RecursiveItemCount,BackdropImageTags,ParentBackdropImageTags`,
           {
             headers: this.getAuthHeaders(),
           }
@@ -2051,6 +2073,10 @@
               if (!itemData.ParentLogoImageTag && parentSeries.ImageTags && parentSeries.ImageTags.Logo) {
                 itemData.ParentLogoImageTag = parentSeries.ImageTags.Logo;
                 itemData.ParentLogoItemId = parentSeries.Id;
+              }
+              if ((!itemData.ParentBackdropImageTags || itemData.ParentBackdropImageTags.length === 0) && parentSeries.BackdropImageTags) {
+                itemData.ParentBackdropImageTags = parentSeries.BackdropImageTags;
+                itemData.ParentBackdropItemId = parentSeries.Id;
               }
             }
           } catch (e) {
@@ -3731,7 +3757,42 @@
    */
   const VisibilityObserver = {
     wasVisible: false,
+    wasRemotePlaying: false,
     _historyWrapped: false,
+    checkRemotePlaybackActive() {
+      // 1. Check Jellyfin's PlaybackManager if accessible
+      try {
+        if (window.playbackManager && typeof window.playbackManager.isPlaying === 'function') {
+          if (window.playbackManager.isPlaying()) {
+            const isLocal = typeof window.playbackManager.isPlayingLocally === 'function' ? window.playbackManager.isPlayingLocally() : false;
+            if (!isLocal) return true;
+          }
+        }
+      } catch (e) { }
+
+      // 2. Check persistent nowPlayingBar (present when casting / remote playing e.g. MPV Shim, or playing audio)
+      const nowPlayingBar = document.querySelector('.nowPlayingBar:not(.hide), .nowPlayingBarContainer:not(.hide)');
+      if (nowPlayingBar) {
+        const playPauseBtn = nowPlayingBar.querySelector('.btnPlayPause, [data-action="pause"], [data-action="playPause"]');
+        if (playPauseBtn) {
+          const text = (playPauseBtn.textContent || '').trim().toLowerCase();
+          const html = (playPauseBtn.innerHTML || '').toLowerCase();
+          const action = (playPauseBtn.getAttribute('data-action') || '').toLowerCase();
+          if (text === 'pause' || html.includes('pause') || action === 'pause') {
+            return true;
+          }
+        } else {
+          return true;
+        }
+      }
+
+      // 3. Remote Control page / OSD
+      if (document.querySelector('.remoteControlView:not(.hide), .remoteControlContainer:not(.hide), #remoteControlPage:not(.hide)')) {
+        return true;
+      }
+
+      return false;
+    },
     updateVisibility() {
       const videoPlayer = document.querySelector('.videoPlayerContainer');
       const trailerPlayer = document.querySelector('.youtubePlayerContainer');
@@ -3785,6 +3846,9 @@
         document.body.appendChild(container);
       }
 
+      const pauseOnExternal = MediaBarEnhancedSettingsManager.getSetting('pauseOnExternalPlayback', CONFIG.pauseOnExternalPlayback);
+      const isRemotePlaying = pauseOnExternal && this.checkRemotePlaybackActive();
+
       if (isVisible && !this.wasVisible) {
         if (isTvMode()) {
           const isReturningFromDetails = STATE.slideshow.wasOnDetailsPage;
@@ -3805,13 +3869,38 @@
 
         STATE.slideshow.isTransitioning = false;
 
-        if (STATE.slideshow.hasInitialized && STATE.slideshow.itemIds.length > 0) {
-          SlideshowManager.updateCurrentSlide(STATE.slideshow.currentSlideIndex);
-        } else if (STATE.slideshow.slideInterval && !STATE.slideshow.isPaused) {
-          SlideshowManager.resumeActivePlayback();
+        this.wasRemotePlaying = isRemotePlaying;
+        if (isRemotePlaying) {
+          if (STATE.slideshow.slideInterval) {
+            STATE.slideshow.slideInterval.stop();
+          }
+          SlideshowManager.stopAllPlayback();
+        } else {
+          if (STATE.slideshow.hasInitialized && STATE.slideshow.itemIds.length > 0) {
+            SlideshowManager.updateCurrentSlide(STATE.slideshow.currentSlideIndex);
+          } else if (STATE.slideshow.slideInterval && !STATE.slideshow.isPaused) {
+            SlideshowManager.resumeActivePlayback();
+          }
+          if (STATE.slideshow.slideInterval && !STATE.slideshow.isPaused) {
+            STATE.slideshow.slideInterval.start();
+          }
         }
-        if (STATE.slideshow.slideInterval && !STATE.slideshow.isPaused) {
-          STATE.slideshow.slideInterval.start();
+      } else if (isVisible && this.wasVisible) {
+        // Page was already visible; pause slideshow and trailers when casting starts, resume when cast stops
+        if (isRemotePlaying && !this.wasRemotePlaying) {
+          this.wasRemotePlaying = true;
+          if (STATE.slideshow.slideInterval) {
+            STATE.slideshow.slideInterval.stop();
+          }
+          SlideshowManager.stopAllPlayback();
+        } else if (!isRemotePlaying && this.wasRemotePlaying) {
+          this.wasRemotePlaying = false;
+          if (!STATE.slideshow.isPaused) {
+            if (STATE.slideshow.slideInterval) {
+              STATE.slideshow.slideInterval.start();
+            }
+            SlideshowManager.resumeActivePlayback();
+          }
         }
       } else if (!isVisible) {
         if (this.wasVisible) {
@@ -3889,6 +3978,17 @@
         window.addEventListener(evt, () => this.updateVisibility());
       });
 
+      // Listen to PlaybackManager events if exposed
+      try {
+        if (window.Events && window.playbackManager) {
+          ['playbackstart', 'playbackstop', 'playstatechange', 'statechange'].forEach((evt) => {
+            window.Events.on(window.playbackManager, evt, () => {
+              try { VisibilityObserver.updateVisibility(); } catch (e) { }
+            });
+          });
+        }
+      } catch (e) { }
+
       this.updateVisibility();
     },
   };
@@ -3954,10 +4054,11 @@
       const item = STATE.slideshow.loadedItems[itemId];
       if (!item) return;
 
+      const backdropIndex = item._selectedBackdropIndex !== undefined ? item._selectedBackdropIndex : 0;
       const src = SlideCreator.buildImageUrl(
         item,
         "Backdrop",
-        0,
+        backdropIndex,
         STATE.jellyfinData.serverAddress,
         60
       );
@@ -4073,7 +4174,10 @@
 
       // Build base URL path
       let baseUrl;
-      if (index !== undefined) {
+      if (imageType === "Backdrop") {
+        const effectiveIndex = tag ? (index !== undefined ? index : 0) : 0;
+        baseUrl = `${serverAddress}/Items/${itemId}/Images/${imageType}/${effectiveIndex}`;
+      } else if (index !== undefined) {
         baseUrl = `${serverAddress}/Items/${itemId}/Images/${imageType}/${index}`;
       } else {
         baseUrl = `${serverAddress}/Items/${itemId}/Images/${imageType}`;
@@ -4148,6 +4252,21 @@
       // Client Setting Overrides
       const enableVideo = MediaBarEnhancedSettingsManager.getSetting('videoBackdrops', CONFIG.enableVideoBackdrop);
       const showTrailerBtnCheck = MediaBarEnhancedSettingsManager.getSetting('trailerButton', CONFIG.showTrailerButton);
+      const isRandomBackdrop = MediaBarEnhancedSettingsManager.getSetting('randomizeBackdrops', CONFIG.randomizeBackdrops);
+
+      let totalBackdrops = 0;
+      if (item.BackdropImageTags && Array.isArray(item.BackdropImageTags) && item.BackdropImageTags.length > 0) {
+        totalBackdrops = item.BackdropImageTags.length;
+      } else if (item.ParentBackdropImageTags && Array.isArray(item.ParentBackdropImageTags) && item.ParentBackdropImageTags.length > 0) {
+        totalBackdrops = item.ParentBackdropImageTags.length;
+      }
+
+      let backdropIndex = 0;
+      if (isRandomBackdrop && totalBackdrops > 1) {
+        backdropIndex = Math.floor(Math.random() * totalBackdrops);
+      }
+      item._selectedBackdropIndex = backdropIndex;
+      slide.dataset.backdropIndex = backdropIndex;
       const needsTrailerUrl = enableVideo || showTrailerBtnCheck;
 
       // 1. Check for Remote/Local Trailers (skip entirely if neither video backdrops
@@ -4213,7 +4332,7 @@
           ? false
           : (!!item.MediaBarLibraryId && trailerEnabledLibraryIds.includes(item.MediaBarLibraryId));
 
-      const shouldPlayVideo = enableVideo && libraryAllowsTrailer && (!isMobile || enableMobileVideo);
+      const shouldPlayVideo = enableVideo && libraryAllowsTrailer && (!isMobile || enableMobileVideo) && !(MediaBarEnhancedSettingsManager.getSetting('pauseOnExternalPlayback', CONFIG.pauseOnExternalPlayback) && VisibilityObserver.checkRemotePlaybackActive());
 
       if (trailerUrl && shouldPlayVideo) {
         STATE.slideshow.hasTrailer = STATE.slideshow.hasTrailer || {};
@@ -4659,7 +4778,7 @@
       // Always create a static backdrop image (to show while video loads or if no video)
       backdrop = SlideUtils.createElement("img", {
         className: "backdrop high-quality",
-        src: this.buildImageUrl(item, "Backdrop", 0, serverAddress, 60),
+        src: this.buildImageUrl(item, "Backdrop", backdropIndex, serverAddress, 60),
         alt: LocalizationUtils.getLocalizedString('Backdrop', 'Backdrop'),
         loading: "eager",
       });
@@ -6315,7 +6434,7 @@
      * Resumes playback for the active slide if not globally paused
      */
     resumeActivePlayback() {
-      if (STATE.slideshow.isPaused) return;
+      if (STATE.slideshow.isPaused || (MediaBarEnhancedSettingsManager.getSetting('pauseOnExternalPlayback', CONFIG.pauseOnExternalPlayback) && VisibilityObserver.checkRemotePlaybackActive())) return;
 
       const currentItemId = STATE.slideshow.itemIds[STATE.slideshow.currentSlideIndex];
       if (!currentItemId) return;
@@ -8336,6 +8455,7 @@
         { key: 'videoBackdrops', label: t.videoBackdropsLabel, description: t.videoBackdropsDesc, default: CONFIG.enableVideoBackdrop },
         { key: 'splitScreenTrailer', label: t.splitScreenTrailerLabel || 'Split-Screen Trailer View', description: t.splitScreenTrailerDesc || 'Play trailers in split-screen layout on the right with poster/info on the left.', default: CONFIG.enableSplitScreenTrailer },
         { key: 'pauseOnHover', label: t.pauseOnHoverLabel || 'Pause Slideshow On Hover', description: t.pauseOnHoverDesc || 'Pause slide rotation while the mouse cursor is over the media bar.', default: CONFIG.pauseOnHover },
+        { key: 'pauseOnExternalPlayback', label: t.pauseOnExternalPlaybackLabel || 'Pause on External Playback', description: t.pauseOnExternalPlaybackDesc || 'Pause slideshow and trailers when casting or playing media externally (e.g. MPV Shim, Chromecast).', default: CONFIG.pauseOnExternalPlayback },
         { key: 'onlyLocalTrailers', label: t.onlyLocalTrailersLabel || 'Only Play Local Trailers', description: t.onlyLocalTrailersDesc || 'Do not play remote (YouTube) trailers.', default: CONFIG.onlyLocalTrailers },
         { key: 'trailerButton', label: t.trailerButtonLabel, description: t.trailerButtonDesc, default: CONFIG.showTrailerButton },
         { key: 'mobileVideo', label: t.mobileVideoLabel, description: t.mobileVideoDesc, default: CONFIG.enableMobileVideo },
@@ -8344,6 +8464,7 @@
         { key: 'hoverAudioFade', label: t.hoverAudioFadeLabel || 'Hover Audio Fade', description: t.hoverAudioFadeDesc || 'While muted, hover the media bar to fade sound in; leave to fade out.', default: CONFIG.hoverAudioFade },
       ];
       const layoutSettings = [
+        { key: 'randomizeBackdrops', label: t.randomizeBackdropsLabel || 'Randomize Background Image', description: t.randomizeBackdropsDesc || 'Selects a random backdrop image instead of always the first one when multiple are available.', default: CONFIG.randomizeBackdrops },
         { key: 'syncPageBackdrop', label: t.syncPageBackdropLabel || 'Sync Page Backdrop', description: t.syncPageBackdropDesc || 'Mirrors the featured slide background image into Jellyfin\'s page background.', default: CONFIG.syncPageBackdrop },
         { key: 'enableBottomGradient', label: t.enableBottomGradientLabel || 'Enable Bottom Gradient', description: t.enableBottomGradientDesc || 'Smoothly fade the bottom edge of the media bar into Jellyfin\'s content (turn off for custom themes/skins).', default: CONFIG.enableBottomGradient !== false },
       ];
@@ -8550,6 +8671,17 @@
             <option value="ZoomIn" ${transitionEffectVal === 'ZoomIn' ? 'selected' : ''}>${t.optionTransitionZoomIn || 'Zoom In'}</option>
             <option value="ZoomOut" ${transitionEffectVal === 'ZoomOut' ? 'selected' : ''}>${t.optionTransitionZoomOut || 'Zoom Out'}</option>
         </select>
+    </div>
+
+    <div class="media-bar-toggle-container" style="margin-top: 0.5em;">
+        <div class="media-bar-toggle-info">
+            <span class="media-bar-toggle-label">${t.randomizeBackdropsLabel || 'Randomize Background Image'}</span>
+            <span class="media-bar-toggle-desc">${t.randomizeBackdropsDesc || 'Selects a random backdrop image instead of always the first one when multiple are available.'}</span>
+        </div>
+        <label class="media-bar-switch" tabindex="0">
+            <input id="mb-setting-randomizeBackdrops" type="checkbox" ${this.getSetting('randomizeBackdrops', CONFIG.randomizeBackdrops) ? 'checked' : ''} />
+            <span class="media-bar-slider"></span>
+        </label>
     </div>
 
     <div class="media-bar-toggle-container" style="margin-top: 0.5em;">
@@ -8796,6 +8928,11 @@
         if (checkbox) {
           checkbox.addEventListener('change', (e) => {
             this.setSetting(setting.key, e.target.checked);
+            if (setting.key === 'pauseOnExternalPlayback') {
+              if (typeof VisibilityObserver !== 'undefined') {
+                VisibilityObserver.updateVisibility();
+              }
+            }
             if (setting.key === 'splitScreenTrailer') {
               const cont = document.getElementById('slides-container');
               if (cont) cont.classList.toggle('split-screen-trailer', e.target.checked);
