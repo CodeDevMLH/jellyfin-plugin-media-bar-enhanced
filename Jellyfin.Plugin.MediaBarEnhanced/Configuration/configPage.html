@@ -481,6 +481,16 @@
                                     </div>
                                     <div class="checkboxContainer checkboxContainer-withDescription">
                                         <label>
+                                            <input is="emby-checkbox" type="checkbox" id="PauseOnExternalPlayback"
+                                                name="PauseOnExternalPlayback" />
+                                            <span>Pause on External Playback (Cast / MPV Shim)</span>
+                                        </label>
+                                        <div class="fieldDescription">Automatically pause the slideshow and stop trailer
+                                            videos when media is cast to an external player (e.g., Jellyfin MPV Shim,
+                                            Chromecast).</div>
+                                    </div>
+                                    <div class="checkboxContainer checkboxContainer-withDescription">
+                                        <label>
                                             <input is="emby-checkbox" type="checkbox" id="ConstrainPlotWidth"
                                                 name="ConstrainPlotWidth" />
                                             <span>Constrain Plot Width</span>
@@ -536,21 +546,30 @@
                                     </div>
                                     <div class="checkboxContainer checkboxContainer-withDescription">
                                         <label>
-                                            <input is="emby-checkbox" type="checkbox" id="ShowProgressBar"
-                                                name="ShowProgressBar" />
-                                            <span>Show Slide Progress Bar</span>
-                                        </label>
-                                        <div class="fieldDescription">Displays a thin progress bar representing timer
-                                            duration.</div>
-                                    </div>
-                                    <div class="checkboxContainer checkboxContainer-withDescription">
-                                        <label>
                                             <input is="emby-checkbox" type="checkbox" id="SyncPageBackdrop"
                                                 name="SyncPageBackdrop" />
                                             <span>Sync Page Backdrop</span>
                                         </label>
                                         <div class="fieldDescription">Mirrors the featured slide background image into
                                             Jellyfin's page background.</div>
+                                    </div>
+                                    <div class="checkboxContainer checkboxContainer-withDescription">
+                                        <label>
+                                            <input is="emby-checkbox" type="checkbox" id="RandomizeBackdrops"
+                                                name="RandomizeBackdrops" />
+                                            <span>Randomize Background Image</span>
+                                        </label>
+                                        <div class="fieldDescription">Selects a random backdrop image instead of always
+                                            the first one when multiple are available.</div>
+                                    </div>
+                                    <div class="checkboxContainer checkboxContainer-withDescription">
+                                        <label>
+                                            <input is="emby-checkbox" type="checkbox" id="ShowProgressBar"
+                                                name="ShowProgressBar" />
+                                            <span>Show Slide Progress Bar</span>
+                                        </label>
+                                        <div class="fieldDescription">Displays a thin progress bar representing timer
+                                            duration.</div>
                                     </div>
                                 </div>
 
@@ -1490,7 +1509,7 @@
                             'LoadingCheckInterval', 'MaxPlotLength', 'MaxMovies', 'MaxTvShows',
                             'MaxItems', 'PreloadCount', 'FadeTransitionDuration', 'MaxPaginationDots',
                             'SlideAnimationEnabled', 'EnableVideoBackdrop', 'UseSponsorBlock', 'SponsorBlockCategories',
-                            'WaitForTrailerToEnd', 'StartMuted', 'HoverAudioFade', 'FullWidthVideo', 'EnableSplitScreenTrailer', 'PauseOnHover', 'EnableMobileVideo',
+                            'WaitForTrailerToEnd', 'StartMuted', 'HoverAudioFade', 'FullWidthVideo', 'EnableSplitScreenTrailer', 'PauseOnHover', 'PauseOnExternalPlayback', 'EnableMobileVideo',
                             'ShowTrailerButton', 'AlwaysShowArrows', 'EnableKeyboardControls',
                             'EnableCustomMediaIds', 'CustomMediaIds', 'EnableLoadingScreen',
                             'EnableSeasonalContent', 'EnableClientSideSettings', 'SortBy', 'SortOrder',
@@ -1505,7 +1524,7 @@
                             'BackdropVideoDelay', 'TrailerStartOffset', 'TrailerEndOffset', 'ConstrainPlotWidth', 'MobileCompactMode',
                             'DefaultTrailerVolume', 'HoverAudioFadeMs', 'ClientMenuLocation', 'ClientMenuLocationMobile',
                             'CustomPlaylists', 'TransitionEffect', 'ShowProgressBar', 'ProgressBarLocation', 'ExcludedLibraries',
-                            'TrailerEnabledLibraries', 'YoYoProgressBar', 'SyncPageBackdrop', 'UseRecommendations', 'RequireLogo',
+                            'TrailerEnabledLibraries', 'YoYoProgressBar', 'SyncPageBackdrop', 'RandomizeBackdrops', 'UseRecommendations', 'RequireLogo',
                             'EnableBottomGradient', 'DotStyle'
                         ];
 
@@ -1906,7 +1925,7 @@
                         'LoadingCheckInterval', 'MaxPlotLength', 'MaxMovies', 'MaxTvShows',
                         'MaxItems', 'PreloadCount', 'FadeTransitionDuration', 'MaxPaginationDots',
                         'SlideAnimationEnabled', 'EnableVideoBackdrop', 'UseSponsorBlock', 'SponsorBlockCategories',
-                        'WaitForTrailerToEnd', 'StartMuted', 'HoverAudioFade', 'FullWidthVideo', 'EnableSplitScreenTrailer', 'PauseOnHover', 'EnableMobileVideo',
+                        'WaitForTrailerToEnd', 'StartMuted', 'HoverAudioFade', 'FullWidthVideo', 'EnableSplitScreenTrailer', 'PauseOnHover', 'PauseOnExternalPlayback', 'EnableMobileVideo',
                         'ShowTrailerButton', 'AlwaysShowArrows', 'EnableKeyboardControls',
                         'EnableCustomMediaIds', 'CustomMediaIds', 'EnableLoadingScreen',
                         'EnableSeasonalContent', 'EnableClientSideSettings', 'SortBy', 'SortOrder',
@@ -1921,7 +1940,7 @@
                         'BackdropVideoDelay', 'TrailerStartOffset', 'TrailerEndOffset', 'ConstrainPlotWidth', 'MobileCompactMode',
                         'DefaultTrailerVolume', 'HoverAudioFadeMs', 'ClientMenuLocation', 'ClientMenuLocationMobile',
                         'CustomPlaylists', 'TransitionEffect', 'ShowProgressBar', 'ProgressBarLocation', 'ExcludedLibraries',
-                        'TrailerEnabledLibraries', 'YoYoProgressBar', 'SyncPageBackdrop', 'UseRecommendations', 'RequireLogo',
+                        'TrailerEnabledLibraries', 'YoYoProgressBar', 'SyncPageBackdrop', 'RandomizeBackdrops', 'UseRecommendations', 'RequireLogo',
                         'EnableBottomGradient', 'DotStyle'
                     ];
 
