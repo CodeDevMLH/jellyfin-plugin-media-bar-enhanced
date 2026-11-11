@@ -33,6 +33,10 @@ This plugin is a fork and enhancement of the original [Media Bar by MakD](https:
     - [Adjusting Spacing & Positioning with Custom CSS (Custom Themes / Mobile Overlap)](#adjusting-spacing--positioning-with-custom-css-eg-custom-themes--mobile-overlap)
     - [Docker Permission Issues](#docker-permission-issues)
     - [YouTube "Sign in to confirm you're not a bot" message instead of trailers](#youtube-sign-in-to-confirm-youre-not-a-bot-message-instead-of-trailers)
+    - [Known Issues & Platform Limitations](#known-issues--platform-limitations)
+      - [No Sound on YouTube Trailers in Official Mobile Apps (Android and iOS)](#no-sound-on-youtube-trailers-in-official-mobile-apps-android-and-ios)
+      - [Button Text Overflow with Custom CSS Themes (e.g., Abyss Theme)](#button-text-overflow-with-custom-css-themes-eg-abyss-theme)
+      - [Brief YouTube UI Flash](#brief-youtube-ui-flash)
   - [Uninstall](#uninstall)
   - [Credits](#credits)
   - [Contributing](#contributing)
@@ -201,6 +205,7 @@ Configure the plugin via **Dashboard** > **Plugins** > **Media Bar Enhanced**.
 *   **Split-Screen Trailer View**: Plays backdrop trailers in a split-screen layout on the right with a smooth fade into the center, keeping fanart and metadata card visible on the left (paradox27 style).
 *   **Pause Slideshow On Hover**: Pauses slide rotation timer and progress bar while hovering over the Media Bar with the mouse.
 *   **Sync Page Backdrop**: Mirrors the active slide background image into Jellyfin's page background.
+*   **Enable Bottom Gradient**: Smoothly fades the bottom edge of the media bar into Jellyfin's content. Can be disabled for clean compatibility with custom themes and skins (e.g. ElegantFin).
 *   **Wait For Trailer To End**: Prevents slide transition until the video finishes.
 *   **Enable Trailer on Mobile**: Specific setting to allow video playback on mobile devices (disabled by default to save data/battery).
 *   **Show Trailer Button**: Adds a button to open the trailer in a popup modal if video backdrops are disabled (e.g. on mobile if trailers are disabled there).
@@ -271,7 +276,12 @@ Alternatively, check the URL: `.../web/#/details?id=YOUR_ITEM_ID_IS_HERE&...`
 ### Advanced Settings
 *   **Slide Animations**: Enable/disable the "Zoom In" effect.
 *   **Transition Effect**: Choose between `Fade`, `Slide`, or `None` for slide transitions.
-*   **Show Progress Bar**: Display an animated progress bar indicating time remaining on the active slide (`Top`, `Bottom`, or `Disabled`).
+*   **Show Progress Bar**: Display an animated progress bar indicating time remaining on the active slide (`Under Dots / Counter`, `Top`, `Inside Active Dot / Counter`, or `Disabled`).
+    *   **Progress Bar Location**: Choose where the progress bar appears: `Under Dots / Counter`, `Top (Under Header)`, or `Inside Active Dot / Counter` (where the active pagination dot stretches into an elongated pill, or the slide counter fills up).
+    *   **Yo-Yo Progress Bar**: Empties the progress bar from left to right on alternating slides instead of resetting to zero.
+*   **Show Pagination Dots / Counter**: Display navigation dots or numeric slide counter at the bottom of the media bar.
+    *   **Pagination Dot Style**: Choose between `Round (Classic)` dots and `Pill / Capsule` style dots.
+    *   **Always Use Slide Counter**: Force numeric slide counter (`X / Y`) instead of dots.
 *   **Client-Side Settings**: Allow users to customize their own experience by enabling client-side overrides for certain settings.
 *   **Randomize Backdrop Video/Local Trailer**: If multiple videos are available, randomly select one instead of always using the first, if backdrop videos or local trailers are enabled.
 *   **Use SponsorBlock**: Skips non-content segments in YouTube trailers (if the data exists).
@@ -437,6 +447,37 @@ If YouTube trailers stop playing and show a "Sign in" or bot check message (only
 1. This is usually due to loading too many trailers in a short period from the same IP address.
 2. **Solution**: Use local trailers instead, or request a new IP address from your ISP (e.g., via your router reconnect) or wait for the temporary block to expire.
 3. To prevent this, increase the **Shuffle Interval** or use **Backdrop Video Delay** to reduce the frequency of YouTube requests.
+
+### Known Issues & Platform Limitations
+
+#### No Sound on YouTube Trailers in Official Mobile Apps (Android and iOS)
+* **Issue**: When watching YouTube trailers or backdrop videos in official Jellyfin mobile apps with MBE, unmuting the video produces no sound or the player remains muted.
+* **Cause**: 
+  - **Android (`jellyfin-android`)**: Runs within an Android WebView. Modern WebViews enforce strict cross-origin iframe security policies: autoplay with audio is strictly blocked, and touch events on the host web page cannot synthesize trusted interaction events inside cross-origin YouTube `<iframe>` elements to unmute them. In contrast, third-party native clients (such as Moonfin) play trailers via native media engines (ExoPlayer/Media3) instead of WebViews.
+  - **iOS (`jellyfin-ios` / Safari)**: Runs within Apple's WebKit / `WKWebView`. iOS enforces even stricter user activation policies: asynchronous cross-origin `postMessage` calls to unMute YouTube iframes are rejected by WebKit.
+* **Solution / Recommendation**: 
+  - Use **local trailers** or theme videos stored on your Jellyfin server. Because local media is served from the same origin (`<video>` tags), playback and audio control work seamlessly across both mobile and desktop platforms.
+  - Alternatively, tap the **Watch on YouTube** link inside the trailer modal to open the trailer directly in the native YouTube app or an external browser if option to show the button is enabled.
+
+#### Button Text Overflow with Custom CSS Themes (e.g., Abyss Theme)
+* **Issue**: On certain custom CSS themes (such as the Abyss theme), button labels such as "Play" or "Abspielen" may overflow, wrap awkwardly, or clip outside the button borders.
+* **Cause**: Some custom themes apply fixed pixel dimensions (e.g. `width: 40px`, `height: 40px`, or restrictive `overflow` rules) to Jellyfin's standard `.btnPlay` or `.detailButton` classes.
+* **Solution**: Add the following snippet to your **Jellyfin Dashboard -> General -> Custom CSS**:
+```css
+/* Prevent Abyss theme from overriding Media Bar action buttons */
+#slides-container .play-button,
+#slides-container .trailer-button {
+    width: auto !important;
+    height: auto !important;
+    max-width: none !important;
+    overflow: visible !important;
+}
+```
+
+#### Brief YouTube UI Flash
+* **Issue**: When switching slides with YouTube trailer backdrops enabled, YouTube's native title bar and branding overlay briefly flashes on screen before fading out (on some display modes like 4:3, 16:9, it is more noticable as it is not cropped there)
+* **Cause**: This is behavior enforced by YouTube's embed player (`youtube-nocookie.com`). YouTube always renders title and channel branding during video initialization. In the default "Original" portrait mode (65vh height), this top area is hidden by CSS overflow cropping. In compact 16:9 and 4:3 modes, the full video aspect ratio is visible, exposing YouTube's transient branding overlay for the first 1-2 seconds until YouTube's internal timer fades it out.
+* **Solution**: This cannot be altered via CSS or the YouTube IFrame API. If you prefer completely clean transitions without YouTube branding, use **local trailers** or backdrop images.
 
 ## Uninstall
 To cleanly uninstall the plugin and ensure all injected scripts (Direct Injection or File Transformation) are removed from the Jellyfin web interface:
